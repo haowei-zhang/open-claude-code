@@ -322,13 +322,13 @@ graph TD
 
 **MCP (Model Context Protocol)** (`src/services/mcp/`). MCP servers provide additional tools and resources to Claude Code. The client supports stdio and SSE transports, handles name normalization, and integrates with the permission system. MCP tools are discovered at runtime and merged with the built-in tool list.
 
-**Compaction** (`src/services/compact/`). Conversation compaction prevents the context window from growing unbounded. Multiple strategies exist: proactive autocompact (triggered by token thresholds), reactive compact (triggered by prompt-too-long API errors), context collapse (granular archiving of old turns), and snip compact (feature-gated aggressive truncation). Each produces a compact boundary message in the transcript.
+**Compaction** (`src/services/compact/`). Conversation compaction prevents the context window from growing unbounded. Multiple strategies exist: proactive autocompact (triggered by token thresholds) and microcompact (fine-grained removal of compactable tool results) are always available. Additional strategies — reactive compact (triggered by prompt-too-long API errors), context collapse (granular archiving of old turns), and snip compact (aggressive truncation) — are feature-gated (`feature('REACTIVE_COMPACT')`, `feature('CONTEXT_COLLAPSE')`, `feature('HISTORY_SNIP')`) and only exist in the internal (ant) build; they are eliminated from the external build via DCE. Each produces a compact boundary message in the transcript.
 
 **SubAgents** (`src/tools/AgentTool/`). The AgentTool spawns child conversations (subagents) that share the parent's tool set but run in isolated contexts. Subagents can be built-in (DocDoctor, Architect, etc.) or custom (defined in `.claude/agents/`). The teammate system extends this to multi-agent orchestration with shared state.
 
 ### 1.5 The Message Model
 
-Every piece of data that flows through the system is represented as a `Message` object, defined in `src/types/message.ts`. The message types form a discriminated union:
+Every piece of data that flows through the system is represented as a `Message` object. The `Message` type is exported from `src/utils/messages.ts` — note that `src/types/message.ts` does not exist as a source file on disk; it is a generated/virtual module resolved by the Bun bundler, so the type definitions cannot be directly inspected. The message types form a discriminated union:
 
 - **`assistant`**: A message from the Claude API. Contains content blocks (text, tool_use, thinking). Each assistant message corresponds to one API response.
 - **`user`**: A message from the user or a tool result. User messages can contain text, tool_result blocks, or image content. Tool results are encoded as `user` messages with `tool_result` content blocks (following the Anthropic API convention).
@@ -492,13 +492,13 @@ flowchart TD
 The `MACRO.VERSION` identifier is injected at build time by Bun's bundler. It is used in `src/entrypoints/cli.tsx` for the `--version` fast path:
 
 ```typescript
-if (args.length === 1 && (args[0] === '--version' || args[0] === '-v')) {
+if (args.length === 1 && (args[0] === '--version' || args[0] === '-v' || args[0] === '-V')) {
   console.log(`${MACRO.VERSION} (Claude Code)`)
   return
 }
 ```
 
-This fast path has zero imports — no module loading, no config system, no API client. The version string is baked directly into the binary at build time, making `claude --version` respond in milliseconds.
+This fast path has zero imports — no module loading, no config system, no API client. The version string is baked directly into the binary at build time, making `claude --version` (or `claude -V`) respond in milliseconds.
 
 ### 2.3 `process.env.USER_TYPE === 'ant'` — The Runtime Variant Check
 
@@ -600,6 +600,8 @@ The following table summarizes the key feature flags and their ant vs external a
 | `EXPERIMENTAL_SKILL_SEARCH` | Yes | No | Skill discovery via search/prefetch |
 | `OVERFLOW_TEST_TOOL` | Yes | No | Test tool for context overflow scenarios |
 | `TERMINAL_PANEL` | Yes | No | Terminal capture and panel display |
+| `KAIROS_PUSH_NOTIFICATION` | Yes | No | Push notifications for idle task completion |
+| `KAIROS_GITHUB_WEBHOOKS` | Yes | No | GitHub webhook integration for PR subscription |
 
 ### 2.5 The `require()` vs `import()` Distinction for DCE
 
@@ -706,6 +708,8 @@ Not all feature checks are compile-time. The codebase distinguishes between two 
 1. **Compile-time** (via `feature()`): Evaluated at build time, enables DCE. Used for code that should not exist in the external binary at all.
 
 2. **Runtime** (via GrowthBook/Statsig): Evaluated at runtime, allows dynamic feature rollout. Used for code that exists in both builds but is conditionally enabled.
+
+3. **Environment-based** (via `process.env`): The build sets an environment variable to a known value, and the code checks it at runtime. For example, `VerifyPlanExecutionTool` uses `process.env.CLAUDE_CODE_VERIFY_PLAN === 'true'` — the build sets this env var to `'true'` in ant builds and omits it in external builds, so the tool is effectively DCE'd even though the check is technically a runtime comparison. This pattern is used when the feature-gated code needs to be importable (so `require()`-based DCE is not appropriate) but should still be excluded from external builds.
 
 The `cli.tsx` bridge path demonstrates both:
 
@@ -1254,7 +1258,7 @@ The `STATE` object is created once when the module is first imported. It is neve
 
 ### 4.2 The State Type — A Field-by-Field Analysis
 
-The `State` type contains approximately 80 fields. They can be organized into the following categories:
+The `State` type contains approximately 95+ fields. They can be organized into the following categories:
 
 **Directory State**:
 - `originalCwd` — The working directory when Claude Code was launched (symlink-resolved)
@@ -1650,7 +1654,7 @@ The `clearBetaHeaderLatches()` function is called on `/clear` and `/compact` to 
 
 | File | Role |
 |------|------|
-| `src/bootstrap/state.ts` | Global mutable singleton with ~80 fields |
+| `src/bootstrap/state.ts` | Global mutable singleton with ~95+ fields |
 | `src/utils/signal.ts` | Tiny listener-set primitive for event signals |
 | `src/utils/startupProfiler.ts` | Checkpoint-based latency measurement |
 
@@ -1698,9 +1702,9 @@ graph TD
     style A fill:#69db7c,color:#000
 ```
 
-### 5.2 Global Config — `~/.claude.json`
+### 5.2 Global Config
 
-The global config is the user's personal settings file, stored at `~/.claude.json`. It is managed through `getGlobalConfig()` and `saveGlobalConfig()` in `src/utils/config.ts`. The config includes:
+The global config is the user's personal settings file. The path varies by OAuth configuration type: `~/.claude.json` for production OAuth, `~/.claude-staging-oauth.json` for staging, `~/.claude-local-oauth.json` for local dev, and `~/.claude-custom-oauth.json` for FedStart/custom. The base directory can also be overridden by the `CLAUDE_CONFIG_DIR` environment variable. It is managed through `getGlobalConfig()` and `saveGlobalConfig()` in `src/utils/config.ts`. The config includes:
 
 - `apiKey` — Anthropic API key (legacy, superseded by OAuth)
 - `oauthToken` — OAuth access token
@@ -1815,7 +1819,7 @@ The `SettingsJson` type in `src/utils/settings/types.ts` defines the schema for 
 - `env` — Environment variables (`z.record(z.string(), z.coerce.string())`)
 - `hooks` — Lifecycle hooks with `HooksSchema`
 - `mcpServers` — MCP server configurations
-- `defaultMode` — Permission mode (default, plan, auto, bypass)
+- `defaultMode` — Permission mode (default, plan, auto, bypass). This is a field within the `permissions` sub-object (defined by `PermissionsSchema`), not a top-level settings field. Its enum values vary by build variant.
 - `additionalDirectories` — Extra directories in the permission scope
 
 The schema uses `lazySchema()` for recursive or expensive schemas to defer their evaluation until first use.
@@ -2005,21 +2009,27 @@ IMPORTANT: These instructions OVERRIDE any default behavior and you MUST follow 
 When settings are loaded from multiple sources, they must be merged correctly. The merge algorithm uses `lodash-es/mergeWith` with a custom merge customizer:
 
 ```typescript
+function mergeArrays<T>(targetArray: T[], sourceArray: T[]): T[] {
+  return uniq([...targetArray, ...sourceArray])
+}
+
 function settingsMergeCustomizer(
   objValue: unknown,
   srcValue: unknown,
   key: string,
 ): unknown {
-  // Arrays are replaced, not concatenated
-  if (Array.isArray(objValue)) {
-    return srcValue
+  // Arrays are concatenated and deduplicated
+  if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+    return mergeArrays(objValue, srcValue)
   }
   // Default: deep merge
   return undefined
 }
 ```
 
-The key behavior is that **arrays are replaced, not concatenated**. If the user settings have `allowedTools: ['Read', 'Edit']` and the project settings have `allowedTools: ['Bash']`, the merged result is `allowedTools: ['Bash']` (not `['Read', 'Edit', 'Bash']`). This is the correct behavior for permission rules — higher-priority sources should completely override lower-priority sources, not add to them.
+The key behavior is that **arrays are concatenated and deduplicated** via `uniq()`. If the user settings have `allowedTools: ['Read', 'Edit']` and the project settings have `allowedTools: ['Bash']`, the merged result is `allowedTools: ['Read', 'Edit', 'Bash']` (deduplicated). This is the correct behavior for permission rules — settings from all sources are combined, not replaced.
+
+> **Important**: There is a separate, different merge behavior for *writing* settings. The `updateSettingsForSource()` function uses a customizer that **replaces** arrays (`return srcValue` for arrays), because when a user writes settings, they intend to overwrite the existing array, not append to it. The concatenation behavior applies only to the read-time merge across sources.
 
 For objects (like `env` and `mcpServers`), the merge is deep — nested properties are merged recursively. This allows a project's `mcpServers` to add new servers without overriding the user's existing servers.
 
@@ -2071,7 +2081,7 @@ The full list is defined in `managedEnvConstants.ts` and is reviewed carefully f
 
 ## Chapter 6: The REPL Screen — Where User Meets Machine
 
-The REPL component is the beating heart of Claude Code's interactive interface. It is the React component that users stare at for hours — the scrollback of messages, the blinking cursor, the spinner that pulses while the model thinks. At roughly three thousand lines, `REPL.tsx` is the single largest component in the codebase, and for good reason: it orchestrates nearly every user-facing concern, from rendering the conversation transcript to managing background tasks, from handling slash commands to coordinating swarm teammates. Understanding REPL.tsx is understanding how Claude Code feels to use.
+The REPL component is the beating heart of Claude Code's interactive interface. It is the React component that users stare at for hours — the scrollback of messages, the blinking cursor, the spinner that pulses while the model thinks. At 5005 lines, `REPL.tsx` is the single largest component in the codebase, and for good reason: it orchestrates nearly every user-facing concern, from rendering the conversation transcript to managing background tasks, from handling slash commands to coordinating swarm teammates. Understanding REPL.tsx is understanding how Claude Code feels to use.
 
 ### The Component Hierarchy
 
@@ -2522,9 +2532,20 @@ For teammates (swarm workers), additional hooks run after stop hooks:
 
 The `TOKEN_BUDGET` feature introduces a per-turn token budget that limits how many tokens the model can consume. The `checkTokenBudget()` function in `src/query/tokenBudget.ts` evaluates the current spend against the budget:
 
-- If the turn has used less than 90% of the budget, it returns a `continue` decision with a nudge message that tells the model to keep working but wrap up.
-- If the turn has used more than 90% but the model is making progress (each continuation produces significant new tokens), it allows continuation.
-- If the model is producing diminishing returns (less than 500 new tokens per continuation, for 3+ continuations), it stops the turn.
+- If the turn has used less than 90% of the budget AND the model is not producing diminishing returns, it returns a `continue` decision with a nudge message that tells the model to keep working but wrap up.
+- If the turn has used 90% or more of the budget, it **always stops** — there is no continuation path above 90%, regardless of whether the model is making progress.
+- If the model is producing diminishing returns (both the current delta AND the previous delta are under 500 new tokens, for 3+ continuations), it stops the turn. The dual-delta check ensures the model is genuinely slowing down, not just having one smaller continuation in an otherwise productive turn.
+
+The `BudgetTracker` type tracks the state used by `checkTokenBudget()`:
+
+```typescript
+type BudgetTracker = {
+  continuationCount: number
+  lastDeltaTokens: number
+  lastGlobalTurnTokens: number
+  startedAt: number
+}
+```
 
 ```typescript
 type ContinueDecision = {
@@ -2855,7 +2876,7 @@ The `Message` type is imported from `src/types/message.js` and is a discriminate
 
 - **UserMessage**: Represents a user's input, including tool results.
 - **AssistantMessage**: Represents the model's response, including text, tool use blocks, and thinking blocks.
-- **SystemMessage**: Represents system-level information (compact boundaries, local command output, API errors, informational messages). Subtyped via a `subtype` field.
+- **SystemMessage**: Represents system-level information subtyped via a `subtype` field. There are at least 13 subtypes: SystemAgentsKilledMessage, SystemAPIErrorMessage, SystemApiMetricsMessage, SystemAwaySummaryMessage, SystemBridgeStatusMessage, SystemCompactBoundaryMessage, SystemInformationalMessage, SystemLocalCommandMessage, SystemMemorySavedMessage, SystemMicrocompactBoundaryMessage, SystemPermissionRetryMessage, SystemScheduledTaskFireMessage, SystemStopHookSummaryMessage, SystemTurnDurationMessage.
 - **AttachmentMessage**: Represents auxiliary data attached to a turn (hook results, progress updates, queued commands, structured output).
 - **ProgressMessage**: Represents in-progress tool execution updates.
 - **TombstoneMessage**: A control signal that removes a previously rendered message (used during streaming fallback).
@@ -3094,10 +3115,15 @@ Messages are persisted to disk as JSONL (JSON Lines) via the session storage mod
 
 ```typescript
 export type TranscriptMessage = SerializedMessage & {
-  type: string
-  uuid: string
-  timestamp: string
-  // Additional metadata for session management
+  parentUuid: UUID | null
+  logicalParentUuid?: UUID | null
+  isSidechain: boolean
+  gitBranch?: string
+  agentId?: string
+  teamName?: string
+  agentName?: string
+  agentColor?: string
+  promptId?: string
 }
 ```
 
@@ -3105,7 +3131,7 @@ The transcript file lives at a path derived from the session ID and project dire
 
 The `recordTranscript()` function appends messages to the JSONL file. It uses a write queue with 100ms lazy `jsonStringify` to batch writes and reduce I/O overhead. For cowork/desktop mode, `flushSessionStorage()` forces an immediate flush before yielding the result message.
 
-Session restoration reads the JSONL file and deserializes messages via `deserializeMessages()` (in `src/utils/conversationRecovery.ts`). The `getLastSessionLog()` function reads the tail of the file to find the most recent session, and `readTranscriptForLoad()` reads the full file for session resume.
+Session restoration reads the JSONL file and deserializes messages via `deserializeMessages()` (in `src/utils/conversationRecovery.ts`). The `getLastSessionLog()` function reads the tail of the file to find the most recent session, and `readTranscriptForLoad()` (defined in `src/utils/sessionStoragePortable.ts:717`) reads the full file for session resume.
 
 ### The Compact Boundary Message
 
@@ -3115,11 +3141,12 @@ The boundary message carries `compactMetadata` that describes what was compacted
 
 ```typescript
 type CompactMetadata = {
-  compactedMessages: number
-  summaryMessages: number
-  preCompactTokenCount: number
-  postCompactTokenCount: number
-  compactionUsage?: Usage
+  trigger: 'manual' | 'auto'
+  preTokens: number
+  userContext?: string
+  messagesSummarized?: number
+  preservedSegment?: { headUuid: UUID; anchorUuid: UUID; tailUuid: UUID }
+}
   preservedSegment?: {
     headUuid: string
     tailUuid: string
@@ -3235,7 +3262,7 @@ The message model in Claude Code is a rich discriminated union that captures eve
 
 ### The Tool Type: A Complete Contract
 
-Every tool in Claude Code satisfies the `Tool<Input, Output, P>` type defined in `src/Tool.ts`. This is not an abstract class or an interface with optional defaults -- it is a structural type contract with over forty fields, each serving a distinct purpose in the tool lifecycle. The type is parameterized over three generics: `Input` (a Zod object schema), `Output` (the return type of `call()`), and `P` (progress data type for streaming UI updates). The generic parameters ensure that each tool's `call()` method receives correctly typed input and returns correctly typed output, while the progress type enables the streaming executor to type-check progress callbacks.
+Every tool in Claude Code satisfies the `Tool<Input, Output, P>` type defined in `src/Tool.ts`. This is not an abstract class or an interface with optional defaults -- it is a structural type contract with approximately 47 total keys (13 required + 34 optional), each serving a distinct purpose in the tool lifecycle. The Mermaid diagram below lists about 32 fields which represent the commonly-implemented subset. The type is parameterized over three generics: `Input` (a Zod object schema), `Output` (the return type of `call()`), and `P` (progress data type for streaming UI updates). The generic parameters ensure that each tool's `call()` method receives correctly typed input and returns correctly typed output, while the progress type enables the streaming executor to type-check progress callbacks.
 
 The core fields break into five categories:
 
@@ -3329,7 +3356,7 @@ Each default is chosen to be fail-closed in the security-relevant cases:
 - `isDestructive` defaults to `() => false` -- this is not security-relevant for the default because destructive tools must explicitly opt in.
 - `checkPermissions` defaults to allowing the operation and deferring to the general permission system. Individual tools override this when they need tool-specific logic (e.g., FileEditTool checks write permissions for the target path, BashTool invokes the entire 15-stage permission pipeline).
 - `toAutoClassifierInput` defaults to returning `''` (empty string), which skips the auto-mode security classifier. Security-relevant tools like BashTool must override this to surface their commands to the classifier -- BashTool returns the raw command string, GrepTool returns the pattern and path, and GlobTool returns the glob pattern.
-- `userFacingName` defaults to returning the tool's own name. Overridden by tools that want a more descriptive display name (e.g., GrepTool returns "Search", GlobTool returns "Glob").
+- `userFacingName` defaults to returning the tool's own name. Overridden by tools that want a more descriptive display name (e.g., GrepTool returns "Search", GlobTool also returns "Search" — both search tools share the same user-facing name).
 
 The type-level result `BuiltTool<D>` uses conditional mapped types to ensure that if a tool definition provides a required (non-optional) implementation of a defaultable method, that implementation's type wins. If the definition omits it or marks it optional (inherited from `Partial<>`), the default type fills in. This preserves exact arity, optional presence, and literal types exactly as `satisfies Tool` did -- the 60+ tools in the codebase all typecheck with zero errors. The `satisfies ToolDef<InputSchema, OutputSchema>` annotation at the end of each tool definition provides an additional compile-time check that catches missing required fields and type mismatches.
 
@@ -3438,7 +3465,7 @@ FileReadTool is the most frequently used tool in the system and the most complex
 
 **Input schema.** The tool accepts four fields: `file_path` (required, absolute path), `offset` (optional, line number to start reading from, non-negative integer), `limit` (optional, number of lines to read, positive integer), and `pages` (optional, page range for PDF files, maximum `PDF_MAX_PAGES_PER_READ` pages per request). Both `offset` and `limit` use `semanticNumber()` which accepts string representations of numbers in addition to actual numbers, making the API more forgiving when the model sends parameters as strings.
 
-**Output schema.** The output uses a discriminated union on `type` with five variants: `text` (file content with line numbers, start line, total lines), `image` (base64-encoded image data with MIME type, dimensions, and size), `pdf` (base64-encoded PDF document), `pdf_pages` (extracted JPEG images for specific pages), and `notebook` (JSON cells from .ipynb files). The `file_unchanged` variant is used for dedup hits, returning a stub message instead of the full content.
+**Output schema.** The output uses a discriminated union on `type` with six variants: `text` (file content with line numbers, start line, total lines), `image` (base64-encoded image data with MIME type, dimensions, and size), `pdf` (base64-encoded PDF document), `parts` (extracted JPEG images for specific pages), `notebook` (JSON cells from .ipynb files), and `file_unchanged` (stub for dedup hits, returning a stub message instead of the full content).
 
 **Deduplication.** Before any I/O, FileReadTool checks whether the same file/offset/limit has been read before and the file's mtime is unchanged. This optimization targets a specific pattern: the model often re-reads the same file across turns, and the earlier `tool_result` is still in context. Sending the full content again wastes `cache_creation` tokens on every subsequent turn. Analytics from the BigQuery proxy show approximately 18% of Read calls are same-file collisions, accounting for up to 2.64% of fleet cache creation cost.
 
@@ -3710,7 +3737,7 @@ flowchart TD
     AF --> AG[Return ask with merged suggestions + pendingClassifierCheck]
 ```
 
-**Stage 0: AST parse.** The command is parsed via tree-sitter. In shadow mode (`TREE_SITTER_BASH_SHADOW`), the AST result is recorded for telemetry but the legacy path remains authoritative. The shadow mode logs `tengu_tree_sitter_shadow` events tracking availability, too-complex rate, semantic failures, and subcommand divergence from the legacy splitter.
+**Stage 0: AST parse.** The command is parsed via tree-sitter. In shadow mode (`TREE_SITTER_BASH_SHADOW`), the AST result is recorded for telemetry but the legacy path remains authoritative. The shadow mode is a feature flag that runs tree-sitter parsing alongside the legacy path for observational telemetry only — it does not affect permission outcomes. The shadow mode logs `tengu_tree_sitter_shadow` events tracking availability, too-complex rate, semantic failures, and subcommand divergence from the legacy splitter.
 
 **Stage 1: too-complex handling.** If the AST produces `too-complex`, `checkEarlyExitDeny()` checks exact-match deny/ask/allow rules, then prefix/wildcard deny rules. Only if no deny matched does it fall through to `ask` -- never downgrading a deny to an ask. The reason is included in the permission request message so the user understands why the command was flagged.
 
@@ -4038,9 +4065,9 @@ sequenceDiagram
 
 The V2 task system replaces the legacy V1 `TodoWriteTool` with four dedicated tools: TaskCreateTool, TaskGetTool, TaskUpdateTool, and TaskListTool. All four are gated behind `isTodoV2Enabled()` and set `shouldDefer: true` (their schemas are omitted from the initial prompt to save tokens). All four declare `isConcurrencySafe() => true`, allowing multiple task operations in parallel. All four set `renderToolUseMessage() => null` because the task panel in the UI renders the state, not the tool result.
 
-**TaskCreateTool** creates a new task with a subject, description, optional `activeForm` (present-continuous verb shown in the spinner when status is `in_progress` -- e.g., "Running tests"), and optional `metadata` record. After creation, it runs `executeTaskCreatedHooks()` -- async hooks that can block the creation with a `blockingError`. If any hook blocks, the task is immediately deleted via `deleteTask()`. On success, the tool auto-expands the task list in the UI by setting `expandedView: 'tasks'` in the app state. The `metadata` field is a flat `Record<string, unknown>` where keys with `null` values are deleted, enabling partial metadata updates.
+**TaskCreateTool** creates a new task with a subject, description, optional `activeForm` (present-continuous verb shown in the spinner when status is `in_progress` -- e.g., "Running tests"), and optional `metadata` record. After creation, it runs `executeTaskCreatedHooks()` -- async hooks that can block the creation with a `blockingError`. If any hook blocks, the task is immediately deleted via `deleteTask()`. On success, the tool auto-expands the task list in the UI by setting `expandedView: 'tasks'` in the app state. TaskUpdateTool also sets `expandedView: 'tasks'` after successful updates. The `metadata` field is a flat `Record<string, unknown>` where keys with `null` values are deleted, enabling partial metadata updates.
 
-**TaskGetTool** retrieves a single task by ID. Returns the task's id, subject, description, status, blocks, and blockedBy. Returns `null` if the task is not found. It is the only read-only tool in the family, declaring `isReadOnly() => true`. The null return is important -- it allows the model to check for task existence without generating an error that would cancel sibling tool executions.
+**TaskGetTool** retrieves a single task by ID. Returns the task's id, subject, description, status, blocks, and blockedBy. Returns `null` if the task is not found. It is one of two read-only tools in the family, declaring `isReadOnly() => true` (the other being TaskListTool). The null return is important -- it allows the model to check for task existence without generating an error that would cancel sibling tool executions.
 
 **TaskUpdateTool** is the most complex of the four. It supports updating basic fields (`subject`, `description`, `activeForm`), status (`pending`/`in_progress`/`completed` or the special `deleted` action), dependencies (`addBlocks` and `addBlockedBy` as arrays of task IDs), ownership (`owner`), and metadata (merged with existing metadata; keys set to `null` are deleted).
 
@@ -4480,7 +4507,7 @@ After extraction, `checkSemantics()` in `ast.ts` inspects each `SimpleCommand` f
 - **exec**: Replace the current process
 - **bash -c / sh -c**: Shell invocation with command strings
 - **zsh builtins**: autoload, bindkey, etc.
-- **Wrapper stripping**: Strips `nice`, `timeout`, `nohup`, `stdbuf` to expose the wrapped command
+- **Wrapper stripping**: Strips `nice`, `timeout`, `nohup`, `stdbuf`, `env`, `time` to expose the wrapped command
 
 If any semantic check fails, the command is blocked even though the AST parse succeeded. This is defense-in-depth — the tree structure is valid, but the command semantics are dangerous.
 
@@ -4516,11 +4543,15 @@ Before matching against rules, commands are normalized by stripping safe wrapper
 
 This allows a rule like `Bash(npm install:*)` to match `NODE_ENV=production timeout 30 npm install foo`.
 
-**Security boundary**: Only environment variables on the `SAFE_ENV_VARS` allowlist are stripped for allow rules. Variables like `PATH`, `LD_PRELOAD`, and `PYTHONPATH` are never stripped because they can change which binary executes. For deny rules, `stripAllLeadingEnvVars()` strips all env vars to prevent bypassing denials via `FOO=bar denied_command`.
+**Security boundary**: The `SAFE_ENV_VARS` set is an inclusion list (allowlist), not an exclusion list — only variables present in this set are stripped from commands before permission matching. Variables like `PATH`, `LD_PRELOAD`, and `PYTHONPATH` are never stripped because they are not in the set and can change which binary executes. There is no separate exclusion list; variables not in the set simply remain in the command. For deny rules, `stripAllLeadingEnvVars()` strips all env vars to prevent bypassing denials via `FOO=bar denied_command`.
 
 ### Safe Wrapper Stripping: Argv-Level Counterpart
 
 The `stripWrappersFromArgv()` function performs the same wrapper stripping on AST-derived argv arrays rather than string commands. This is used when the AST path provides `SimpleCommand.argv` directly, avoiding the string-level regex parsing that `stripSafeWrappers()` uses.
+
+There is a separate `ANT_ONLY_SAFE_ENV_VARS` set containing environment variables like `KUBECONFIG`, `DOCKER_HOST`, `AWS_PROFILE`, and `CLOUDSDK_CORE_PROJECT` that are only stripped for `USER_TYPE === 'ant'` users. The security comment on this set explicitly warns: "This is INTENTIONALLY ANT-ONLY and MUST NEVER ship to external users." These variables are safe to strip for internal users because they control cloud/infrastructure tool routing rather than binary execution, but external users could leverage them for privilege escalation.
+
+The `BARE_SHELL_PREFIXES` set blocks certain command names — `sh`, `bash`, `zsh`, `fish`, `csh`, `tcsh`, `ksh`, `dash`, `cmd`, `powershell`, `pwsh`, `env`, `xargs`, `nice`, `stdbuf`, `nohup`, `timeout`, `time`, `sudo`, `doas`, `pkexec` — from being suggested as prefix rules. Suggesting `Bash(bash:*)` or `Bash(sudo:*)` as a prefix rule would allow arbitrary code execution, since these commands accept arbitrary arguments.
 
 ### Sandbox Auto-Allow
 
@@ -4712,7 +4743,7 @@ The classifier receives the user's CLAUDE.md content as a prefix message. This i
 
 The classifier supports three modes, controlled by `tengu_auto_mode_config.twoStageClassifier`:
 
-- **both** (default): Stage 1 ("fast") runs with max_tokens=64 and stop_sequences for an immediate yes/no. If allowed, return. If blocked, escalate to Stage 2 ("thinking") with chain-of-thought to reduce false positives.
+- **both** (default): Stage 1 ("fast") runs with max_tokens=64 and stop_sequences for an immediate yes/no. If allowed, return. If blocked, escalate to Stage 2 ("thinking") with chain-of-thought to reduce false positives. Note: the max_tokens=64 value is specific to `both` mode; in `fast` mode, Stage 1 uses max_tokens=256 and drops stop_sequences so the response can include a `<reason>` tag.
 - **fast**: Stage 1 only with max_tokens=256 (no stop sequences, includes reason).
 - **thinking**: Stage 2 only with full chain-of-thought.
 
@@ -4730,10 +4761,10 @@ When the XML classifier is not enabled, the system uses the legacy tool-use form
 
 The classifier leverages prompt caching for efficiency. `cache_control` is placed on:
 - The system prompt (1 block)
-- The CLAUDE.md prefix message (0-1 blocks)
+- The CLAUDE.md prefix message (0-1 blocks, only when present)
 - The action block (1 block)
 
-This stays within the API limit of 4 cache_control blocks. In 2-stage mode, Stage 2 shares the same transcript+action prefix as Stage 1, getting a guaranteed cache hit.
+This yields 2-3 cache_control blocks total, staying within the API limit of 4. In 2-stage mode, Stage 2 shares the same transcript+action prefix as Stage 1, getting a guaranteed cache hit.
 
 ### YoloClassifierResult
 
@@ -4888,13 +4919,15 @@ The ordering is critical: explicit deny rules must fire before the "edit implies
 The write pipeline in `checkWritePermissionForTool()` is more restrictive:
 
 1. **Deny rules**: Checked on all path representations (original + symlink-resolved)
-2. **Internal editable paths**: Plan files, scratchpad, agent memory, job directories — allowed without further checks. This MUST come before safety checks because `.claude/` is a dangerous directory and internal paths live under it.
-3. **.claude/** session allow rules**: Session-scoped rules like `Edit(.claude/skills/my-skill/**)` can bypass safety checks. Only session-level rules qualify (not userSettings/projectSettings) to prevent accidental permanent grants.
-4. **Safety checks**: `checkPathSafetyForAutoEdit()` — Windows patterns, Claude config files, dangerous files/directories
-5. **Ask rules**: Content-specific ask rules
-6. **acceptEdits mode + working directory**: In acceptEdits mode, writes within working directories are allowed
-7. **Allow rules**: Explicit Edit allow rules
-8. **Default ask**: Prompt the user
+1.5. **Internal editable paths**: Plan files, scratchpad, agent memory, job directories — allowed without further checks. This MUST come before safety checks because `.claude/` is a dangerous directory and internal paths live under it.
+1.6. **.claude/** session allow rules: Session-scoped rules like `Edit(.claude/skills/my-skill/**)` can bypass safety checks. Only session-level rules qualify (not userSettings/projectSettings) to prevent accidental permanent grants.
+1.7. **Safety checks**: `checkPathSafetyForAutoEdit()` — Windows patterns, Claude config files, dangerous files/directories
+2. **Ask rules**: Content-specific ask rules
+3. **acceptEdits mode + working directory**: In acceptEdits mode, writes within working directories are allowed
+4. **Allow rules**: Explicit Edit allow rules
+5. **Default ask**: Prompt the user
+
+The source code uses fractional numbering (1, 1.5, 1.6, 1.7, 2, 3, 4, 5) rather than whole numbers (1-8). The fractional steps reflect that steps 1.5-1.7 are bypass-immune checks that sit between deny rules (step 1) and ask rules (step 2) — they cannot be overridden by allow rules and must run before any ask/allow evaluation.
 
 ### Dangerous File and Directory Protection
 
@@ -5002,7 +5035,7 @@ The scratchpad is a per-session temporary directory for Claude to write intermed
 /tmp/claude-{uid}/{sanitized-cwd}/{sessionId}/scratchpad/
 ```
 
-The `ensureScratchpadDir()` function creates the directory with secure permissions (`0o700` — owner-only access). Scratchpad writes bypass the dangerous-directory check because the path is under `/tmp/`, not `.claude/`.
+The `ensureScratchpadDir()` function creates the directory with secure permissions (`0o700` — owner-only access). Scratchpad writes bypass the dangerous-directory check not because the path is under `/tmp/`, but because of the ordering of checks in the write pipeline: `checkEditableInternalPath()` (step 1.5) runs BEFORE `checkPathSafetyForAutoEdit()` (step 1.7). The check ordering ensures internal editable paths are allowed before safety checks can block them — even though scratchpad paths are not under `.claude/`, the internal-editable-path check fires first and returns allow.
 
 ### Session Memory and Internal Paths
 
@@ -5197,7 +5230,7 @@ The selection logic in `getCLISyspromptPrefix()` depends on the session context:
 
 `getAttributionHeader()` in `system.ts` constructs a billing/routing header that is injected into the system prompt as a text block. The header includes:
 
-- **Version**: `MACRO.VERSION` (injected at build time by Bun's `--define`) plus a fingerprint computed from message content by `computeFingerprintFromMessages()` in `src/utils/fingerprint.ts`. The fingerprint ensures that different conversation states produce different cache keys, preventing one user's cached response from being served to another.
+- **Version**: `MACRO.VERSION` (injected at build time by Bun's `--define`) plus a fingerprint computed from message content by the fingerprinting functions in `src/utils/fingerprint.ts`. There are actually two functions: `computeFingerprint(messageText, version)` is the core SHA-256-based algorithm that hashes the message text with a version salt, and `computeFingerprintFromMessages(messages)` is a wrapper that extracts the first user message text and calls `computeFingerprint()`. The fingerprint ensures that different conversation states produce different cache keys, preventing one user's cached response from being served to another.
 - **Entrypoint**: `process.env.CLAUDE_CODE_ENTRYPOINT` (cli, sdk-ts, sdk-py, claude-desktop, etc.)
 - **Workload**: A turn-scoped hint from `getWorkload()` that allows the API to route cron-initiated requests to a lower QoS pool. Absent for interactive sessions.
 - **Client attestation hash**: When `NATIVE_CLIENT_ATTESTATION` is enabled, a `cch=00000` placeholder is inserted. Bun's native HTTP stack finds this placeholder in the serialized request body and overwrites the zeros with a computed hash. The server verifies this token to confirm the request came from a genuine Claude Code client. The same-length replacement technique avoids Content-Length changes and buffer reallocation, which would be expensive for large request bodies.
@@ -5314,7 +5347,7 @@ sequenceDiagram
 - `src/constants/outputStyles.ts` -- Output style configuration type and resolution
 - `src/utils/queryContext.ts` -- `fetchSystemPromptParts()`, `buildSideQuestionFallbackParams()`, API cache-key prefix assembly
 - `src/memdir/memdir.ts` -- `loadMemoryPrompt()` for MEMORY.md/CLAUDE.md loading
-- `src/utils/fingerprint.ts` -- `computeFingerprintFromMessages()` for version fingerprinting
+- `src/utils/fingerprint.ts` -- `computeFingerprint()` (core SHA-256-based algorithm) and `computeFingerprintFromMessages()` (wrapper extracting first user message) for version fingerprinting
 
 ---
 
@@ -5364,9 +5397,9 @@ A TODO in the source notes that a new `GoogleAuth` instance is created for every
 
 The `getCustomHeaders()` function in `client.ts` assembles the complete set of HTTP headers that are sent with every API request. The header merging follows a strict precedence: default headers (x-app, User-Agent, session ID) are overridden by `ANTHROPIC_CUSTOM_HEADERS`, which are overridden by auth headers (Authorization, x-api-key), which are overridden by provider-specific headers. The merge is implemented as a series of object spreads, with later spreads overriding earlier keys.
 
-The `configureApiKeyHeaders()` function deserves special attention because it handles a subtle security concern. When `ANTHROPIC_AUTH_TOKEN` is set, the function injects it as a `Authorization: Bearer <token>` header. However, if the user is in a managed OAuth context (CCR or Claude Desktop), the function skips this injection because the managed context has its own OAuth flow that should not be bypassed by a static token. This prevents a user's personal API key from overriding the organization's OAuth credentials in a shared environment.
+The `configureApiKeyHeaders()` function deserves special attention because it handles a subtle security concern. When `ANTHROPIC_AUTH_TOKEN` is set, the function injects it as a `Authorization: Bearer <token>` header. The function itself does not check `isManagedOAuthContext()` — it simply sets the Authorization header from `ANTHROPIC_AUTH_TOKEN` or `apiKeyHelper` output. The managed OAuth context guard is at the caller level: `configureApiKeyHeaders()` is only called when `!isClaudeAISubscriber()` in `getAnthropicClient()`. The `isManagedOAuthContext()` check exists in `isAnthropicAuthEnabled()` and `getAuthTokenSource()` in `src/utils/auth.ts`, not inside `configureApiKeyHeaders()` itself. This prevents a user's personal API key from overriding the organization's OAuth credentials in a shared environment.
 
-The `apiKeyHelper` shell command is executed via `child_process.execSync()` with a 10-second timeout. The command's stdout is trimmed of whitespace and cached in a module-level variable. The cache is invalidated by `clearApiKeyHelperCache()` on 401 errors, which forces the next API call to re-execute the shell command. The shell command runs in the user's default shell environment, which means it has access to all environment variables and credentials that the user's shell has. This makes it possible to use credential helpers like AWS's `credential_process` or Vault's `vault read` commands.
+The `apiKeyHelper` shell command is executed via `execa()` (async, from the `execa` package) with a 10-minute timeout (`timeout: 10 * 60 * 1000`) and `reject: false` (resolves rather than throws on non-zero exit). The command's stdout is trimmed of whitespace and cached in a module-level variable with stale-while-revalidate (SWR) semantics. The cache is invalidated by `clearApiKeyHelperCache()` on 401 errors, which forces the next API call to re-execute the shell command. The shell command runs in the user's default shell environment, which means it has access to all environment variables and credentials that the user's shell has. This makes it possible to use credential helpers like AWS's `credential_process` or Vault's `vault read` commands.
 
 ### Custom Headers, Request ID Injection, and Debug Logging
 
@@ -5378,7 +5411,7 @@ Debug logging is available via `isDebugToStdErr()`, which enables the Anthropic 
 
 ### The `getSmallFastModel()` Function
 
-`getSmallFastModel()` in `src/utils/model/model.ts` returns the model used for background operations like title generation, session summaries, prompt suggestions, and task summaries. The function resolves through its own priority chain: `ANTHROPIC_SMALL_FAST_MODEL` environment variable > `getSmallFastModelOverride()` from settings > provider-aware default (Haiku 4.5 for all providers). The small/fast model is always Haiku (or its equivalent on 3P providers) because these background operations do not require the reasoning capability of Opus or Sonnet, and the lower cost and faster response time of Haiku make it ideal for high-volume background tasks.
+`getSmallFastModel()` in `src/utils/model/model.ts` returns the model used for background operations like title generation, session summaries, prompt suggestions, and task summaries. The function resolves through a two-step priority chain: `ANTHROPIC_SMALL_FAST_MODEL` environment variable > `getDefaultHaikuModel()` (provider-aware default, which returns Haiku 4.5 for all providers). The small/fast model is always Haiku (or its equivalent on 3P providers) because these background operations do not require the reasoning capability of Opus or Sonnet, and the lower cost and faster response time of Haiku make it ideal for high-volume background tasks.
 
 The model-specific region override (`ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION`) is particularly important for Bedrock users who want to place Haiku in a different region. The rationale is that Haiku is used for high-volume, low-latency background operations where the region choice has a significant impact on cost and latency. A user might place their primary model in `us-east-1` for compliance reasons but place Haiku in `us-west-2` where it is cheaper or more available.
 
@@ -5499,7 +5532,8 @@ sequenceDiagram
 - `src/utils/model/providers.ts` -- `getAPIProvider()`, `isFirstPartyAnthropicBaseUrl()`
 - `src/utils/betas.ts` -- Beta header merging, feature gating per provider/model
 - `src/utils/effort.ts` -- Effort level resolution, thinking budget configuration
-- `src/utils/api.ts` -- `splitSysPromptPrefix()`, `toolToAPISchema()`, `normalizeMessagesForAPI()`
+- `src/utils/api.ts` -- `splitSysPromptPrefix()`, `toolToAPISchema()`
+- `src/utils/messages.ts` -- `normalizeMessagesForAPI()`
 - `src/services/api/withRetry.ts` -- Retry logic, model fallback, error classification (covered in depth in Chapter 21)
 
 ---
@@ -5559,7 +5593,7 @@ The `[1m]` suffix is stripped before alias lookup (via `normalizedModel.replace(
 
 The `resolveSkillModelOverride()` function handles a subtle case: when a skill specifies `model: opus` and the user is on `opus[1m]` at 230K tokens, passing the bare alias through would drop the effective context window from 1M to 200K, triggering autocompact at 23% apparent usage and surfacing "Context limit reached" even though nothing overflowed. The function carries the `[1m]` suffix over when the target model supports 1M (sonnet/opus families), but not for Haiku (which has no 1M variant). This ensures that skill-executed queries maintain the same effective context window as the main loop.
 
-Legacy Opus 4.0/4.1 models on first-party are silently remapped to the current Opus default via `isLegacyOpusFirstParty()` when `isLegacyModelRemapEnabled()` returns true. The `LEGACY_OPUS_FIRSTPARTY` list includes `claude-opus-4-20250514` and `claude-opus-4-1-20250805`. The remap can be disabled with `CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP`. The remap exists because older Opus models have higher hallucination rates and slower inference, and the API charges the same price regardless of version -- there is no benefit to using the older model.
+Legacy Opus 4.0/4.1 models on first-party are silently remapped to the current Opus default via `isLegacyOpusFirstParty()` when `isLegacyModelRemapEnabled()` returns true. The `LEGACY_OPUS_FIRSTPARTY` list includes four entries: `claude-opus-4-20250514`, `claude-opus-4-1-20250805`, `claude-opus-4-0`, and `claude-opus-4-1`. The remap can be disabled with `CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP`. The remap exists because older Opus models have higher hallucination rates and slower inference, and the API charges the same price regardless of version -- there is no benefit to using the older model.
 
 ### Canonical Name Resolution
 
@@ -5620,9 +5654,9 @@ The `shouldUseGlobalCacheScope()` function determines whether the `prompt-cachin
 
 ### The `CannotRetryError` and `FallbackTriggeredError`
 
-When `shouldRetry()` returns false, the retry loop throws a `CannotRetryError` that carries both the original error and the `RetryContext` (which includes the model, thinking configuration, fast mode status, and any `maxTokensOverride`). The `RetryContext` is propagated to the error handler so that the caller can extract the model name and configuration for telemetry and debugging. The `CannotRetryError` extends `Error` but is not a subclass of `APIError`, which means it bypasses the SDK's error handling and is caught directly by the `query()` function in `src/services/api/query.ts`.
+When `shouldRetry()` returns false, the retry loop throws a `CannotRetryError` that carries both the original error and the `RetryContext` (which includes the model, thinking configuration, fast mode status, and any `maxTokensOverride`). The `RetryContext` is propagated to the error handler so that the caller can extract the model name and configuration for telemetry and debugging. The `CannotRetryError` extends `Error` but is not a subclass of `APIError`, which means it bypasses the SDK's error handling and is caught directly by the `query()` function in `src/services/api/query.ts`. Note that despite the class name, the constructor sets `this.name = 'RetryError'` (not `'CannotRetryError'`), so error logs and stack traces will show `RetryError` as the error name.
 
-The `FallbackTriggeredError` is a separate error class that signals the caller to switch from the primary model to the fallback model. It carries three fields: `primaryModel` (the model that was being used), `fallbackModel` (the model to switch to), and `originalError` (the 529 error that triggered the fallback). The caller (in `query.ts`) catches this error, switches the model to the fallback, and re-enters the `query()` function with the new model. The fallback model is determined by `getFallbackModel()` in `src/utils/model/model.ts`, which returns the Sonnet default when the primary is Opus, and Haiku when the primary is Sonnet. There is no fallback from Haiku -- if Haiku is overloaded, the retry loop continues indefinitely (in persistent mode) or gives up after max retries (in normal mode).
+The `FallbackTriggeredError` is a separate error class that signals the caller to switch from the primary model to the fallback model. It carries two fields: `originalModel` (the model that was being used) and `fallbackModel` (the model to switch to). The caller (in `query.ts`) catches this error, switches the model to the fallback, and re-enters the `query()` function with the new model. The fallback model is determined by `getFallbackModel()` in `src/utils/model/model.ts`, which returns the Sonnet default when the primary is Opus, and Haiku when the primary is Sonnet. There is no fallback from Haiku -- if Haiku is overloaded, the retry loop continues indefinitely (in persistent mode) or gives up after max retries (in normal mode).
 
 The interaction between `FallbackTriggeredError` and the fast mode cooldown is subtle. When a `FallbackTriggeredError` is thrown, the caller switches to the fallback model (e.g., from Opus to Sonnet). However, if fast mode was active on the primary model, the fallback model is also in fast mode because the fast mode state is shared across models. This means that the fallback request may also hit a 529 error, which would trigger another fallback attempt. To prevent infinite fallback loops, the `initialConsecutive529Errors` parameter in `RetryOptions` pre-seeds the consecutive 529 counter when the retry loop is re-entered after a fallback. This ensures that the total number of 529 errors across both the primary and fallback models is counted toward the `MAX_529_RETRIES` threshold.
 
@@ -5666,7 +5700,7 @@ The interaction between `FallbackTriggeredError` and the fast mode cooldown is s
 
 **Persistent retry** (unattended sessions): Retries 429/529 indefinitely with higher backoff. Long waits are chunked into 30-second intervals (`HEARTBEAT_INTERVAL_MS`), yielding `SystemAPIErrorMessage` keep-alive messages so the host environment (CCR, GitHub Actions, SDK) does not mark the session idle. The for-loop's attempt counter is clamped at `maxRetries` so it never terminates, while the separate `persistentAttempt` counter keeps growing to the 5-minute backoff cap. The heartbeat yield includes the current wait duration and the total elapsed time, so the host environment can make informed decisions about whether to continue waiting.
 
-**Circuit breaker**: After `MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3` consecutive autocompact failures, the auto-compact system stops retrying entirely. This prevents sessions where context is irrecoverably over the limit from hammering the API with doomed compaction attempts on every turn. The data shows 1,279 sessions had 50+ consecutive failures, wasting approximately 250K API calls per day globally before the circuit breaker was added. The circuit breaker resets when a manual compact succeeds, giving the user a recovery path.
+**Circuit breaker**: After `MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3` consecutive autocompact failures (defined at `src/services/compact/autoCompact.ts:70`), the auto-compact system stops retrying entirely. This prevents sessions where context is irrecoverably over the limit from hammering the API with doomed compaction attempts on every turn. The data shows 1,279 sessions had 50+ consecutive failures, wasting approximately 250K API calls per day globally before the circuit breaker was added. The circuit breaker resets when a manual compact succeeds, giving the user a recovery path.
 
 **Client refresh on auth errors**: The retry loop recreates the `Anthropic` client instance when it encounters 401 errors (expired tokens), OAuth token revocation errors (403 with "OAuth token has been revoked"), Bedrock auth errors (403 or CredentialsProviderError), Vertex auth errors (credential refresh failures or 401), and stale connection errors (ECONNRESET/EPIPE). For 401 and OAuth revocation, the refresh also triggers `handleOAuth401Error()` to force a token refresh before creating the new client. The `clearApiKeyHelperCache()` function is called on 401 errors to invalidate the cached API key helper output, forcing a fresh execution on the next attempt.
 
@@ -5712,7 +5746,7 @@ sequenceDiagram
 - `src/utils/model/model.ts` -- Model selection chain, alias resolution, marketing names, canonical name resolution
 - `src/utils/model/providers.ts` -- Provider determination from environment, first-party URL detection
 - `src/utils/betas.ts` -- Beta header assembly, feature gating per provider/model, SDK beta merging
-- `src/services/api/withRetry.ts` -- Retry logic, 529 fallback, exponential backoff, fast mode cooldown, circuit breaker
+- `src/services/api/withRetry.ts` -- Retry logic, 529 fallback, exponential backoff, fast mode cooldown
 - `src/utils/context.ts` -- Context window resolution, max output tokens, 1M context support
 - `src/services/api/errors.ts` -- Error message constants, prompt-too-long parsing
 
@@ -5806,11 +5840,11 @@ The `annotateBoundaryWithPreservedSegment()` function records the preserved segm
 
 The `createCompactBoundaryMessage()` function creates a system message that marks the compaction point in the conversation. This message is not sent to the API -- it is only stored in the JSONL transcript. The boundary message carries rich metadata in its `compactMetadata` field:
 
-- `triggerType`: 'auto' or 'manual', indicating whether the compaction was triggered automatically or by the user
-- `preCompactTokenCount`: The token count before compaction, used for telemetry and for the status bar's "saved N tokens" display
-- `lastPreCompactMessageUuid`: The UUID of the last message before the compaction boundary, used for chain reconstruction on resume
-- `discoveredToolNames`: The set of tool names that were discovered before compaction (via `extractDiscoveredToolNames()` from `src/utils/toolSearch.ts`). These are used by the delta attachment system to re-announce tool schemas after compaction, because the empty message history means the diff-against-nothing comparison will announce the full set of tools.
-- `preservedSegment`: For partial compaction, the head, anchor, and tail UUIDs of the preserved segment, used by `applyPreservedSegmentRelinks()` on resume
+- `trigger`: 'auto' or 'manual', indicating whether the compaction was triggered automatically or by the user
+- `preTokens`: The token count before compaction, used for telemetry and for the status bar's "saved N tokens" display
+- `userContext`: Optional user-provided context string included with manual compaction
+- `messagesSummarized`: Optional count of messages that were summarized during compaction
+- `preservedSegment`: For partial compaction, an object with `headUuid`, `anchorUuid`, and `tailUuid` of the preserved segment, used by `applyPreservedSegmentRelinks()` on resume
 
 The boundary message also includes the `compactSummary` field, which contains the full text of the generated summary. This is redundant with the summary user message but is stored in the system message for backward compatibility -- older versions of the resume logic read the summary from the boundary message rather than from the subsequent user message.
 
@@ -5941,7 +5975,7 @@ flowchart LR
 - `src/services/compact/microCompact.ts` -- Cached micro-compact (cache editing), time-based micro-compact (content clearing), tool result token estimation
 - `src/services/compact/prompt.ts` -- Compaction prompt templates (BASE, PARTIAL, PARTIAL_UP_TO), summary formatting, NO_TOOLS preamble/trailer
 - `src/services/compact/grouping.ts` -- Message grouping by API round boundaries for PTL retry
-- `src/services/compact/cachedMicrocompact.ts` -- CachedMCState, CacheEditsBlock, getToolResultsToDelete, createCachedMCState
+- `src/services/compact/cachedMicrocompact.ts` -- CachedMCState, CacheEditsBlock, getToolResultsToDelete, createCachedMCState (note: this does not exist as a standalone `.ts` source file; the cached microcompact logic is inlined within `microCompact.ts` with lazy imports of `./cachedMicrocompact.js`)
 - `src/services/compact/timeBasedMCConfig.ts` -- Time-based micro-compact threshold configuration from GrowthBook
 - `src/services/compact/compactWarningState.ts` -- Warning suppression state for UI display
 
@@ -6033,13 +6067,7 @@ The subdirectory structure enables efficient cleanup of agent transcripts when a
 
 ### The `sortLogs()` Function and Entry Ordering
 
-`sortLogs()` in `src/types/logs.ts` defines the canonical ordering for JSONL entries when multiple entries exist for the same UUID or session. The ordering is important because the JSONL file is append-only and entries may be written out of chronological order (e.g., when metadata entries like titles and tags are updated). The ordering rules are:
-
-1. `SerializedMessage` entries come first (they contain the conversation data)
-2. Metadata entries are ordered by their `type` field: `summary` before `custom-title` before `ai-title` before `tag` before `last-prompt` before others
-3. Within the same type, entries are ordered by timestamp (ascending)
-
-The ordering ensures that `loadTranscriptFile()` processes conversation data before metadata, which is necessary because some metadata entries (like `SummaryMessage`) reference message UUIDs that must already be in the message map. The `sortLogs()` function is called by `readTranscriptForLoad()` before parsing, ensuring that the entries are processed in the correct order regardless of how they were written to the file.
+`sortLogs()` in `src/types/logs.ts` sorts `LogOption[]` entries for the `--resume` display. The sorting is purely date-based: entries are sorted by `modified` date (newest first), with `created` date as a tiebreaker (newest first). There is no type-based ordering — the function simply puts the most recently modified sessions at the top of the list. The function is called by the resume UI to order session entries, not to order individual JSONL lines within a session.
 
 ### Session Restore: `loadTranscriptFromFile()`
 
@@ -6080,7 +6108,7 @@ In `src/utils/conversationRecovery.ts`, `loadConversationForResume()` handles th
 
 The re-appending is necessary because the JSONL file is append-only, and new conversation messages can push the metadata entries far from the end of the file. Without re-appending, the `--resume` display would need to read the entire file to find the metadata, which is prohibitively slow for large session files. The re-appended entries are duplicates -- the original entries remain in the file -- but the tail reader only reads the most recent entry of each type, so the duplicates are harmless.
 
-The `SKIP_PRECOMPACT_THRESHOLD` constant in `sessionStoragePortable.ts` defines the file size threshold (currently 50MB) above which the pre-compact transcript rewrite is skipped. The pre-compact rewrite removes old messages that were consumed by compaction, shrinking the file size. For files above 50MB, the rewrite would require reading and rewriting the entire file, which could cause OOM errors or excessive disk I/O. The skip is safe because the compaction boundary message already truncates the chain, so the old messages are effectively dead data that does not affect the conversation.
+The `SKIP_PRECOMPACT_THRESHOLD` constant in `sessionStoragePortable.ts` defines the file size threshold (currently 5MB, set as `5 * 1024 * 1024`) above which the pre-compact transcript rewrite is skipped. The pre-compact rewrite removes old messages that were consumed by compaction, shrinking the file size. For files above 5MB, the rewrite would require reading and rewriting the entire file, which could cause OOM errors or excessive disk I/O. The skip is safe because the compaction boundary message already truncates the chain, so the old messages are effectively dead data that does not affect the conversation.
 
 ### Concurrent Write Handling and File Safety
 
@@ -6206,7 +6234,7 @@ classDiagram
     Entry <|-- PRLinkMessage
     Entry <|-- FileHistorySnapshotMessage
     Entry <|-- ContextCollapseCommitEntry
-    TranscriptMessage <|-- SerializedMessage
+    SerializedMessage <|-- TranscriptMessage
 ```
 
 ### Session Save/Restore Sequence
@@ -6387,19 +6415,19 @@ A critical optimization skips the profile fetch entirely when the global config 
 
 OAuth tokens are stored in two locations: the secure storage backend (macOS Keychain or plaintext file) and the global config file (`~/.claude/settings.json`). The secure storage holds the raw tokens (access token, refresh token, and their expiration times), while the global config holds the account information (subscription type, rate limit tier, display name, billing type, and account creation dates). The dual storage is necessary because the global config is shared across all sessions on the same machine, while the secure storage is per-user (on macOS, per-keychain-account).
 
-The keychain service name is computed by `getMacOsKeychainStorageServiceName()`, which returns a string like `claude-code-oauth-tokens`. The account name is the system username from `getUsername()`, which ensures that different users on the same macOS machine have separate token entries in the keychain. The `macOsKeychainStorage` module uses the `security` command-line tool to interact with the Keychain Services API:
+The keychain service name is computed by `getMacOsKeychainStorageServiceName()`, which returns a string starting with the base name `Claude Code` (capital C, space, capital C), followed by the OAuth config suffix and a service suffix (e.g., `Claude Code-credentials`). The account name is the system username from `getUsername()`, which ensures that different users on the same macOS machine have separate token entries in the keychain. The `macOsKeychainStorage` module uses the `security` command-line tool to interact with the Keychain Services API:
 
-- `security add-generic-password -a <account> -s <service> -w <password>` to store a token
-- `security find-generic-password -a <account> -s <service> -w` to retrieve a token
-- `security delete-generic-password -a <account> -s <service>` to remove a token
+- For writing: Uses `security -i` (interactive stdin mode) with `add-generic-password -U -a <account> -s <service> -X <hexValue>` piped via stdin. The `-X` flag accepts hex-encoded input, and the interactive mode avoids exposing credentials in process arguments visible to process monitors like CrowdStrike. There is a 4096-byte stdin buffer limit; payloads exceeding this fall back to direct argv.
+- For reading: `security find-generic-password -a <account> -s <service> -w` to retrieve a token
+- For deleting: `security delete-generic-password -a <account> -s <service>` to remove a token
 
-The `plainTextStorage` module stores tokens in a JSON file at `~/.claude/credentials.json` with mode `0o600`. The file contains a JSON object mapping service names to token strings. The plaintext storage is less secure than the keychain but is the only option on Linux and Windows.
+The `plainTextStorage` module stores tokens in a JSON file at `~/.claude/.credentials.json` (a hidden file with a leading dot) with mode `0o600`. The file contains a JSON object mapping service names to token strings. The plaintext storage is less secure than the keychain but is the only option on Linux and Windows.
 
 `populateOAuthAccountInfoIfNeeded()` in `src/services/oauth/client.ts` is called after token refresh to ensure that the global config has complete account information. The function checks whether the `oauthAccountInfo` object in the config has all required fields (`billingType`, `accountCreatedAt`, `subscriptionCreatedAt`). If any field is missing, it fetches the profile info from the API and updates the config. This lazy population avoids an extra API call on every refresh when the config is already complete, which is the common case for established users.
 
 ### The `isOAuthTokenExpired()` Function
 
-`isOAuthTokenExpired()` in `src/services/oauth/client.ts` implements the token expiry check that is called before every API request. The function uses a 5-minute buffer: if the token's `expiresAt` timestamp (stored as a Unix epoch in seconds) is within 5 minutes of the current time, the function returns true, triggering a refresh. The 5-minute buffer was chosen through empirical testing: it is large enough to account for clock skew between the client and server (which can be up to 30 seconds in practice) and for the time it takes to complete the refresh request itself (typically 200-500ms), while being small enough to avoid unnecessary refreshes that would add latency to the critical path.
+`isOAuthTokenExpired()` in `src/services/oauth/client.ts` implements the token expiry check that is called before every API request. The function uses a 5-minute buffer (`5 * 60 * 1000` milliseconds): if the token's `expiresAt` timestamp (stored in milliseconds, computed as `Date.now() + expiresIn * 1000`) is within 5 minutes of the current time (`Date.now() + bufferTime >= expiresAt`), the function returns true, triggering a refresh. The 5-minute buffer was chosen through empirical testing: it is large enough to account for clock skew between the client and server (which can be up to 30 seconds in practice) and for the time it takes to complete the refresh request itself (typically 200-500ms), while being small enough to avoid unnecessary refreshes that would add latency to the critical path.
 
 The function also handles the edge case where `expiresAt` is not set (e.g., when the token was obtained from `CLAUDE_CODE_OAUTH_TOKEN` without an expiration time). In this case, the function returns false (not expired), allowing the token to be used until it actually fails with a 401 error. This is the correct behavior because the alternative -- assuming the token is expired and forcing a refresh -- would fail when there is no refresh token available (e.g., in CCR environments where the token is injected by the infrastructure).
 
@@ -6516,8 +6544,8 @@ MCP server configurations are defined across seven distinct scopes, represented 
 | Scope | Source | Priority |
 |-------|--------|----------|
 | `local` | `.mcp.json` in project root | Highest (project-local overrides) |
-| `project` | `settings.json` project-level config | |
 | `user` | `settings.json` user-level config | |
+| `project` | `settings.json` project-level config | |
 | `dynamic` | Plugin-provided at runtime | |
 | `enterprise` | Managed `managed-mcp.json` | |
 | `claudeai` | Claude.ai connector discovery | |
@@ -7001,9 +7029,9 @@ When `AgentTool.call()` is invoked, the execution follows this path:
 
 ### runAgent() — The Execution Engine
 
-`src/tools/AgentTool/runAgent.ts` contains the core agent execution logic:
+`src/tools/AgentTool/AgentTool.tsx` contains the core agent execution logic:
 
-1. **System prompt assembly** — Builds from agent definition's `getSystemPrompt()`, enhanced with environment details via `enhanceSystemPromptWithEnvDetails()`. For fork agents, the parent's rendered system prompt is threaded directly (`toolUseContext.renderedSystemPrompt`) to avoid GrowthBook cold-to-warm divergence busting the prompt cache.
+1. **System prompt assembly** — Builds from agent definition's `getSystemPrompt()`, enhanced with environment details via `enhanceSystemPromptWithEnvDetails()`. For fork agents, the parent's rendered system prompt is threaded directly via `if (toolUseContext.renderedSystemPrompt) { forkParentSystemPrompt = toolUseContext.renderedSystemPrompt; }` in `AgentTool.tsx` (lines 496-497) to avoid GrowthBook cold-to-warm divergence busting the prompt cache.
 
 2. **Subagent context creation** — `createSubagentContext(parentContext, overrides)` from `src/utils/forkedAgent.ts` creates an isolated `ToolUseContext`:
    - `readFileState` — Cloned from parent.
@@ -7168,7 +7196,7 @@ The `AgentDefinition` type hierarchy in `src/tools/AgentTool/loadAgentsDir.ts` d
 
 5. **claude-code-guide** (`CLAUDE_CODE_GUIDE_AGENT`) — Available for non-SDK entrypoints only. Provides Claude Code usage guidance.
 
-6. **Verification** (`VERIFICATION_AGENT`) — Available when `VERIFICATION_AGENT` feature is on AND `tengu_hive_evidence` GrowthBook flag is true. Post-task validation agent.
+6. **Verification** (`VERIFICATION_AGENT`) — Available when `VERIFICATION_AGENT` feature is on AND `tengu_hive_evidence` GrowthBook flag is true. Post-task validation agent. Has `agentType: 'verification'` (lowercase), `background: true`, `color: 'red'`, and `model: 'inherit'`.
 
 All built-in agents can be disabled via `CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS` env var in non-interactive sessions.
 
@@ -7358,7 +7386,7 @@ For prompt cache sharing, all fork children must produce byte-identical API requ
 
 1. **Clone the parent's last assistant message** — All content blocks (thinking, text, every `tool_use`) are preserved with a new UUID.
 
-2. **Build placeholder tool_results** — For every `tool_use` block in the assistant message, create a `tool_result` with identical placeholder text: `"Fork started — processing in background"`. This placeholder is the same across ALL fork children, maximizing cache hits.
+2. **Build placeholder tool_results** — For every `tool_use` block in the assistant message, create a `tool_result` with identical placeholder text: `FORK_PLACEHOLDER_RESULT = 'Fork started — processing in background'` (using em-dash U+2014). This placeholder is the same across ALL fork children, maximizing cache hits.
 
 3. **Append per-child directive** — A text block with the child's specific task directive is appended after the placeholders. Only this final block differs per child.
 
@@ -7631,7 +7659,7 @@ When an in-process teammate encounters a permission prompt, the bridge provides 
 7. Leader writes the resolution to `permissions/resolved/{requestId}.json` and sends a response to the worker's mailbox.
 8. Worker polls for the response and continues execution.
 
-`SwarmPermissionRequestSchema` defines the full request format including `id`, `workerId`, `workerName`, `toolName`, `toolUseId`, `description`, `input`, `permissionSuggestions`, `status`, `resolvedBy`, `feedback`, `updatedInput`, and `permissionUpdates`.
+`SwarmPermissionRequestSchema` defines the full request format including `id`, `workerId`, `workerName`, `workerColor`, `teamName`, `toolName`, `toolUseId`, `description`, `input`, `permissionSuggestions`, `status`, `resolvedBy`, `feedback`, `updatedInput`, `permissionUpdates`, `createdAt`, and `resolvedAt`. Workers poll for resolution at `PERMISSION_POLL_INTERVAL_MS = 500`.
 
 ### In-Process Runner — The Agent Execution Loop
 
@@ -7801,12 +7829,13 @@ The `onRender` method is the heart of the frame loop. When React's reconciler fi
 
 1. Calls `this.renderer()` with the current front/back frames, terminal dimensions, and alt-screen flag.
 2. Processes follow-scroll selection translation (anchoring text selection to scrolled content).
-3. Applies the search-highlight overlay by inverting matching cells on the frame's screen buffer.
-4. Applies the text-selection overlay for visual highlighting.
+3. Applies the text-selection overlay for visual highlighting (applied BEFORE search highlight).
+4. Applies the search-highlight overlay by inverting matching cells on the frame's screen buffer.
 5. Computes the diff between the front and back frames via `LogUpdate.render()`.
-6. Runs `optimize()` on the resulting patch list.
-7. Writes the diff to the terminal via `writeDiffToTerminal()`.
-8. Swaps front and back frames for the next cycle.
+6. Swaps front and back frames for the next cycle (frame swap occurs between diff and optimize, not after write).
+7. Runs `optimize()` on the resulting patch list.
+8. Calls `applyPositionedHighlight()` to position cursor and highlights.
+9. Writes the diff to the terminal via `writeDiffToTerminal()`.
 
 ### The Custom React Reconciler
 
@@ -8251,7 +8280,7 @@ File: `src/ink/terminal.ts`
 Ink detects various terminal capabilities to tailor its output:
 
 - **`isProgressReportingAvailable()`** — Checks for OSC 9;4 progress reporting support (ConEmu, Ghostty 1.2.0+, iTerm2 3.6.6+). Windows Terminal is explicitly excluded since it interprets OSC 9;4 as notifications.
-- **`isSynchronizedOutputSupported()`** — Checks for DEC 2026 (synchronized output) support. Detects known terminals (iTerm2, WezTerm, WarpTerminal, ghostty, kitty, foot, VTE 0.68+, Windows Terminal). tmux is explicitly excluded since it doesn't implement DEC 2026 and BSU/ESU pass-through breaks atomicity.
+- **`isSynchronizedOutputSupported()`** — Checks for DEC 2026 (synchronized output) support. Detects known terminals (iTerm2, WezTerm, WarpTerminal, ghostty, kitty, foot, VTE 0.68+, Windows Terminal, contour, alacritty, vscode, Zed). tmux is explicitly excluded since it doesn't implement DEC 2026 and BSU/ESU pass-through breaks atomicity.
 - **`isXtermJs()`** — Detects xterm.js-based terminals (VS Code, Cursor, Windsurf) via `TERM_PROGRAM=vscode` or the XTVERSION probe result.
 - **`supportsExtendedKeys()`** — Checks for Kitty keyboard protocol and xterm modifyOtherKeys support, allowlisted to known terminals (iTerm2, kitty, WezTerm, ghostty, tmux, Windows Terminal).
 - **`hasCursorUpViewportYankBug()`** — Windows conhost's `SetConsoleCursorPosition` follows cursor-up into scrollback, yanking users to the top of the buffer. Detected for win32 and WSL-in-Windows-Terminal.
@@ -8359,7 +8388,7 @@ It first configures `marked` (disabling strikethrough parsing since the model of
 
 The `formatToken` function handles every Markdown token type:
 
-- **Blockquotes** — Each line is prefixed with a dim vertical bar (`│`). Text is italicized but at normal brightness (chalk.dim is nearly invisible on dark themes).
+- **Blockquotes** — Each line is prefixed with a dim vertical bar (`▎` U+258E, LEFT ONE QUARTER BLOCK, defined as `BLOCKQUOTE_BAR` in `src/constants/figures.ts:34`). Text is italicized but at normal brightness (chalk.dim is nearly invisible on dark themes).
 - **Code blocks** — If a highlighter is available, the code is syntax-highlighted. Otherwise, the raw text is output. Language detection falls back to plaintext if not supported.
 - **Inline code** (`codespan`) — Styled with the theme's "permission" color.
 - **Emphasis** — `chalk.italic`
@@ -8367,7 +8396,7 @@ The `formatToken` function handles every Markdown token type:
 - **Headings** — H1: bold+italic+underline; H2: bold; H3+: bold.
 - **Links** — If the display text differs from the URL, rendered as an OSC 8 hyperlink. `mailto:` links are displayed as plain email text.
 - **Lists** — Ordered lists use depth-dependent numbering: depth 0-1 = Arabic numerals, depth 2 = alphabetic (a, b, c...), depth 3 = Roman numerals (i, ii, iii...).
-- **Tables** — Column widths are computed from displayed content (after stripAnsi). Alignment is applied via `padAligned()`. Separator rows use dashes without alignment colons.
+- **Tables** — MarkdownTable has a dual rendering strategy: horizontal format (default, flexbox layout) when rows fit within `MAX_ROW_LINES=4`, and vertical format (key-value, "BoldHeader: value") as a fallback for narrow terminals. Column widths are computed from displayed content (after stripAnsi). Alignment is applied via `padAligned()`. Separator rows use dashes without alignment colons.
 - **Text** — `linkifyIssueReferences()` converts `owner/repo#123` patterns to clickable GitHub issue hyperlinks.
 - **Strikethrough** — Disabled at the lexer level since `~` is used for "approximately".
 
@@ -8472,7 +8501,7 @@ File: `src/hooks/useVirtualScroll.ts`
 | `DEFAULT_ESTIMATE` | 3 | Estimated height for unmeasured items (intentionally low) |
 | `OVERSCAN_ROWS` | 80 | Extra rows above and below viewport |
 | `COLD_START_COUNT` | 30 | Items rendered before ScrollBox lays out |
-| `SCROLL_QUANTUM` | 40 | ScrollTop quantization for re-render gating |
+| `SCROLL_QUANTUM` | 40 (derived from `OVERSCAN_ROWS >> 1` = 80 >> 1) | ScrollTop quantization for re-render gating |
 | `PESSIMISTIC_HEIGHT` | 1 | Worst-case assumed height for coverage computation |
 | `MAX_MOUNTED_ITEMS` | 300 | Cap on mounted items to bound fiber allocation |
 | `SLIDE_STEP` | 25 | Max new items mounted per commit |
@@ -9088,7 +9117,7 @@ Claude Code's UI is built on React with Ink, and at its core is a single immutab
 
 ### The AppState Type
 
-`src/state/AppStateStore.ts` defines `AppState` as `DeepImmutable<{...}>` with approximately 400+ fields organized into logical categories:
+`src/state/AppStateStore.ts` defines `AppState` as `DeepImmutable<{...}>` with approximately 60-70 top-level fields (many containing nested structures) organized into logical categories:
 
 **Settings**: `settings` (full `SettingsJson`), `verbose`, `mainLoopModel`, `mainLoopModelForSession`
 
@@ -9141,7 +9170,7 @@ The `onChange` callback is the bridge to `onChangeAppState`, which handles side 
 The React integration follows a familiar pattern. `AppState.tsx` provides:
 
 - `AppStoreContext` — a React context holding the `Store<AppState>`
-- `useAppState(selector)` — subscribes to state slices. The selector is called on every state change; if the result is referentially equal (via `Object.is`), the component does not re-render. This is critical for performance given 400+ fields changing at arbitrary times.
+- `useAppState(selector)` — subscribes to state slices. The selector is called on every state change; if the result is referentially equal (via `Object.is`), the component does not re-render. This is critical for performance given 60-70 top-level fields changing at arbitrary times.
 - `useSetAppState()` — returns the `setState` function for mutations
 
 The provider wraps children in `MailboxProvider` and `VoiceProvider` for inter-agent messaging and voice features.
@@ -9169,7 +9198,7 @@ The provider wraps children in `MailboxProvider` and `VoiceProvider` for inter-a
 ```mermaid
 flowchart TD
     subgraph AppStateStore
-        A[400+ fields in DeepImmutable AppState]
+        A[60-70 top-level fields in DeepImmutable AppState]
     end
 
     subgraph Store
@@ -9213,7 +9242,7 @@ flowchart TD
 
 ### Key Files
 
-- `src/state/AppStateStore.ts` — Full AppState type definition with 400+ fields
+- `src/state/AppStateStore.ts` — Full AppState type definition with 60-70 top-level fields
 - `src/state/store.ts` — Minimal Store<T> implementation with immutable updates
 - `src/state/AppState.tsx` — React context provider, useAppState, useSetAppState
 - `src/state/selectors.ts` — Derived state selectors
@@ -9639,19 +9668,17 @@ type TaskType =
   | 'monitor_mcp'       // MCP monitoring
   | 'dream'             // Assistant mode dream/skill
 
-type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'killed'
 
 type TaskHandle = {
-  id: string
-  type: TaskType
-  status: TaskStatus
-  // ... additional fields per type
+  taskId: string
+  cleanup?: () => void
 }
 
 type TaskContext = {
-  taskId: string
-  agentId?: string
-  // ... execution context
+  abortController: AbortController
+  getAppState: () => AppState
+  setAppState: SetAppState
 }
 ```
 
@@ -9749,7 +9776,7 @@ Before the sink is attached, events accumulate in `eventQueue`. When `attachAnal
 
 `src/services/analytics/sink.ts` implements `logEventImpl()`, which:
 
-1. **Event sampling**: Checks `shouldSampleEvent(eventName)` against the `tengu_event_sampling_config` GrowthBook dynamic config. Sampled-out events are dropped; sampled events get `sample_rate` added to metadata.
+1. **Event sampling**: Checks `shouldSampleEvent(eventName)` against the `tengu_kairos_cron_config` GrowthBook dynamic config. Sampled-out events are dropped; sampled events get `sample_rate` added to metadata.
 
 2. **Datadog fanout**: If `tengu_log_datadog_events` gate is enabled and the sink is not killed, calls `trackDatadogEvent()` after stripping `_PROTO_*` keys (unredacted PII-tagged values meant only for 1P).
 
@@ -9760,7 +9787,7 @@ Before the sink is attached, events accumulate in `eventQueue`. When `attachAnal
 `src/services/analytics/datadog.ts` batches logs and sends them to `https://http-intake.logs.us5.datadoghq.com/api/v2/logs`. Key details:
 
 - Only sends in production and for first-party API customers (not Bedrock/Vertex)
-- Only whitelisted events in `DATADOG_ALLOWED_EVENTS` are sent (~40 events)
+- Only whitelisted events in `DATADOG_ALLOWED_EVENTS` are sent (44 events)
 - MCP tool names are normalized to "mcp" for cardinality reduction
 - Model names are canonicalized for external users (short name if in `MODEL_COSTS`, else "other")
 - Dev versions are truncated to base + date (removes timestamp and sha)
@@ -10146,7 +10173,7 @@ For React render paths, `useVoiceEnabled()` memoizes the auth half to avoid repe
 
 Voice mode uses a streaming audio pipeline:
 - Audio is captured from the microphone in chunks.
-- Chunks are streamed to the `voice_stream` endpoint on claude.ai.
+- Chunks are streamed to the `voice_stream` WebSocket endpoint at `/api/ws/speech_to_text/voice_stream` on claude.ai (not a generic HTTP endpoint).
 - The server returns streaming STT results.
 - Keyterm detection improves recognition accuracy for domain-specific terms (file paths, command names, technical jargon).
 
@@ -10356,7 +10383,7 @@ graph TD
 
 ### 45.1.1 Overview
 
-The teleport system (`src/utils/teleport/`) enables remote session migration: it bundles the current project's git state, transfers it to a remote machine, resumes the session there, and syncs the results back. The main implementation lives in `teleport.tsx`, a massive component (~176KB) that handles the full teleport workflow.
+The teleport system (`src/utils/teleport.tsx`) enables remote session migration: it bundles the current project's git state, transfers it to a remote machine, resumes the session there, and syncs the results back. The main implementation lives in `teleport.tsx`, a massive component (~176KB) that handles the full teleport workflow.
 
 ### 45.1.2 Teleport Architecture
 
@@ -10579,7 +10606,7 @@ The `ccrClient.ts` (~998 lines) implements the CCR (Claude Code Remote) client t
 | AskUserQuestionTool | src/tools/AskUserQuestionTool/ | Ask user a question | question, options? | None | None | Yes | Yes | No |
 | BriefTool | src/tools/BriefTool/ | Get brief summary | topic | Read | KAIROS/KAIROS_BRIEF | Yes | Yes | No |
 | EnterPlanModeTool | src/tools/EnterPlanModeTool/ | Enter planning mode | (none) | None | None | Yes | Yes | No |
-| ExitPlanModeV2Tool | src/tools/ExitPlanModeV2Tool/ | Exit planning mode | plan | None | None | Yes | Yes | No |
+| ExitPlanModeV2Tool | src/tools/ExitPlanModeTool/ | Exit planning mode | plan | None | None | Yes | Yes | No |
 | EnterWorktreeTool | src/tools/EnterWorktreeTool/ | Create git worktree | name? | Execute | Worktree mode | No | No | No |
 | ExitWorktreeTool | src/tools/ExitWorktreeTool/ | Exit git worktree | action, discard_changes? | Execute | Worktree mode | No | No | Varies |
 | ConfigTool | src/tools/ConfigTool/ | Modify configuration | key, value? | Execute | USER_TYPE=ant | No | No | Yes |
@@ -10592,9 +10619,9 @@ The `ccrClient.ts` (~998 lines) implements the CCR (Claude Code Remote) client t
 | NotebookEditTool | src/tools/NotebookEditTool/ | Edit Jupyter notebook | notebook_path, new_source, cell_type? | Write | None | No | No | No |
 | TungstenTool | src/tools/TungstenTool/ | Internal search/index | query, filters? | Read | USER_TYPE=ant | Yes | Yes | No |
 | REPLTool | src/tools/REPLTool/ | VM-based REPL execution | command | Execute | USER_TYPE=ant | No | No | Varies |
-| ScheduleCronTool (CronCreate) | src/tools/BashTool/ | Create scheduled task | name, schedule, prompt | Execute | AGENT_TRIGGERS | No | No | No |
-| ScheduleCronTool (CronDelete) | src/tools/BashTool/ | Delete scheduled task | name | Execute | AGENT_TRIGGERS | No | No | Yes |
-| ScheduleCronTool (CronList) | src/tools/BashTool/ | List scheduled tasks | (none) | Read | AGENT_TRIGGERS | Yes | Yes | No |
+| ScheduleCronTool (CronCreate) | src/tools/ScheduleCronTool/ | Create scheduled task | name, schedule, prompt | Execute | AGENT_TRIGGERS | No | No | No |
+| ScheduleCronTool (CronDelete) | src/tools/ScheduleCronTool/ | Delete scheduled task | name | Execute | AGENT_TRIGGERS | No | No | Yes |
+| ScheduleCronTool (CronList) | src/tools/ScheduleCronTool/ | List scheduled tasks | (none) | Read | AGENT_TRIGGERS | Yes | Yes | No |
 | SleepTool | src/tools/SleepTool/ | Sleep for duration | seconds | None | None | Yes | Yes | No |
 | WorkflowTool | src/tools/WorkflowTool/ | Execute workflow script | workflow, args? | Execute | WORKFLOW_SCRIPTS | No | No | No |
 | SyntheticOutputTool | src/tools/SyntheticOutputTool/ | Generate synthetic output | type, content | None | Internal only | Yes | Yes | No |
@@ -10675,35 +10702,37 @@ The `SYSTEM_PROMPT_DYNAMIC_BOUNDARY` marker separates static (cacheable) from dy
 
 ## Appendix D: Hook Event Reference
 
-| Event Name | When It Fires | Data Received | What It Can Modify |
+> **Base fields on every event**: All hook events receive the fields from `BaseHookInputSchema`: `session_id` (string), `transcript_path` (string), `cwd` (string), `permission_mode?` (string), `agent_id?` (string), `agent_type?` (string). The table below lists only the event-specific fields beyond these base fields.
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
 |---|---|---|---|
-| PreToolUse | Before a tool is executed | tool_name, tool_input, tool_use_id | Can deny execution, modify input, update permissions |
-| PostToolUse | After a tool completes successfully | tool_name, tool_input, tool_output, tool_use_id | Can modify output, trigger side effects |
-| PostToolUseFailure | After a tool fails | tool_name, tool_input, error, tool_use_id | Can provide fallback output, log errors |
-| UserPromptSubmit | When user submits a prompt | prompt text | Can modify prompt, inject context |
-| SessionStart | When a new session begins | session_id, cwd | Can set up session state, load configurations |
-| SessionEnd | When a session ends | session_id, exit_reason | Can clean up resources, save state |
-| Setup | During initial setup | Configuration data | Can configure environment, set defaults |
-| Stop | When the agent stops normally | stop_reason | Can perform cleanup, save results |
-| StopFailure | When the agent stops due to failure | error, stop_reason | Can log errors, attempt recovery |
-| SubagentStart | When a sub-agent is spawned | agent_id, description, prompt | Can modify sub-agent prompt, set up tracking |
-| SubagentStop | When a sub-agent completes | agent_id, status, result | Can process results, update state |
-| TeammateIdle | When a teammate agent becomes idle | agent_id | Can reassign work, send follow-up |
-| PreCompact | Before context compaction | message_count, token_count | Can select which messages to keep |
-| PostCompact | After context compaction | compacted_message_count | Can verify compaction, update state |
-| TaskCreated | When a task is created | task_id, title, description | Can track task, set up notifications |
-| TaskCompleted | When a task is completed | task_id, status, result | Can process results, update tracking |
-| PermissionRequest | When a permission is requested | tool_name, tool_input, request_id | Can auto-approve, modify input |
-| PermissionDenied | When a permission is denied | tool_name, tool_input, reason | Can log, suggest alternatives |
-| ConfigChange | When configuration changes | key, old_value, new_value | Can react to config updates |
-| CwdChanged | When working directory changes | old_cwd, new_cwd | Can update file paths, refresh state |
-| FileChanged | When a file is modified | file_path, change_type | Can trigger re-indexing, LSP refresh |
-| InstructionsLoaded | When CLAUDE.md is loaded | file_path, content | Can modify instructions, inject context |
-| WorktreeCreate | When a git worktree is created | worktree_path, branch | Can set up worktree environment |
-| WorktreeRemove | When a git worktree is removed | worktree_path | Can clean up worktree resources |
-| Notification | Asynchronous notification | message, type | Can display alerts, trigger actions |
-| Elicitation | When user input is elicited | question, options | Can modify question, provide defaults |
-| ElicitationResult | When user responds to elication | response | Can validate/process response |
+| PreToolUse | Before a tool is executed | `tool_name`, `tool_input`, `tool_use_id` | Can deny execution (decision: approve/block), modify input (updatedInput), update permissions (updatedPermissions), add context (additionalContext) |
+| PostToolUse | After a tool completes successfully | `tool_name`, `tool_input`, `tool_response`, `tool_use_id` | Can add context (additionalContext), modify MCP tool output (updatedMCPToolOutput) |
+| PostToolUseFailure | After a tool fails | `tool_name`, `tool_input`, `tool_use_id`, `error`, `is_interrupt?` | Can add context (additionalContext) |
+| UserPromptSubmit | When user submits a prompt | `prompt` | Can add context (additionalContext) |
+| SessionStart | When a new session begins | `source` (enum: startup / resume / clear / compact), `agent_type?`, `model?` | Can add context (additionalContext), set initial user message (initialUserMessage), set watch paths (watchPaths) |
+| SessionEnd | When a session ends | `reason` (ExitReason enum: clear / resume / logout / prompt_input_exit / other / bypass_permissions_disabled) | Can clean up resources, save state |
+| Setup | During initial setup | `trigger` (enum: init / maintenance) | Can add context (additionalContext) |
+| Stop | When the agent stops normally | `stop_hook_active`, `last_assistant_message?` | Can perform cleanup, save results |
+| StopFailure | When the agent stops due to failure | `error` (enum: authentication_failed / billing_error / rate_limit / invalid_request / server_error / unknown / max_output_tokens), `error_details?`, `last_assistant_message?` | Can log errors, attempt recovery |
+| SubagentStart | When a sub-agent is spawned | `agent_id`, `agent_type` | Can add context (additionalContext) |
+| SubagentStop | When a sub-agent completes | `stop_hook_active`, `agent_id`, `agent_transcript_path`, `agent_type`, `last_assistant_message?` | Can process results, update state |
+| TeammateIdle | When a teammate agent becomes idle | `teammate_name`, `team_name` | Can reassign work, send follow-up |
+| PreCompact | Before context compaction | `trigger` (enum: manual / auto), `custom_instructions` (nullable) | Can select which messages to keep |
+| PostCompact | After context compaction | `trigger` (enum: manual / auto), `compact_summary` | Can verify compaction, update state |
+| TaskCreated | When a task is created | `task_id`, `task_subject`, `task_description?`, `teammate_name?`, `team_name?` | Can track task, set up notifications |
+| TaskCompleted | When a task is completed | `task_id`, `task_subject`, `task_description?`, `teammate_name?`, `team_name?` | Can process results, update tracking |
+| PermissionRequest | When a permission is requested | `tool_name`, `tool_input`, `permission_suggestions?` | Can auto-approve or deny (allow with updatedInput/updatedPermissions, or deny with message/interrupt) |
+| PermissionDenied | When a permission is denied | `tool_name`, `tool_input`, `tool_use_id`, `reason` | Can log, suggest alternatives, set retry flag |
+| ConfigChange | When configuration changes | `source` (enum: user_settings / project_settings / local_settings / policy_settings / skills), `file_path?` | Can react to config updates |
+| CwdChanged | When working directory changes | `old_cwd`, `new_cwd` | Can update file paths, set watch paths (watchPaths) |
+| FileChanged | When a file is modified | `file_path`, `event` (enum: change / add / unlink) | Can trigger re-indexing, set watch paths (watchPaths) |
+| InstructionsLoaded | When CLAUDE.md is loaded | `file_path`, `memory_type` (enum: User / Project / Local / Managed), `load_reason` (enum: session_start / nested_traversal / path_glob_match / include / compact), `globs?`, `trigger_file_path?`, `parent_file_path?` | Can observe instruction loading |
+| WorktreeCreate | When a git worktree is created | `name` | Can set up worktree environment; hook output provides worktreePath |
+| WorktreeRemove | When a git worktree is removed | `worktree_path` | Can clean up worktree resources |
+| Notification | Asynchronous notification | `message`, `title?`, `notification_type` | Can add context (additionalContext) |
+| Elicitation | When an MCP server requests user input | `mcp_server_name`, `message`, `mode?` (enum: form / url), `url?`, `elicitation_id?`, `requested_schema?` | Can auto-respond (action: accept/decline/cancel, content) |
+| ElicitationResult | After user responds to an MCP elicitation | `mcp_server_name`, `elicitation_id?`, `mode?` (enum: form / url), `action` (enum: accept / decline / cancel), `content?` | Can override response (action/content) before sent to MCP server |
 
 ---
 
@@ -11013,7 +11042,7 @@ For React render paths, `useVoiceEnabled()` memoizes the auth half to avoid repe
 
 Voice mode uses a streaming audio pipeline:
 - Audio is captured from the microphone in chunks.
-- Chunks are streamed to the `voice_stream` endpoint on claude.ai.
+- Chunks are streamed to the `voice_stream` WebSocket endpoint at `/api/ws/speech_to_text/voice_stream` on claude.ai (not a generic HTTP endpoint).
 - The server returns streaming STT results.
 - Keyterm detection improves recognition accuracy for domain-specific terms (file paths, command names, technical jargon).
 
@@ -11223,7 +11252,7 @@ graph TD
 
 ### 45.1.1 Overview
 
-The teleport system (`src/utils/teleport/`) enables remote session migration: it bundles the current project's git state, transfers it to a remote machine, resumes the session there, and syncs the results back. The main implementation lives in `teleport.tsx`, a massive component (~176KB) that handles the full teleport workflow.
+The teleport system (`src/utils/teleport.tsx`) enables remote session migration: it bundles the current project's git state, transfers it to a remote machine, resumes the session there, and syncs the results back. The main implementation lives in `teleport.tsx`, a massive component (~176KB) that handles the full teleport workflow.
 
 ### 45.1.2 Teleport Architecture
 
