@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [{"required": "classDiagram of REPL components", "found": false}],
+  "uncovered_topics": ["bridge/inbox communication system", "PromptInput internal architecture", "MCP integration in REPL"],
+  "citation_count": 24,
+  "diagram_count": 5,
+  "snippet_count": 6,
+  "top_files_without_snippets": []
+}

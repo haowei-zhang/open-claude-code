@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "word_count": 4177,
+  "forbidden_tokens_found": [{"token": "todo", "count": 1}],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 298,
+  "snippet_count": 6,
+  "snippets_in_data_structures_section": 6,
+  "snippets_in_control_flow_section": 5,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {"line": 185, "issue": "Duplicated 'Typeahead suggestion pipeline' section with near-identical content and mermaid diagram"},
+    {"line": 338, "issue": "Duplicated voice section content (focusMode, computeLevel, voice lifecycle) identical to L282-314"},
+    {"line": 147, "issue": "Forbidden token 'todo' in 'toggle todo list' context"}
+  ]
+}

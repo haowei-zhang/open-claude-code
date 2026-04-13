@@ -1,0 +1,15 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "companion bones",
+      "definition": "The deterministic-from-identity traits of a Buddy companion (species, eye, hat, shiny, stats), always re-derived from a seeded PRNG and never persisted, preventing forgery or gaming."
+    },
+    {
+      "term": "companion soul",
+      "definition": "The persisted companion data stored in the user's global config, merged with freshly-derived bones at display time so that stale bones fields in old-format configs get overridden."
+    }
+  ]
+}

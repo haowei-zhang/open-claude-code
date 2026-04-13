@@ -1,0 +1,31 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 72,
+      "citation": "src/tools/WebSearchTool/WebSearchTool.ts:L25-L37",
+      "problem": "Formatting drift: chapter compresses z.array(z.string()).optional().describe() onto 2 lines per field; source uses 4 lines per field with chain formatting"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 160,
+      "citation": "src/utils/hooks/ssrfGuard.ts:L216-L283",
+      "problem": "Drift: chapter simplifies callback type from (err: Error | null, address: AxiosLookupAddress | AxiosLookupAddress[], family?: AddressFamily) => void to (err, address, family?) => void"
+    }
+  ],
+  "uncited_sources": [
+    "src/tools/WebFetchTool/utils.ts",
+    "src/tools/WebFetchTool/preapproved.ts",
+    "src/tools/WebFetchTool/prompt.ts",
+    "src/tools/WebFetchTool/UI.tsx",
+    "src/tools/WebSearchTool/prompt.ts",
+    "src/tools/WebSearchTool/UI.tsx"
+  ],
+  "citation_total": 8,
+  "citation_verified": 8,
+  "snippet_total": 8,
+  "snippet_verbatim": 6,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

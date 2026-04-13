@@ -1,0 +1,18 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    { "required": "sequenceDiagram of a successful tool dispatch", "found": false },
+    { "required": "sequenceDiagram of a denied dispatch", "found": false },
+    { "required": "stateDiagram-v2 of deferral / concurrency scheduling", "found": false }
+  ],
+  "uncovered_topics": [
+    "Result normalization step not explicitly described",
+    "Denied dispatch flow not diagrammed",
+    "Concurrency scheduling state machine not shown as stateDiagram-v2"
+  ],
+  "citation_count": 21,
+  "diagram_count": 2,
+  "snippet_count": 21,
+  "top_files_without_snippets": []
+}

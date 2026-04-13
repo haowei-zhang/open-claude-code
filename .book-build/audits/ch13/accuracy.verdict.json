@@ -1,0 +1,76 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 43,
+      "citation": "src/tools/FileReadTool/FileReadTool.ts:L248-L331",
+      "problem": "Output schema snippet omits .describe() calls present in actual source; identifiers and structure match but describe strings are stripped"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 96,
+      "citation": "src/tools/FileEditTool/types.ts",
+      "problem": "Edit input schema snippet uses 'file to edit (must be absolute, not relative)' but actual source says 'file to modify'; replace_all shown as z.boolean().optional() but actual uses semanticBoolean(z.boolean().default(false).optional())"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 130,
+      "citation": "src/tools/FileWriteTool/FileWriteTool.ts:L68-L88",
+      "problem": "Output schema snippet omits .describe() calls present in actual source"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 149,
+      "citation": "src/tools/NotebookEditTool/NotebookEditTool.ts:L30-L57",
+      "problem": "cell_type describe text differs: chapter says 'If using edit_mode=insert, this is required' but actual adds 'If not specified, it defaults to the current cell type' before that clause"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 176,
+      "citation": "src/utils/fileHistory.ts:L33-L52",
+      "problem": "Minor comment differences; BackupFileName inline comment in actual source not shown in chapter"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 389,
+      "citation": "src/tools/GrepTool/GrepTool.ts",
+      "problem": "Grep sort logic snippet omits NODE_ENV test check that exists in actual source between sort callback"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 415,
+      "citation": "src/tools/GlobTool/GlobTool.ts:L57-L65",
+      "problem": "GlobTool snippet omits async description, userFacingName, getToolUseSummary fields present in actual source at those lines"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 432,
+      "citation": "src/utils/fileHistory.ts:L86-L118",
+      "problem": "fileHistoryTrackEdit snippet uses '// ... commit backup to state' placeholder and omits error-logging branch for missing snapshot"
+    }
+  ],
+  "uncited_sources": [
+    "src/tools/FileReadTool/imageProcessor.ts",
+    "src/tools/FileEditTool/constants.ts",
+    "src/tools/FileEditTool/utils.ts",
+    "src/tools/FileEditTool/prompt.ts",
+    "src/tools/FileEditTool/UI.tsx",
+    "src/tools/FileWriteTool/prompt.ts",
+    "src/tools/FileWriteTool/UI.tsx",
+    "src/tools/GlobTool/prompt.ts",
+    "src/tools/GlobTool/UI.tsx",
+    "src/tools/GrepTool/prompt.ts",
+    "src/tools/GrepTool/UI.tsx",
+    "src/tools/NotebookEditTool/constants.ts",
+    "src/tools/NotebookEditTool/prompt.ts",
+    "src/tools/NotebookEditTool/UI.tsx",
+    "src/tools/FileReadTool/UI.tsx"
+  ],
+  "citation_total": 25,
+  "citation_verified": 25,
+  "snippet_total": 18,
+  "snippet_verbatim": 9,
+  "snippet_drift": 9,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,29 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "feature gate",
+      "used_as": "feature flags",
+      "should_be": "feature gate"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "prompt assembly",
+      "definition": "The process of composing the system prompt from multiple sections in a specific layer order, including static cacheable sections and dynamic per-session sections separated by a boundary marker."
+    },
+    {
+      "term": "cache boundary",
+      "definition": "A control token (SYSTEM_PROMPT_DYNAMIC_BOUNDARY) that splits the system prompt array into static (globally cacheable) and dynamic (per-session) segments for API-level prompt caching."
+    },
+    {
+      "term": "memory loading hierarchy",
+      "definition": "The priority-ordered cascade of CLAUDE.md file loading: managed, user, project, local, auto-mem, team-mem, where later-loaded files take precedence."
+    },
+    {
+      "term": "conditional rule scoping",
+      "definition": "The mechanism by which .claude/rules/*.md files with frontmatter paths: globs are filtered at query time to inject only instructions relevant to the current file being operated on."
+    }
+  ]
+}

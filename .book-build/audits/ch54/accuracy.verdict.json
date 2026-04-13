@@ -1,0 +1,18 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 39,
+      "citation": "src/query/tokenBudget.ts:L23-L43",
+      "problem": "Caption says L23 but content starts at L22; line number off by 1"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 92,
+  "citation_verified": 91,
+  "snippet_total": 7,
+  "snippet_verbatim": 6,
+  "snippet_drift": 1,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,18 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 107,
+      "citation": "src/main.tsx:L74-L77",
+      "problem": "Snippet caption says L74-L77 but content includes lines through ~L81 (KAIROS feature gates). Caption should be L74-L81 to match content."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 7,
+  "citation_verified": 7,
+  "snippet_total": 6,
+  "snippet_verbatim": 5,
+  "snippet_drift": 1,
+  "snippet_hallucinated": 0
+}

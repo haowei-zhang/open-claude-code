@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "progressive tool expansion",
+      "used_as": "Progressive Disclosure",
+      "should_be": "progressive tool expansion (the canonical term); 'progressive disclosure' is used loosely"
+    },
+    {
+      "term": "skill",
+      "used_as": "Slash command (legacy 'commands_DEPRECATED')",
+      "should_be": "skill (the chapter correctly distinguishes skills from slash commands but uses 'slash command' in some places where 'skill' is the canonical term)"
+    }
+  ],
+  "voice_drift": "mild voice drift: chapter uses first-person plural ('we') in a few places where the house style uses present-tense descriptive; also uses informal phrasing ('pwned', 'pwn') in the edge cases section which breaks the cite-heavy register",
+  "proposed_new_terms": [
+    {
+      "term": "safe-properties auto-allow",
+      "definition": "The optimization in SkillTool.checkPermissions that auto-allows skills whose only non-trivial properties are in the SAFE_SKILL_PROPERTIES set, reducing permission fatigue for safe skills."
+    },
+    {
+      "term": "conditional skill",
+      "definition": "A skill with a paths frontmatter field that is not loaded into the tool listing at startup but is activated when the model operates on files matching the declared glob patterns."
+    },
+    {
+      "term": "dynamic skill discovery",
+      "definition": "The process of discovering skills from .claude/skills directories encountered during file operations, as opposed to the startup-time scan."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "wrong_line",
+      "chapter_line": 13,
+      "citation": "src/screens/REPL.tsx:L11",
+      "problem": "Screen type is at L571, not L11. L11 is a useInput import."
+    },
+    {
+      "type": "wrong_line",
+      "chapter_line": 36,
+      "citation": "src/components/PromptInput/PromptInput.tsx:L81-L107",
+      "problem": "Props type starts at L124, not L81. Lines 81-107 contain import statements."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 112,
+      "citation": "src/hooks/useVoice.ts:L42-L89",
+      "problem": "LANGUAGE_NAME_TO_CODE snippet omits entries and uses '// ...' abbreviation; actual file has more entries than shown."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 289,
+      "citation": "src/hooks/useVoice.ts:L185-L197",
+      "problem": "computeLevel snippet omits inline comments present in source (e.g., '// 16-bit = 2 bytes per sample')."
+    }
+  ],
+  "uncited_sources": ["src/components/Messages.tsx", "src/query.ts"],
+  "citation_total": 24,
+  "citation_verified": 22,
+  "snippet_total": 18,
+  "snippet_verbatim": 14,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

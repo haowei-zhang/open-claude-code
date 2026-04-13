@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 76,
+      "citation": "src/schemas/hooks.ts:L31-L65",
+      "problem": "Caption says L31-L65 but snippet shows content beyond L65 (PromptHookSchema, HttpHookSchema, AgentHookSchema). Also, the BashCommandHookSchema omits .describe() on timeout and omits shell/statusMessage fields. Marked (abridged) but caption line range is inaccurate."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 280,
+      "citation": "src/tools/AgentTool/AgentTool.tsx:L82-L88",
+      "problem": "Snippet shows run_in_background: z.boolean().optional() but actual source has .describe('Set to true to run this agent in the background. You will be notified when it completes.'). The .describe() call is omitted."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 37,
+  "citation_verified": 37,
+  "snippet_total": 14,
+  "snippet_verbatim": 12,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

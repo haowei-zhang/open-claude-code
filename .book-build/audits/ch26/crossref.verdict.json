@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "required_refs_found": 1,
+  "required_refs_total": 2,
+  "required_refs_missing": ["§7.1 Persistent Instruction File"],
+  "divergence_section_length_words": 420,
+  "issues": [
+    {
+      "type": "missing_ref",
+      "detail": "§7.1 Persistent Instruction File is not explicitly cited. The chapter references the ETH Zurich study from §7.1 but does not name the HER section directly."
+    }
+  ]
+}

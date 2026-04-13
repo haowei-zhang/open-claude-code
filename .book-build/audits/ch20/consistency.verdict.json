@@ -1,0 +1,11 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "agent definition", "definition": "A typed configuration object (built-in, custom, or plugin variant) that specifies an agent's tools, permissions, model, memory scope, and system prompt, discovered from multiple sources with layered precedence."},
+    {"term": "frontmatter", "definition": "A YAML header delimited by --- markers at the top of a Markdown file, parsed into typed fields that configure agents, skills, or slash commands."},
+    {"term": "agent discovery", "definition": "The process of loading agent definitions from multiple sources (built-in, plugin, user, project, flag, policy) with later sources overriding earlier ones for the same agentType."},
+    {"term": "MCP requirement filtering", "definition": "The mechanism that removes agents from the active list when their declared requiredMcpServers do not match any configured MCP servers, preventing runtime failures from missing infrastructure."}
+  ]
+}

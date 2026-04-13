@@ -1,0 +1,27 @@
+{
+  "reviewer": 1,
+  "pass": 1,
+  "flags": [
+    {
+      "chapter_id": 50,
+      "severity": "soft",
+      "reasons": [
+        "Chapter reads as API documentation of sinks, counters, and GrowthBook config rather than extracting architectural principles from the observability subsystem",
+        "The 'Where cc diverges' section is honest (cc lacks hard cost caps, lacks cost-per-outcome tracking, lacks automated alerting) but the chapter does not push beyond cataloging gaps into proposing why these gaps exist or what architectural constraints prevent closing them",
+        "HER cross-references are present but largely restate what HER says without deepening the analysis from cc's concrete implementation perspective",
+        "Diagrams are present but mostly illustrate data flow rather than reveal non-obvious architectural tensions"
+      ],
+      "suggested_angle": "Restructure around the tension between observability-for-operators (what cc provides) and observability-for-the-agent (what HER prescribes but cc omits), explaining why the agent itself does not consume its own analytics to make adaptive decisions."
+    },
+    {
+      "chapter_id": 53,
+      "severity": "soft",
+      "reasons": [
+        "As a meta-chapter covering all 12 patterns, it risks being a reference table rather than a teacher -- each pattern gets a brief mapping to files and mechanisms but the chapter does not weave the patterns into a coherent narrative about how they compose in a running system",
+        "The divergences section is substantive but reads as a list of 12 independent observations rather than an integrated analysis of what the pattern-family decomposition misses",
+        "Connections to other chapters are explicit (chapter numbers cited) but the chapter does not explain what a reader would lose by skipping those chapters and only reading this one"
+      ],
+      "suggested_angle": "Add a section showing how the 12 patterns interact during a single running query (the existing flowchart is a start), and identify the 2-3 pattern interactions that are most surprising or non-obvious from reading the individual pattern descriptions alone."
+    }
+  ]
+}

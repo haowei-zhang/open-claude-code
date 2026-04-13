@@ -1,0 +1,36 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 17,
+      "citation": "src/utils/messages.ts:L45-L72",
+      "problem": "Import list starts at line 41 not 45; endpoint 73 not 72. Content matches but line range is imprecise."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 139,
+      "citation": "src/utils/attachments.ts:L295-L332",
+      "problem": "JSDoc comments were trimmed from the FileAttachment types; actual code includes /** Whether the file was truncated due to size limits */ and similar comments."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 212,
+      "citation": "src/utils/attachments.ts:L269-L289",
+      "problem": "RELEVANT_MEMORIES_CONFIG section has much longer comments in actual source that were simplified/omitted in the chapter."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 540,
+      "citation": "src/utils/messages.ts:L2843-L2853",
+      "problem": "Actual function extends to line 2857; snippet endpoint is off by 4 lines."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 19,
+  "citation_verified": 15,
+  "snippet_total": 19,
+  "snippet_verbatim": 13,
+  "snippet_drift": 6,
+  "snippet_hallucinated": 0
+}

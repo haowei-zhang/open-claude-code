@@ -1,0 +1,20 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 41, "citation": "src/hooks/toolPermission/PermissionContext.ts:L113-L130", "problem": "Snippet is a curated summary of the context object, not character-exact copy from source" },
+    { "type": "snippet_drift", "chapter_line": 84, "citation": "src/hooks/useCanUseTool.tsx:L32-L38", "problem": "Snippet condenses the async callback; actual source has different formatting" },
+    { "type": "snippet_drift", "chapter_line": 161, "citation": "src/hooks/toolPermission/handlers/coordinatorHandler.ts:L32-L38", "problem": "Snippet abbreviates the two sequential checks; accurate logic but condensed" },
+    { "type": "snippet_drift", "chapter_line": 203, "citation": "src/hooks/toolPermission/handlers/swarmWorkerHandler.ts:L79-L123", "problem": "Snippet shows onAllow/onReject with claim() guard; condensed from actual source with different parameter types" },
+    { "type": "snippet_drift", "chapter_line": 234, "citation": "src/hooks/useCanUseTool.tsx:L127-L131", "problem": "Speculative classifier race simplified; actual code uses _temp/_temp2 helper functions" },
+    { "type": "snippet_drift", "chapter_line": 320, "citation": "src/hooks/toolPermission/handlers/interactiveHandler.ts:L204-L231", "problem": "recheckPermission snippet condensed; accurate logic but some lines omitted" },
+    { "type": "snippet_drift", "chapter_line": 479, "citation": "src/utils/classifierApprovals.ts:L63-L72", "problem": "Two separate functions combined into one snippet block" },
+    { "type": "wrong_line", "chapter_line": 38, "citation": "src/hooks/toolPermission/PermissionContext.ts:L96", "problem": "Line number is approximate; createPermissionContext starts at a different line" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 20,
+  "citation_verified": 18,
+  "snippet_total": 17,
+  "snippet_verbatim": 9,
+  "snippet_drift": 8,
+  "snippet_hallucinated": 0
+}

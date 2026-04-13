@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "bad_citation",
+      "chapter_line": 16,
+      "citation": "src/utils/hooks.ts:L166",
+      "problem": "Line 166 is TOOL_HOOK_EXECUTION_TIMEOUT_MS, not the HookResult type. HookResult is at L338, AggregatedHookResult at L359."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 122,
+      "citation": "src/utils/hooks/execPromptHook.ts:L55-L100",
+      "problem": "Snippet condenses the source code, omitting intermediate options like getToolPermissionContext, toolChoice, isNonInteractiveSession, hasAppendSystemPrompt, agents, querySource, mcpTools, agentId."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 267,
+      "citation": "src/utils/hooks/execAgentHook.ts:L87-L121",
+      "problem": "Snippet condenses agent setup code, omitting intermediate variable declarations and some options."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 9,
+  "citation_verified": 8,
+  "snippet_total": 9,
+  "snippet_verbatim": 6,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

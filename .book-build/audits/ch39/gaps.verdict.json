@@ -1,0 +1,14 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/utils/processUserInput/processSlashCommand.tsx"],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "$ARGUMENTS substitution implementation details",
+    "Shell command injection (! backtick) in prompt expansion",
+    "LocalJSXCommandContext wiring details"
+  ],
+  "citation_count": 10,
+  "diagram_count": 3,
+  "snippet_count": 10,
+  "top_files_without_snippets": ["src/utils/processUserInput/processSlashCommand.tsx"]
+}

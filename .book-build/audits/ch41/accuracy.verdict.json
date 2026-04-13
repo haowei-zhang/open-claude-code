@@ -1,0 +1,16 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "unsupported_claim", "chapter_line": 7, "citation": "shouldDefer: true on MCPTool", "problem": "MCPTool does not set shouldDefer: true; deferral is via isMcp:true checked in isDeferredTool()" },
+    { "type": "snippet_drift", "chapter_line": 16, "citation": "src/tools/MCPTool/MCPTool.ts:L27-L55", "problem": "Line range extends beyond L55 to include checkPermissions at L56-61" },
+    { "type": "snippet_drift", "chapter_line": 282, "citation": "src/services/mcp/client.ts:L1249-L1365", "problem": "Cited range is 117 lines but snippet shows only ~15 lines" },
+    { "type": "snippet_drift", "chapter_line": 460, "citation": "src/services/mcp/client.ts:L1429-L1570", "problem": "Cited range is 142 lines but snippet is heavily simplified to ~24 lines" }
+  ],
+  "uncited_sources": ["src/tools/McpAuthTool/McpAuthTool.ts"],
+  "citation_total": 33,
+  "citation_verified": 29,
+  "snippet_total": 15,
+  "snippet_verbatim": 4,
+  "snippet_drift": 10,
+  "snippet_hallucinated": 0
+}

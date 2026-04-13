@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 17,
+      "citation": "src/services/tools/toolOrchestration.ts:L14-L17",
+      "problem": "Chapter shows 'newContext: ToolUseContext' (required) but actual source has 'newContext?: ToolUseContext' (optional). Missing '?' changes semantics."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 357,
+      "citation": "src/services/tools/StreamingToolExecutor.ts:L355-L363",
+      "problem": "Snippet is a slightly condensed paraphrase of the actual code rather than character-by-character verbatim. Logic is correct but whitespace/structure differs."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 303,
+      "citation": "src/hooks/useCanUseTool.tsx:L127-L161",
+      "problem": "Snippet shown in chapter is from the original .tsx source but the checked file is compiled/minified output; line numbers may not correspond exactly to the compiled artifact."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 21,
+  "citation_verified": 21,
+  "snippet_total": 21,
+  "snippet_verbatim": 18,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

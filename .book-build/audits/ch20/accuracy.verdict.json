@@ -1,0 +1,20 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 16, "citation": "src/tools/AgentTool/loadAgentsDir.ts:L106-L165", "problem": "Comments trimmed from type fields in BaseAgentDefinition" },
+    { "type": "snippet_drift", "chapter_line": 130, "citation": "src/tools/AgentTool/loadAgentsDir.ts:L73-L99", "problem": "Minor formatting differences in AgentJsonSchema" },
+    { "type": "snippet_drift", "chapter_line": 208, "citation": "src/utils/frontmatterParser.ts:L10-L59", "problem": "Comments trimmed from FrontmatterData type" },
+    { "type": "snippet_drift", "chapter_line": 238, "citation": "src/tools/AgentTool/loadAgentsDir.ts:L193-L221", "problem": "Minor formatting difference in closing braces" },
+    { "type": "snippet_drift", "chapter_line": 292, "citation": "src/utils/frontmatterParser.ts:L130-L175", "problem": "Comments trimmed and log message abbreviated" },
+    { "type": "snippet_drift", "chapter_line": 335, "citation": "src/utils/frontmatterParser.ts:L67-L121", "problem": "Line range includes comments partially shown" },
+    { "type": "snippet_drift", "chapter_line": 409, "citation": "src/tools/AgentTool/loadAgentsDir.ts:L229-L255", "problem": "JSDoc comments trimmed" },
+    { "type": "snippet_drift", "chapter_line": 441, "citation": "src/tools/AgentTool/loadAgentsDir.ts:L262-L294", "problem": "Log statements trimmed from initialize/prompt-update cases" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 13,
+  "citation_verified": 13,
+  "snippet_total": 13,
+  "snippet_verbatim": 4,
+  "snippet_drift": 9,
+  "snippet_hallucinated": 0
+}

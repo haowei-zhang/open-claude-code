@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": ["getClaudeSkillScope function lacks a code snippet despite security importance", "checkEditableInternalPath/checkReadableInternalPath discussed in prose but not shown in code"],
+  "citation_count": 21,
+  "diagram_count": 2,
+  "snippet_count": 13,
+  "top_files_without_snippets": []
+}

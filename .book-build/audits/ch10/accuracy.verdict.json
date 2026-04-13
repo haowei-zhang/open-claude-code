@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 33,
+      "citation": "src/query/tokenBudget.ts:L23-L31",
+      "problem": "Line range off by 1; actual ContinueDecision is at L22-L29"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 50,
+      "citation": "src/query/tokenBudget.ts:L33-L43",
+      "problem": "Line range off by 2; actual StopDecision is at L31-L41"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 185,
+      "citation": "src/services/tokenEstimation.ts:L401-L412",
+      "problem": "Line range off by 1; actual image/document block starts at L400"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 15,
+  "citation_verified": 15,
+  "snippet_total": 7,
+  "snippet_verbatim": 4,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

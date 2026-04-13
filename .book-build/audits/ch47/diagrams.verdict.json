@@ -1,0 +1,19 @@
+{
+  "verdict": "revise",
+  "diagram_count": 2,
+  "invalid_indices": [],
+  "trivial_indices": [],
+  "type_breakdown": {
+    "flowchart": 0,
+    "sequenceDiagram": 1,
+    "stateDiagram-v2": 1,
+    "classDiagram": 0,
+    "erDiagram": 0
+  },
+  "missing_mandated_diagrams": [
+    {
+      "required": "classDiagram of CronTask record",
+      "found": false
+    }
+  ]
+}

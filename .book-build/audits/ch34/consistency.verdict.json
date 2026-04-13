@@ -1,0 +1,10 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "denial tracking", "definition": "A subsystem that tracks consecutive and total permission denials to prevent classifier death spirals, falling back to interactive prompting after configurable thresholds."},
+    {"term": "path safety validation", "definition": "The process of checking file paths against dangerous file/directory lists, suspicious Windows patterns, and Claude configuration files before allowing auto-edit operations."},
+    {"term": "internal path carve-out", "definition": "An exception in the filesystem permission layer that allows the agent to access specific internal paths (plan files, scratchpads, session memory) without explicit permission, even when those paths reside within otherwise dangerous directories."}
+  ]
+}

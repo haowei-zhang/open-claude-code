@@ -1,0 +1,18 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "wrong_line", "chapter_line": 32, "citation": "src/assistant/sessionHistory.ts:L26-L28", "problem": "Line range off by 1; actual range is L25-L28" },
+    { "type": "wrong_line", "chapter_line": 44, "citation": "src/buddy/companion.ts:L87-L89", "problem": "Line range off by 1; actual range is L86-L89" },
+    { "type": "wrong_line", "chapter_line": 120, "citation": "src/assistant/sessionHistory.ts:L55", "problem": "Line reference off by 1; timeout is on L54" },
+    { "type": "unsupported_claim", "chapter_line": 196, "citation": "src/assistant/sessionHistory.ts:L34", "problem": "Claim 'trust is implicit in non-interactive sessions' not directly supported by line L34 (which is 'const { accessToken, orgUUID } = await prepareApiRequest()')" },
+    { "type": "snippet_drift", "chapter_line": 32, "citation": "src/assistant/sessionHistory.ts:L26-L28", "problem": "Snippet line numbers off by 1" },
+    { "type": "snippet_drift", "chapter_line": 44, "citation": "src/buddy/companion.ts:L87-L89", "problem": "Snippet line numbers off by 1" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 21,
+  "citation_verified": 17,
+  "snippet_total": 9,
+  "snippet_verbatim": 7,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

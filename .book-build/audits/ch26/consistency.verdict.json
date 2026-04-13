@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "side query",
+      "definition": "A secondary API call using a smaller model (typically Sonnet) to evaluate or select items without consuming the main model's context budget, used in memdir for relevance selection."
+    },
+    {
+      "term": "entrypoint",
+      "definition": "The MEMORY.md index file that is always loaded into context, serving as the compact catalog of available memory topic files, capped at 200 lines and 25KB."
+    },
+    {
+      "term": "staleness warning",
+      "definition": "A text injection appended to recalled memories older than one day via memoryFreshnessText(), reminding the model to verify claims before asserting them as fact."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "progressive tool expansion",
+      "definition": "The mechanism by which cc starts with a small set of core tools and loads additional tools on demand via ToolSearch, reducing initial prompt size and improving selection accuracy."
+    },
+    {
+      "term": "keyword scoring",
+      "definition": "The weighted search algorithm in ToolSearchTool that parses queries into terms and matches them against tool name parts, search hints, and descriptions with different weights (10/12 for exact name match, 5/6 for partial, 4 for hint, 2 for description)."
+    },
+    {
+      "term": "search hint",
+      "definition": "A curated, high-signal capability phrase on a tool definition (e.g., 'search file contents with regex (ripgrep)') that scores higher than the full description in ToolSearchTool keyword matching."
+    },
+    {
+      "term": "head-limit pagination",
+      "definition": "The pattern in GrepTool and GlobTool where a default limit (250) caps result size, with explicit pagination signaling when truncation occurs, enabling the model to paginate with offset."
+    },
+    {
+      "term": "semantic type wrapper",
+      "definition": "A Zod schema wrapper (semanticNumber, semanticBoolean) that coerces string-typed fields from LLM JSON output into their proper types, reducing tool-call failures from type mismatches."
+    }
+  ]
+}

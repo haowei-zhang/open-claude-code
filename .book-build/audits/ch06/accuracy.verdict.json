@@ -1,0 +1,16 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "wrong_line", "chapter_line": 44, "citation": "src/main.tsx:L547-L552", "problem": "PendingConnect type starts at L543, not L547; range off by 4 lines" },
+    { "type": "snippet_drift", "chapter_line": 15, "citation": "src/main.tsx:L585-L607", "problem": "Snippet omits profileCheckpoint line and condenses comments" },
+    { "type": "snippet_drift", "chapter_line": 44, "citation": "src/main.tsx:L547-L552", "problem": "Range is L543-L552; snippet misses type declaration first line" },
+    { "type": "snippet_drift", "chapter_line": 134, "citation": "src/main.tsx:L326-L352", "problem": "Snippet abbreviates migration calls with // ... ellipsis" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 28,
+  "citation_verified": 26,
+  "snippet_total": 4,
+  "snippet_verbatim": 1,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,12 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "microcompact",
+      "used_as": "micro-compacted",
+      "should_be": "microcompacted"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": []
+}

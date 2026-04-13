@@ -1,0 +1,16 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 23, "citation": "bashClassifier.ts:L6-L13", "problem": "Actual content at L5-L12, line numbers off by 1" },
+    { "type": "snippet_drift", "chapter_line": 59, "citation": "shouldUseSandbox.ts:L3-L6", "problem": "Actual SandboxInput type at L13-L16" },
+    { "type": "snippet_missing_caption", "chapter_line": 14, "citation": "BashTool.tsx input schema", "problem": "First code block is a comment placeholder, not a real snippet" },
+    { "type": "snippet_drift", "chapter_line": 155, "citation": "readOnlyValidation.ts:L128-L150", "problem": "Composite snippet merges CommandConfig type (line 35) with COMMAND_ALLOWLIST (line 128)" }
+  ],
+  "uncited_sources": ["src/tools/BashTool/bashPermissions.ts", "src/tools/BashTool/pathValidation.ts"],
+  "citation_total": 15,
+  "citation_verified": 12,
+  "snippet_total": 18,
+  "snippet_verbatim": 12,
+  "snippet_drift": 5,
+  "snippet_hallucinated": 0
+}

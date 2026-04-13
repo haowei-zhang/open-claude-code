@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "async rewake", "definition": "A flag on command hooks that causes the hook to run in the background and wake the model if it exits with code 2, enabling blocking-error detection for long-running background tasks."},
+    {"term": "hook matcher", "definition": "A grouping construct that associates one or more hooks with a matcher string, where the matcher is event-specific (tool names for PreToolUse/PostToolUse, notification types for Notification, etc.)."},
+    {"term": "exit code semantics", "definition": "The three patterns (block-on-2, show-on-2, output-as-input) that define how a hook's exit code is interpreted for each lifecycle event."},
+    {"term": "once-hook", "definition": "A hook with `once: true` that is removed after its first execution, useful for one-time setup commands."},
+    {"term": "env var interpolation", "definition": "The mechanism in HTTP hooks that replaces `$VAR_NAME` or `${VAR_NAME}` patterns in header values with environment variable values, gated by an `allowedEnvVars` allowlist."}
+  ]
+}

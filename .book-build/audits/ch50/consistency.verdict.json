@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "analytics sink", "definition": "The backend interface (AnalyticsSink) that receives queued analytics events after attachment, implementing logEvent and logEventAsync methods for fanout to Datadog and first-party logging."},
+    {"term": "queue-then-drain", "definition": "The pattern where events are buffered in an in-memory array until a sink is attached, then drained asynchronously via queueMicrotask to avoid blocking startup."},
+    {"term": "disk-cached feature flag", "definition": "A GrowthBook feature flag value persisted to ~/.claude.json by a previous process, read without network I/O as a fallback when the in-memory payload is unavailable."},
+    {"term": "CACHED_OR_BLOCKING", "definition": "A GrowthBook gate evaluation pattern that returns cached true values immediately but blocks on fresh server values when the cache says false, preventing unfair blocking from stale negative values."},
+    {"term": "PII marker type", "definition": "A TypeScript type set to never that forces explicit casting before including string values in analytics metadata, preventing accidental inclusion of code snippets or file paths in events."}
+  ]
+}

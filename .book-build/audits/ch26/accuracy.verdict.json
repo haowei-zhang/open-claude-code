@@ -1,0 +1,42 @@
+{
+  "verdict": "rewrite",
+  "issues": [
+    {
+      "type": "snippet_hallucinated",
+      "chapter_line": 632,
+      "citation": "src/utils/attachments.ts:L282",
+      "problem": "Claims 'export const memoryHeader = \"memory\"' at L282, but actual source at L282 is 'MAX_SESSION_BYTES: 60 * 1024,'. The real memoryHeader is a function at line 2327 with signature (path: string, mtimeMs: number): string, not a string constant."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 384,
+      "citation": "src/memdir/memdir.ts:L199-L266",
+      "problem": "buildMemoryLines snippet is heavily trimmed with '//' omission markers, showing only structural outline rather than actual code."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 441,
+      "citation": "src/memdir/memdir.ts:L419-L507",
+      "problem": "loadMemoryPrompt snippet is heavily trimmed with omission markers."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 590,
+      "citation": "src/memdir/memdir.ts:L327-L370",
+      "problem": "buildAssistantDailyLogPrompt snippet is heavily trimmed with '//' omission markers."
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 636,
+      "citation": "",
+      "problem": "Claims memoryHeader 'enables the API-level token accounting to distinguish memory-injected content from other file attachments', but memoryHeader is actually a function that constructs a staleness-aware header string from path and mtimeMs, not a static tag for token accounting."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 27,
+  "citation_verified": 23,
+  "snippet_total": 27,
+  "snippet_verbatim": 21,
+  "snippet_drift": 5,
+  "snippet_hallucinated": 1
+}

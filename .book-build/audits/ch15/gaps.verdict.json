@@ -1,0 +1,33 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [
+    "src/tools/LSPTool/formatters.ts",
+    "src/tools/LSPTool/schemas.ts",
+    "src/tools/LSPTool/symbolContext.ts",
+    "src/tools/LSPTool/prompt.ts",
+    "src/tools/LSPTool/UI.tsx",
+    "src/tools/ToolSearchTool/constants.ts",
+    "src/tools/ToolSearchTool/prompt.ts",
+    "src/services/lsp/LSPClient.ts",
+    "src/services/lsp/LSPServerInstance.ts",
+    "src/services/lsp/LSPServerManager.ts",
+    "src/services/lsp/LSPDiagnosticRegistry.ts",
+    "src/services/lsp/manager.ts",
+    "src/services/lsp/config.ts",
+    "src/services/lsp/passiveFeedback.ts"
+  ],
+  "missing_diagrams": [
+    {
+      "required": "classDiagram of LSP client lifecycle",
+      "found": false
+    }
+  ],
+  "uncovered_topics": [
+    "LSP server manager architecture (LSPServerManager, LSPClient routing and lifecycle)",
+    "LSP diagnostic registry and passive feedback (LSPDiagnosticRegistry, passiveFeedback.ts)"
+  ],
+  "citation_count": 7,
+  "diagram_count": 3,
+  "snippet_count": 8,
+  "top_files_without_snippets": []
+}

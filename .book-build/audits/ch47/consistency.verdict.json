@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "cron jitter", "definition": "Deterministic per-task delay applied to cron fire times to prevent thundering-herd conditions, derived from the task ID for reproducibility across restarts."},
+    {"term": "one-shot cron task", "definition": "A cron task that fires once and is auto-deleted, as opposed to a recurring task which reschedules after firing."},
+    {"term": "session-only cron", "definition": "A cron task held in process memory that never touches the filesystem and dies with the process when durable is false."},
+    {"term": "missed-task detection", "definition": "The startup check that identifies cron tasks whose scheduled fire time passed while the REPL was closed, surfacing them for catch-up."},
+    {"term": "dynamic-pacing loop", "definition": "A /loop mode using ScheduleWakeup with simple relative delays instead of cron expressions, allowing the loop to adjust its pace based on task progress and prompt cache warmth."}
+  ]
+}

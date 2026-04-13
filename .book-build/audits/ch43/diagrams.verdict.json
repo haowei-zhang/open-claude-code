@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "diagram_count": 5,
+  "invalid_indices": [],
+  "trivial_indices": [],
+  "type_breakdown": {
+    "flowchart": 2,
+    "sequenceDiagram": 1,
+    "stateDiagram-v2": 2,
+    "classDiagram": 0,
+    "erDiagram": 0
+  },
+  "missing_required": ["classDiagram of REPL components"],
+  "duplicates": [3, 5]
+}

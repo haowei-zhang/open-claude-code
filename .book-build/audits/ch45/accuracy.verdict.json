@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 19, "citation": "src/tools/EnterPlanModeTool/EnterPlanModeTool.ts:L21-L34", "problem": "comments removed from snippet" },
+    { "type": "snippet_drift", "chapter_line": 41, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L77-L89", "problem": "comment removed, description shortened" },
+    { "type": "snippet_drift", "chapter_line": 60, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L110-L142", "problem": "description text shortened" },
+    { "type": "snippet_drift", "chapter_line": 82, "citation": "src/utils/planModeV2.ts:L5-L29", "problem": "comments removed" },
+    { "type": "snippet_drift", "chapter_line": 112, "citation": "src/utils/planModeV2.ts:L64-L95", "problem": "comments removed" },
+    { "type": "snippet_drift", "chapter_line": 134, "citation": "src/tools/EnterPlanModeTool/EnterPlanModeTool.ts:L77-L95", "problem": "comments removed" },
+    { "type": "snippet_drift", "chapter_line": 192, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L357-L403", "problem": "comments removed, code trimmed" },
+    { "type": "snippet_drift", "chapter_line": 228, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L264-L313", "problem": "code trimmed with comment elision" },
+    { "type": "snippet_drift", "chapter_line": 284, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L251-L261", "problem": "comments removed" },
+    { "type": "snippet_drift", "chapter_line": 303, "citation": "src/tools/EnterPlanModeTool/EnterPlanModeTool.ts:L57-L67", "problem": "comments removed" },
+    { "type": "snippet_drift", "chapter_line": 322, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L195-L219", "problem": "comments removed" },
+    { "type": "snippet_drift", "chapter_line": 352, "citation": "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts:L329-L355", "problem": "comments removed" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 28,
+  "citation_verified": 28,
+  "snippet_total": 12,
+  "snippet_verbatim": 0,
+  "snippet_drift": 12,
+  "snippet_hallucinated": 0
+}

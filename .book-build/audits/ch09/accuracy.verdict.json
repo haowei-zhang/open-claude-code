@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 33,
+      "citation": "src/utils/claudemd.ts:L229-L243",
+      "problem": "MemoryFileInfo type snippet collapses comment lines between contentDiffersFromDisk and rawContent fields"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 52,
+      "citation": "src/utils/context.ts:L51-L98",
+      "problem": "getContextWindowForModel snippet omits betas/sonnet1m/antModel branches (lines 85-97) with // ... trim but the function continues beyond the shown trim point"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 14,
+  "citation_verified": 13,
+  "snippet_total": 4,
+  "snippet_verbatim": 2,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

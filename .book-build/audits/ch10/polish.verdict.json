@@ -1,0 +1,23 @@
+{
+  "verdict": "revise",
+  "word_count": 2820,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 340,
+  "snippet_count": 7,
+  "snippets_in_data_structures_section": 4,
+  "snippets_in_control_flow_section": 2,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {"line": 107, "issue": "Snippet #5 (thresholds) is 2 lines, below minimum of 8"},
+    {"line": 184, "issue": "Snippet #7 (image estimate) is 7 lines, below minimum of 8"}
+  ]
+}

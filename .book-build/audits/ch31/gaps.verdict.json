@@ -1,0 +1,15 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {
+      "required": "classDiagram of settings sources",
+      "found": false
+    }
+  ],
+  "uncovered_topics": [],
+  "citation_count": 45,
+  "diagram_count": 2,
+  "snippet_count": 12,
+  "top_files_without_snippets": []
+}

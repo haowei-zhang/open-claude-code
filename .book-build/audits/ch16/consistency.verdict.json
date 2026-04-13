@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "SSRF guard", "definition": "The dns.lookup-compatible function in src/utils/hooks/ssrfGuard.ts that blocks connections to private, link-local, and CGNAT address ranges, preventing HTTP hooks from reaching cloud metadata endpoints."},
+    {"term": "preapproved URL", "definition": "A URL whose hostname is on the PREAPPROVED_HOSTS allowlist, allowing WebFetchTool to skip explicit per-request permission checks for known-safe documentation sites."},
+    {"term": "domain-based permission rule", "definition": "A permission rule that matches web tool access at the hostname level using the domain:hostname pattern, enabling fine-grained access control without requiring full URL specification."},
+    {"term": "IPv4-mapped IPv6 bypass", "definition": "An SSRF attack vector where a private IPv4 address is encoded as an IPv6 address using the ::ffff:X.X.X.X format, bypassing IPv4-only address checks."},
+    {"term": "DNS-rebinding protection", "definition": "The pattern of validating DNS-resolved IP addresses and passing the validated address directly to the TCP socket, closing the window where an attacker could serve different IPs on successive DNS resolutions."}
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 18, "citation": "src/tools/AgentTool/AgentTool.tsx:L82-L88", "problem": "baseInputSchema snippet abbreviates .describe() strings (e.g., 'The type of specialized agent...' vs full text)" },
+    { "type": "snippet_drift", "chapter_line": 35, "citation": "src/tools/AgentTool/AgentTool.tsx:L91-L102", "problem": "fullInputSchema snippet abbreviates isolation enum (omits ant ternary) and .describe() strings" },
+    { "type": "snippet_drift", "chapter_line": 59, "citation": "src/tools/AgentTool/AgentTool.tsx:L110-L125", "problem": "inputSchema snippet omits inline comments" },
+    { "type": "snippet_drift", "chapter_line": 90, "citation": "src/tools/AgentTool/AgentTool.tsx:L141-L156", "problem": "outputSchema snippet abbreviates canReadOutputFile description; actual range is L141-L155" },
+    { "type": "snippet_drift", "chapter_line": 111, "citation": "src/tools/AgentTool/AgentTool.tsx:L159-L191", "problem": "TeammateSpawnedOutput snippet omits agent_type and model fields present in source" },
+    { "type": "snippet_drift", "chapter_line": 262, "citation": "src/tools/AgentTool/AgentTool.tsx:L72-L77", "problem": "getAutoBackgroundMs snippet matches verbatim (no drift)" },
+    { "type": "snippet_drift", "chapter_line": 291, "citation": "src/tools/AgentTool/runAgent.ts:L95-L109", "problem": "initializeAgentMcpServers snippet replaces body with trim marker" },
+    { "type": "snippet_drift", "chapter_line": 314, "citation": "src/tools/AgentTool/runAgent.ts:L389-L398", "problem": "shouldOmitClaudeMd snippet start line off by one (should be L390)" },
+    { "type": "snippet_drift", "chapter_line": 333, "citation": "src/tools/AgentTool/runAgent.ts:L531-L555", "problem": "SubagentStart hooks snippet range mismatch; actual loop is L532-L543" },
+    { "type": "snippet_drift", "chapter_line": 349, "citation": "src/tools/AgentTool/runAgent.ts:L945-L973", "problem": "resolveSkillName snippet omits inline comments" },
+    { "type": "snippet_drift", "chapter_line": 375, "citation": "src/tools/AgentTool/runAgent.ts:L416-L498", "problem": "agentGetAppState snippet omits awaitAutomatedChecksBeforeDialog and allowedTools sections" },
+    { "type": "snippet_drift", "chapter_line": 413, "citation": "src/tools/AgentTool/runAgent.ts:L816-L858", "problem": "cleanup snippet adds numbered comments not present in source and abbreviates body" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 15,
+  "citation_verified": 15,
+  "snippet_total": 15,
+  "snippet_verbatim": 3,
+  "snippet_drift": 12,
+  "snippet_hallucinated": 0
+}

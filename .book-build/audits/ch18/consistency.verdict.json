@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [],
+  "voice_drift": "Duplicated paragraph (AgentDefinition intro appears twice at lines 176 and 178); takeaways section exceeds 300-word target at ~420 words",
+  "proposed_new_terms": [
+    {"term": "lazySchema", "definition": "A wrapper function that defers Zod schema evaluation until first call, ensuring runtime feature flags are populated before schema construction."},
+    {"term": "auto-background", "definition": "A mechanism that automatically transitions a synchronous subagent to asynchronous execution after a configurable timeout (default 120 seconds)."},
+    {"term": "fork recursion guard", "definition": "A dual-guard mechanism preventing infinite recursive agent spawning: a message-scan guard checking FORK_BOILERPLATE_TAG and a querySource guard surviving autocompact."}
+  ]
+}

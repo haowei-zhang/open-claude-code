@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "bypass-immune",
+      "definition": "A property of safety checks that prevents them from being overridden by bypassPermissions mode, auto mode classifiers, or PreToolUse hook approvals, ensuring that critical security boundaries cannot be circumvented."
+    },
+    {
+      "term": "deny-first evaluation",
+      "definition": "The permission pipeline design where deny rules are checked before allow rules, ensuring that a deny rule from any source always takes precedence over an allow rule."
+    },
+    {
+      "term": "iron gate",
+      "definition": "The GrowthBook feature flag (tengu_iron_gate_closed) that controls whether the auto mode classifier fails closed (deny) or fails open (prompt) when the classifier is unavailable."
+    }
+  ]
+}

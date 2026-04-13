@@ -1,0 +1,33 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "task budget",
+      "used_as": "A per-task cost cap interface (TaskBudget) with capUSD/spentUSD/state fields",
+      "should_be": "An API-level budget for the whole agentic turn (output_config.task_budget), distinct from the client-side token budget"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "quality-gates pipeline",
+      "definition": "A deterministic checkpoint pipeline wired into the query loop that evaluates tool results with lint/type-check/test gates and routes verdicts to pass/fail/escalate actions."
+    },
+    {
+      "term": "loop detector",
+      "definition": "A sliding-window monitor that flags identical tool calls within a configurable time window, preventing infinite retry loops."
+    },
+    {
+      "term": "spend-rate monitor",
+      "definition": "A rolling-average anomaly detector that fires alerts when both cost-per-minute and tokens-per-minute exceed 2x their respective rolling averages."
+    },
+    {
+      "term": "escalation record",
+      "definition": "A context-rich payload attached to human-in-the-loop prompts carrying the agent's confidence, intent, prior attempts, options, and recommended action."
+    },
+    {
+      "term": "trace span",
+      "definition": "An OpenTelemetry-compatible observability record linking tool dispatches, subagent spawns, and model invocations into a causal trace tree."
+    }
+  ]
+}

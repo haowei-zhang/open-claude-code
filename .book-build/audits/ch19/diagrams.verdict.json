@@ -1,0 +1,7 @@
+{
+  "verdict": "pass",
+  "diagram_count": 3,
+  "invalid_indices": [],
+  "trivial_indices": [],
+  "type_breakdown": { "flowchart": 0, "sequenceDiagram": 3, "stateDiagram-v2": 0, "classDiagram": 0, "erDiagram": 0 }
+}

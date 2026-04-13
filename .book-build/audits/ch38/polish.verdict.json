@@ -1,0 +1,20 @@
+{
+  "verdict": "revise",
+  "word_count": 3694,
+  "forbidden_tokens_found": [{"token": "simply", "count": 1}],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 420,
+  "snippet_count": 13,
+  "snippets_in_data_structures_section": 3,
+  "snippets_in_control_flow_section": 10,
+  "oversized_snippets": [{"index": 10, "lines": 48}],
+  "unexplained_snippets": [],
+  "style_issues": [{"line": 314, "issue": "forbidden token 'simply' used as filler"}, {"line": 0, "issue": "word_count 3694 below min_words 4675"}, {"line": 0, "issue": "takeaways_word_count 420 exceeds 300 max"}]
+}

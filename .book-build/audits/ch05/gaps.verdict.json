@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [],
+  "citation_count": 25,
+  "diagram_count": 2,
+  "snippet_count": 5,
+  "top_files_without_snippets": ["src/entrypoints/init.ts"]
+}

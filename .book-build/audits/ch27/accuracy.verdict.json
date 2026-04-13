@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 72,
+      "citation": "src/services/SessionMemory/sessionMemory.ts:L247-L263",
+      "problem": "Cited range starts at L247 but the config object declaration begins at L246; off by one line"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 239,
+      "citation": "src/services/SessionMemory/prompts.ts:L43-L81",
+      "problem": "Snippet claims L43-L81 (38 lines) but only shows ~17 lines with several lines omitted and no // ... trim markers"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 391,
+      "citation": "src/services/compact/sessionMemoryCompact.ts:L562-L565",
+      "problem": "Two comment lines present in source at L562-L563 are omitted from the snippet without trim markers"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 15,
+  "citation_verified": 15,
+  "snippet_total": 15,
+  "snippet_verbatim": 12,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

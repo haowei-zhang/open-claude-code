@@ -1,0 +1,10 @@
+{
+  "verdict": "pass",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": ["Plugin agent security model - permissionMode/hooks/mcpServers intentionally not parsed for plugin agents is in code but not discussed in prose"],
+  "citation_count": 13,
+  "diagram_count": 2,
+  "snippet_count": 13,
+  "top_files_without_snippets": []
+}

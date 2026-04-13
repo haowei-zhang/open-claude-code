@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 174,
+      "citation": "src/coordinator/coordinatorMode.ts:L259-L268",
+      "problem": "Snippet uses 'AgentTool' instead of '${AGENT_TOOL_NAME}' as in the actual source; line range slightly off (actual ~L261-L268)"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 193,
+      "citation": "src/coordinator/coordinatorMode.ts:L143-L163",
+      "problem": "Snippet shows XML notification format as // comments, but actual source has raw XML inside a template literal; line range slightly off (actual ~L146-L164)"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 21,
+  "citation_verified": 19,
+  "snippet_total": 6,
+  "snippet_verbatim": 4,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

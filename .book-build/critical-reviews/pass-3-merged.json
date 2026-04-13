@@ -1,0 +1,81 @@
+{
+  "pass": 3,
+  "merge_rule": "2-of-3 promotion: a chapter is 'hard' only if >= 2 reviewers flagged it hard. Otherwise soft if >= 1 reviewer flagged it.",
+  "merged_flags": [
+    {
+      "chapter_id": 2,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Citations count of 0 is a hard miss -- the meta-chapter that explains how to read the book should reference the chapters it maps to",
+        "HER cross-reference table is promised in the synopsis but not delivered in the body -- the chapter describes the mapping but does not provide the actual table",
+        "Reading paths section is thin -- does not help a reader who wants to read only about security, or only about multi-agent, or only about the tool system"
+      ],
+      "suggested_angle": "Add at least 6 citations to the chapters and HER sections referenced. Add the explicit cross-reference table mapping HER patterns/failure modes to chapter numbers. Add 3-4 curated reading paths for different reader profiles."
+    },
+    {
+      "chapter_id": 20,
+      "severity": "soft",
+      "reviewer_count": 3,
+      "reasons": [
+        "Word count 2616 is 784 words below minimum 3400 -- this is a structural completeness problem, not a polish issue (flagged by all 3 reviewers)",
+        "Agent definitions loading from ~/.claude/agents is described but the chapter does not address what prevents a malicious agent definition from being loaded (e.g., in a shared workstation or CI environment)",
+        "No analysis of how plugin-provided agents differ from user-authored agents in terms of trust and security",
+        "The loading sequence is described but error paths (malformed frontmatter, missing fields, conflicting agent names) are not covered",
+        "Frontmatter parser is covered but the security implications of loading arbitrary markdown+YAML from disk are not addressed",
+        "The chapter does not explain what constitutes a well-structured agent definition versus a poorly-structured one"
+      ],
+      "suggested_angle": "Expand to meet minimum word count. Add a section on the trust model for agent definitions (plugin vs user vs built-in agents and what permission isolation each gets). Add error handling paths with concrete examples of malformed vs well-formed agent definitions. Address the supply-chain risk of agent definitions loaded from shared directories."
+    },
+    {
+      "chapter_id": 36,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Previous passes flagged as soft. Round 3 confirms the missing divergences section has still not been addressed",
+        "The five hook types are enumerated but the chapter does not explain why cc chose these five specifically or what each type's security implications are",
+        "Connection between hooks and the permission pipeline is still missing -- the reader cannot understand how hook decisions interact with deny rules"
+      ],
+      "suggested_angle": "Add a divergences section. Explain the security model of each hook type, especially agent and function types that execute arbitrary code. Connect hooks to the permission pipeline explicitly."
+    },
+    {
+      "chapter_id": 41,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "snippets_drift count of 10 is the highest in the entire book, suggesting significant accuracy problems with quoted code",
+        "Chapter describes MCP tool passthrough but does not explain the security implications of tools whose schemas are not under cc's control",
+        "Deferred loading mechanism is explained but the chapter does not connect to the broader ToolSearch system's limitations identified in Chapter 15"
+      ],
+      "suggested_angle": "Fix all drifting snippets first. Then expand the security analysis: what happens when an MCP tool returns malformed output, how does the harness defend against schema-less tool results, and what is the recovery path when an MCP server crashes mid-call."
+    },
+    {
+      "chapter_id": 50,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Previous passes flagged as soft. Round 3 confirms the GrowthBook operational details still dilute the central architectural argument about the operator-vs-agent observability split",
+        "The PII marker pattern (AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS) is described mechanically but its effectiveness as a security control is not analyzed -- developers can simply cast to bypass it",
+        "Cost tracker bridges analytics and bootstrap state but the chapter does not explain what happens when the cost tracker itself fails or produces incorrect numbers"
+      ],
+      "suggested_angle": "Cut GrowthBook internals to one paragraph. Expand the operator-vs-agent observability split with a concrete in-process metrics bus design. Analyze the PII marker pattern's limitations and suggest stronger alternatives."
+    },
+    {
+      "chapter_id": 51,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Previous passes flagged as soft. Round 3 re-reading confirms the chapter still reads as a feature walkthrough without extracting the deeper architectural pattern about post-hoc vs real-time observability",
+        "The dual-identity observation (ant vs external) is present but its implications for production incident diagnosis are still underexplored",
+        "Doctor screen and security review command are listed but not connected back to the harness's ability to detect its own failures in real time"
+      ],
+      "suggested_angle": "Restructure around the observability spectrum. Make the post-hoc vs real-time tension the central organizing principle. Show what architectural constraints prevent real-time self-monitoring and what would be needed to move along the spectrum."
+    }
+  ],
+  "stats": {
+    "total_flags": 6,
+    "hard_flags": 0,
+    "soft_flags": 6,
+    "chapters_flagged": [2, 20, 36, 41, 50, 51]
+  }
+}

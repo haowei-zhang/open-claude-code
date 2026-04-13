@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_hallucinated",
+      "chapter_line": 408,
+      "citation": "src/tools/ScheduleCronTool/CronDeleteTool.ts:L42-L56",
+      "problem": "The cited line range (42-56) contains outputSchema getter, isEnabled, description, prompt, and getPath — not a call method. The actual call() is at L82-85 and returns { data: { id } }, not { data: { message: ... } }. The shown code block does not appear in the referenced range."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 258,
+      "citation": "src/tools/ScheduleCronTool/CronCreateTool.ts:L82-L116",
+      "problem": "Minor whitespace and comment formatting drift between chapter snippet and actual source. The teammate durable-cron comment at L105-L106 differs slightly from chapter representation."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 126,
+      "citation": "src/utils/cron.ts:L119-L181",
+      "problem": "The chapter snippet omits the domSet/dowSet constructions and smart-jump logic present in the actual source (lines 125-131, 148-165), replacing them with '// ... day-of-month/day-of-week OR semantics' and '// ... hour and minute matching'. This is an acceptable trim but constitutes drift from the actual line range."
+    }
+  ],
+  "uncited_sources": ["src/tools/ScheduleCronTool/UI.tsx"],
+  "citation_total": 30,
+  "citation_verified": 27,
+  "snippet_total": 15,
+  "snippet_verbatim": 10,
+  "snippet_drift": 4,
+  "snippet_hallucinated": 1
+}

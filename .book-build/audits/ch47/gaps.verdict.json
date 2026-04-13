@@ -1,0 +1,12 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/tools/ScheduleCronTool/UI.tsx"],
+  "missing_diagrams": [
+    {"required": "classDiagram of CronTask record", "found": false}
+  ],
+  "uncovered_topics": [],
+  "citation_count": 30,
+  "diagram_count": 2,
+  "snippet_count": 15,
+  "top_files_without_snippets": []
+}

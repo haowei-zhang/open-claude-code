@@ -1,0 +1,75 @@
+{
+  "pass": 1,
+  "merged_flags": [
+    {
+      "chapter_id": 41,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "10 of 15 code snippets show drift (66% drift rate), indicating the chapter's code citations do not match the actual source files",
+        "For a chapter about MCP tool passthrough and deferred loading, factual inaccuracy in the code references undermines the chapter's core purpose",
+        "The permission passthrough chain is security-critical and inaccuracy there does the most damage"
+      ],
+      "suggested_angle": "Re-derive the chapter from the actual source files in src/tools/MCPTool/ and src/services/mcp/, verifying every snippet verbatim. Focus on the permission passthrough chain specifically."
+    },
+    {
+      "chapter_id": 11,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "5 of 16 snippets show drift (31%) at the foundational Tool contract that all other tool chapters build on",
+        "The chapter does not adequately explain why the contract takes this specific shape versus alternatives (e.g., why Zod+JSONSchema dual validation)"
+      ],
+      "suggested_angle": "Verify all drifted snippets against source and fix. Add a section explaining the design constraints that produced the dual-schema contract."
+    },
+    {
+      "chapter_id": 49,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "At 3200 words near the 2975 minimum, three distinct subsystems are crammed into minimal space",
+        "The Buddy/Tamagotchi system has implications for HER Section 18 over-trust risk but the connection is underexplored"
+      ],
+      "suggested_angle": "Expand the analysis of how the Buddy system interacts with HER Section 18's over-trust risk -- a companion that tracks stats may increase user attachment, which is both a feature and a risk."
+    },
+    {
+      "chapter_id": 50,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Chapter reads as API documentation rather than extracting architectural principles from the observability subsystem",
+        "The divergences section catalogs gaps without explaining why they exist or what architectural constraints prevent closing them",
+        "HER cross-references restate what HER says without deepening from cc's concrete implementation perspective"
+      ],
+      "suggested_angle": "Restructure around the tension between observability-for-operators (what cc provides) and observability-for-the-agent (what HER prescribes but cc omits)."
+    },
+    {
+      "chapter_id": 53,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "As a meta-chapter covering all 12 patterns, it risks being a reference table rather than a teacher",
+        "The divergences section reads as 12 independent observations rather than an integrated analysis",
+        "Does not explain what a reader would lose by skipping individual chapters and only reading this one"
+      ],
+      "suggested_angle": "Add a section showing how the 12 patterns interact during a single running query and identify the 2-3 pattern interactions that are most surprising or non-obvious."
+    },
+    {
+      "chapter_id": 57,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Closing chapter has only 6 citations (minimum) and 3841 words (near minimum) -- should be more expansive as the book's final statement",
+        "Risks summarizing what was already said rather than synthesizing new insights that only emerge from reading the full book",
+        "Open research questions need to be sharper -- specific unsolved problems with concrete evidence from cc's implementation"
+      ],
+      "suggested_angle": "Identify the 3-5 specific architectural tensions revealed by cc's implementation that cannot be resolved within the current discipline's framework."
+    }
+  ],
+  "stats": {
+    "total_flags": 6,
+    "hard_flags": 0,
+    "soft_flags": 6,
+    "chapters_flagged": [11, 41, 49, 50, 53, 57]
+  }
+}

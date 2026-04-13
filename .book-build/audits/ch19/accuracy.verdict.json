@@ -1,0 +1,19 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 89, "citation": "RemoteAgentTask.tsx:L22-L59", "problem": "Comments omitted from RemoteAgentTaskState type definition" },
+    { "type": "snippet_drift", "chapter_line": 120, "citation": "LocalAgentTask.tsx:L116-L148", "problem": "unregisterCleanup field missing, comments omitted" },
+    { "type": "snippet_drift", "chapter_line": 152, "citation": "LocalAgentTask.tsx:L43-L57", "problem": "Line offset wrong (L43 vs actual L41), comments omitted from ProgressTracker" },
+    { "type": "snippet_drift", "chapter_line": 206, "citation": "forkSubagent.ts:L107-L169", "problem": "Fallback path (no tool_use blocks) omitted from buildForkedMessages" },
+    { "type": "snippet_drift", "chapter_line": 248, "citation": "forkSubagent.ts:L171-L198", "problem": "buildChildMessage content is paraphrased, not verbatim" },
+    { "type": "snippet_drift", "chapter_line": 354, "citation": "RemoteAgentTask.tsx:L124-L141", "problem": "checkRemoteAgentEligibility signature wrong (missing skipBundle param), called function name wrong (Precondition vs Eligibility)" },
+    { "type": "snippet_drift", "chapter_line": 374, "citation": "LocalAgentTask.tsx:L43-L57", "problem": "Duplicate of earlier ProgressTracker snippet with same drift issues" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 14,
+  "citation_verified": 7,
+  "snippet_total": 14,
+  "snippet_verbatim": 7,
+  "snippet_drift": 7,
+  "snippet_hallucinated": 0
+}

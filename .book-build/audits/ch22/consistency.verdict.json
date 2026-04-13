@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "high water mark", "definition": "A persistent counter file (.highwatermark) that stores the maximum task ID ever assigned, preventing ID reuse after deletion or reset operations."},
+    {"term": "task list identity", "definition": "The mechanism by which getTaskListId() determines which task list an agent operates on, using a priority chain: environment variable, teammate context, team name, leader team name, or session ID."},
+    {"term": "task assignment notification", "definition": "A JSON message sent via the teammate mailbox when a task's owner changes, ensuring the newly assigned teammate learns about the work without polling the task list."},
+    {"term": "reference sweeping", "definition": "The O(N) operation performed after task deletion that removes references to the deleted task from all other tasks' blocks and blockedBy arrays, maintaining referential integrity."},
+    {"term": "verification nudge", "definition": "The advisory signal in TaskUpdateTool that fires when the main-thread agent completes 3+ tasks without including a verification step, appending a reminder to spawn the verification subagent."}
+  ]
+}

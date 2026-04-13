@@ -1,0 +1,36 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 23,
+      "citation": "src/utils/permissions/PermissionMode.ts:L10-L11",
+      "problem": "Snippet claims PermissionMode type is defined at L10-L11, but L10-11 contain import statements. The type is actually defined in src/types/permissions.ts and re-exported from PermissionMode.ts. The cited line range is wrong."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 80,
+      "citation": "src/utils/permissions/autoModeState.ts:L7-L9",
+      "problem": "Snippet shows 'let autoModeCircuitBroken = false' and 'isAutoModeCircuitBroken()' on consecutive lines 8-9, but in the actual file the variable is at L9 and the function is at L31-33. They are not adjacent."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 239,
+      "citation": "src/utils/hooks/ssrfGuard.ts:L55-L86",
+      "problem": "Snippet omits the NaN guard and parts.length !== 4 check present in the actual source (lines 58-65). The core blocking logic matches but the validation preamble is missing, making the snippet incomplete."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 29,
+      "citation": "src/utils/permissions/PermissionMode.ts:L96-L105",
+      "problem": "Function actually starts at L97, not L96. Line 96 contains the JSDoc closing comment. Content matches but line range is off by 1."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 46,
+  "citation_verified": 42,
+  "snippet_total": 13,
+  "snippet_verbatim": 9,
+  "snippet_drift": 4,
+  "snippet_hallucinated": 0
+}

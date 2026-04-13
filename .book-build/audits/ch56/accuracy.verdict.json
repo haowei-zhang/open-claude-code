@@ -1,0 +1,18 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 302,
+      "citation": "src/hooks/useCanUseTool.tsx:L126-L131",
+      "problem": "The snippet shows multi-line formatting for the conditional check but the actual code at line 126 is a single condensed line. Logic matches but whitespace/formatting drift."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 12,
+  "citation_verified": 12,
+  "snippet_total": 7,
+  "snippet_verbatim": 6,
+  "snippet_drift": 1,
+  "snippet_hallucinated": 0
+}

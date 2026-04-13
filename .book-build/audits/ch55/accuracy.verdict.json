@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 177,
+      "citation": "src/utils/hooks.ts:L67-L109",
+      "problem": "Caption says 'Hook event type definitions' but actual code is import statements. Listed types match but are selectively shown; many more types exist in the import list."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 259,
+      "citation": "src/bootstrap/state.ts:L46-L67",
+      "problem": "Snippet shows meter/sessionCounter/costCounter/tokenCounter fields that do not appear at L46-L67 in the actual source. Actual lines contain originalCwd, projectRoot, and other fields not shown. The snippet conflates fields from different parts of the State type."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 37,
+  "citation_verified": 35,
+  "snippet_total": 10,
+  "snippet_verbatim": 8,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

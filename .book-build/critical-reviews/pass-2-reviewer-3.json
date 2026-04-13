@@ -1,0 +1,16 @@
+{
+  "reviewer": 3,
+  "pass": 2,
+  "flags": [
+    {
+      "chapter_id": 36,
+      "severity": "soft",
+      "reasons": [
+        "The chapter covers the hook schema thoroughly but the 'Where cc diverges from the published pattern' section is absent -- there is no analysis of how cc's hook implementation differs from HER Pattern 12 (Deterministic Lifecycle Hooks), which is a significant omission for a chapter that should be comparing implementation to published pattern",
+        "The five hook types (command, prompt, http, agent, function) are enumerated but the chapter does not explain why these five specifically, or what the security implications are of each type -- particularly the agent and function types which execute arbitrary code",
+        "The HER cross-reference is limited to Pattern 12 and Configuration Surfaces -- the chapter does not connect hooks to the broader failure-mode defenses (e.g., how hooks interact with the permission system to prevent 6.13 prompt injection)"
+      ],
+      "suggested_angle": "Add a divergences section analyzing how cc's hook implementation differs from HER Pattern 12: the exit-code semantics (0=allow, 2=block), the SSRF guard on HTTP hooks, and the supply-chain risk of function hooks. Connect hooks to the permission pipeline and explain why hooks are NOT the final arbiter for safety-critical paths (safety checks override hook approvals)."
+    }
+  ]
+}

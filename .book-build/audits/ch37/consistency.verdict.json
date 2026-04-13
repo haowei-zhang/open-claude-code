@@ -1,0 +1,27 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "combined abort signal",
+      "definition": "The pattern of merging a parent abort signal with a timeout signal via createCombinedAbortSignal, used across all hook execution paths to enforce timeout boundaries. Distinct from a simple AbortController because it combines two independent abort sources."
+    },
+    {
+      "term": "three-outcome model",
+      "definition": "The hook result contract where every hook execution produces one of three primary outcomes: success, blocking, or non_blocking_error (plus cancelled for external interruption). This is a core invariant of the hook system."
+    },
+    {
+      "term": "session hook registry",
+      "definition": "The Map<string, SessionStore> structure keyed by session ID that stores ephemeral, in-memory hooks (both command and function type) for the duration of a session."
+    },
+    {
+      "term": "structured output enforcement",
+      "definition": "The pattern where a PostToolUse function hook checks whether the agent has called StructuredOutputTool and, if not, blocks the response and prompts the agent to use it. Used by agent hooks to guarantee structured responses."
+    },
+    {
+      "term": "hook event broadcasting",
+      "definition": "The lightweight pub/sub system in hookEvents.ts that broadcasts hook execution progress to SDK consumers and the UI, with a pending-events buffer for late-registered handlers."
+    }
+  ]
+}

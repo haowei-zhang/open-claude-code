@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 92,
+      "citation": "src/utils/permissions/yoloClassifier.ts:L1310-L1327",
+      "problem": "JSDoc comments between AutoModeConfig fields stripped from snippet"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 298,
+      "citation": "src/utils/permissions/yoloClassifier.ts:L262-L285",
+      "problem": "Multi-line property definitions compressed to single lines"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 15,
+  "citation_verified": 15,
+  "snippet_total": 15,
+  "snippet_verbatim": 13,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

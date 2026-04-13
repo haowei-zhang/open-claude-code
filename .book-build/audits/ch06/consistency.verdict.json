@@ -1,0 +1,12 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    { "term": "subagent", "used_as": "sub-agent", "should_be": "subagent" }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    { "term": "pending state pattern", "definition": "A module-scope variable with a feature() gate that is set during argv parsing and consumed later in the action handler, enabling dead-code elimination of feature-gated code paths." },
+    { "term": "eager settings loading", "definition": "The pattern of parsing CLI flags before the Commander program is constructed, necessary when flags affect initialization behavior." },
+    { "term": "content-hash temp path", "definition": "A temporary file path derived from a content hash rather than a random UUID, used to preserve API prompt cache hits across process boundaries." }
+  ]
+}

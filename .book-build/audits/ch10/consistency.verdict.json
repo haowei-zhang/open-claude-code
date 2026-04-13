@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "token budget",
+      "definition": "A client-side limit on the number of tokens consumed per agentic turn, enforced by BudgetTracker and checkTokenBudget() to detect diminishing returns and budget exhaustion."
+    },
+    {
+      "term": "diminishing-returns detector",
+      "definition": "The heuristic in checkTokenBudget() that compares token deltas across consecutive loop iterations, stopping the loop when progress falls below the DIMINISHING_THRESHOLD for at least 3 continuations."
+    },
+    {
+      "term": "token estimation pipeline",
+      "definition": "The three-tier counting system (API-based, Haiku fallback, rough heuristic) that provides token counts with decreasing accuracy and latency, used when the primary API endpoint is unavailable."
+    }
+  ]
+}

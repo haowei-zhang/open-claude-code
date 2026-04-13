@@ -1,0 +1,12 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "classDiagram of rule types", "found": false}
+  ],
+  "uncovered_topics": [],
+  "citation_count": 42,
+  "diagram_count": 2,
+  "snippet_count": 9,
+  "top_files_without_snippets": []
+}

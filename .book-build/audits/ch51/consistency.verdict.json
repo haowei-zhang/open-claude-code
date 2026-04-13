@@ -1,0 +1,33 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "subagent",
+      "used_as": "sub-agent",
+      "should_be": "subagent"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "debug log level",
+      "definition": "A five-tier verbosity filter (verbose, debug, info, warn, error) controlling which messages are written to the debug log file, configured via CLAUDE_CODE_DEBUG_LOG_LEVEL."
+    },
+    {
+      "term": "BufferedWriter",
+      "definition": "A write abstraction supporting immediate (synchronous) and buffered (asynchronous with periodic flush) modes, used by the debug logging system to balance crash safety against performance."
+    },
+    {
+      "term": "debug filter pattern",
+      "definition": "A module or function name pattern specified via --debug=pattern that filters debug output to matching entries, parsed by parseDebugFilter and applied by shouldShowDebugMessage."
+    },
+    {
+      "term": "latest symlink",
+      "definition": "An advisory symlink at ~/.claude/debug/latest pointing to the current session's debug log file, created once per session by updateLatestDebugLogSymlink."
+    },
+    {
+      "term": "immediate mode",
+      "definition": "The debug writer mode where writes use appendFileSync to guarantee crash survival, active when --debug or DEBUG env var is set."
+    }
+  ]
+}

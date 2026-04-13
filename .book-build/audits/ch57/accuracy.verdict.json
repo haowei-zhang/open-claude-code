@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 48,
+      "citation": "src/utils/permissions/PermissionMode.ts:L10-L11",
+      "problem": "PermissionMode type is defined in src/types/permissions.ts and re-exported; L10-L11 in PermissionMode.ts are import lines, not the type definition"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 55,
+      "citation": "src/entrypoints/cli.tsx:L20-L26",
+      "problem": "ABLATION_BASELINE code starts at L21 not L20; line range is offset by 1"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 6,
+  "citation_verified": 6,
+  "snippet_total": 4,
+  "snippet_verbatim": 2,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,60 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 220,
+      "citation": "src/state/AppState.tsx:L49-L56",
+      "problem": "File on disk is React compiler output; clean code shown corresponds to source-mapped original, not actual file content"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 286,
+      "citation": "src/state/AppState.tsx:L142-L163",
+      "problem": "Compiled output differs from clean source shown"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 304,
+      "citation": "src/state/AppState.tsx:L170-L172",
+      "problem": "Compiled output differs from clean source shown"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 336,
+      "citation": "src/state/AppState.tsx:L84-L91",
+      "problem": "Compiled output differs from clean source shown"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 403,
+      "citation": "src/state/AppState.tsx:L44-L48",
+      "problem": "Compiled output differs from clean source shown"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 420,
+      "citation": "src/state/AppState.tsx:L62-L70",
+      "problem": "Compiled output differs from clean source shown"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 448,
+      "citation": "src/state/AppState.tsx:L148-L153",
+      "problem": "Chapter shows `if (false && state === selected)` but actual source-mapped code has `if (\"external\" === \"ant\" && state === selected)`; functionally equivalent in external build but text differs"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 491,
+      "citation": "src/state/AppState.tsx:L186-L199",
+      "problem": "Compiled output differs from clean source shown"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 30,
+  "citation_verified": 22,
+  "snippet_total": 21,
+  "snippet_verbatim": 14,
+  "snippet_drift": 7,
+  "snippet_hallucinated": 0
+}

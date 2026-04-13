@@ -1,0 +1,12 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "Async hook registry: mentioned in synopsis and briefly referenced in command hook section but not covered in depth (lifecycle, data structure, re-wake mechanism)"
+  ],
+  "citation_count": 9,
+  "diagram_count": 2,
+  "snippet_count": 9,
+  "top_files_without_snippets": []
+}

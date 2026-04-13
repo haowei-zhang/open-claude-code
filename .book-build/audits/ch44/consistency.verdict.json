@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "bridge",
+      "definition": "A bidirectional transport layer connecting cc's in-process agent loop to external orchestrators (IDE extensions, web clients, SDK daemons), implementing message translation, session lifecycle management, OAuth token refresh, and permission proxying."
+    },
+    {
+      "term": "work-secret authentication",
+      "definition": "A per-session authentication mechanism where each spawned cc session is bound to a unique work secret generated at spawn time, preventing unauthorized clients from connecting to or injecting messages into a running session."
+    },
+    {
+      "term": "capacity wake signal",
+      "definition": "A signaling mechanism that wakes the work-polling loop immediately when a session completes, reducing latency between session completion and new work assignment from the polling interval to near-zero."
+    }
+  ]
+}

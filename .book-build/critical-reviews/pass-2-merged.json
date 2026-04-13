@@ -1,0 +1,67 @@
+{
+  "pass": 2,
+  "merge_rule": "2-of-3 promotion: a chapter is 'hard' only if >= 2 reviewers flagged it hard. Otherwise soft if >= 1 reviewer flagged it.",
+  "merged_flags": [
+    {
+      "chapter_id": 50,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Round 1 flagged for reading as API documentation. Round 2 re-reading confirms restructuring is present but chapter still spends disproportionate space on GrowthBook internals that dilute the central architectural argument",
+        "The divergences section names the operator-vs-agent split but does not prescribe a concrete solution pattern for closing the loop",
+        "Edge-case section has grown with operational details (formatCost precision, getAllGrowthBookFeatures, etc.) that dilute the chapter's focus"
+      ],
+      "suggested_angle": "Cut GrowthBook operational details to a single paragraph. Expand divergences with a concrete in-process metrics bus interface pattern showing what the API would look like and what call sites would change."
+    },
+    {
+      "chapter_id": 54,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Thorough cataloging of all 17 failure modes but the many-to-many mapping means the reader cannot quickly see which modes have the deepest defenses and which are most exposed",
+        "Failure modes 6.2, 6.4, 6.10, 6.17 are all 'prompt-level, no structural mechanism' but the chapter does not explain WHY cc chose prompt-level over structural enforcement -- deliberate tradeoff or oversight?",
+        "Token budget code snippets for 6.7 are duplicated from Chapter 10 without adding new analytical depth specific to the failure-mode framing"
+      ],
+      "suggested_angle": "Add a severity-exposure matrix at the start showing defense depth (structural/prompt/none) vs exploitability (easy/hard/theoretical). For each prompt-level-only defense, add a one-sentence design rationale explaining why structural enforcement was not chosen."
+    },
+    {
+      "chapter_id": 51,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Reads as a feature walkthrough rather than architectural analysis -- describes WHAT each subsystem does without extracting the deeper pattern about why cc's observability is post-hoc rather than real-time",
+        "The dual-identity observation (ant vs external debug logging) is mentioned but its architectural implications for production incident diagnosis are not explored",
+        "HER cross-reference to Section 6.6 (silent failures) is token -- does not explain how debug log format could enable automated silent-failure detection"
+      ],
+      "suggested_angle": "Restructure around the post-hoc vs real-time observability spectrum. Show where cc sits (firmly post-hoc), what architectural constraints prevent real-time self-monitoring, and what a reader would need to add for real-time failure detection."
+    },
+    {
+      "chapter_id": 26,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "ETH Zurich finding that context files reduce task success while increasing cost is mentioned in overview but not carried through as a design constraint for the rest of the chapter",
+        "Closed four-type taxonomy (user/feedback/project/reference) presented without explaining why these four specifically or what happens when content does not fit",
+        "Side-query relevance evaluation adds latency and cost to every query but the chapter does not quantify this overhead or discuss the tradeoff"
+      ],
+      "suggested_angle": "Add a section on the cost-benefit tension: explain how cc's 200-line cap and type exclusions respond to the ETH Zurich finding, and quantify side-query overhead so readers can assess whether the tiered approach is worth it."
+    },
+    {
+      "chapter_id": 36,
+      "severity": "soft",
+      "reviewer_count": 1,
+      "reasons": [
+        "Missing 'Where cc diverges from the published pattern' section -- no analysis of how cc's hook implementation differs from HER Pattern 12 (Deterministic Lifecycle Hooks)",
+        "Five hook types enumerated without explaining why these five specifically or what security implications each type carries, particularly agent and function types that execute arbitrary code",
+        "HER cross-reference limited to Pattern 12 and Configuration Surfaces -- no connection to broader failure-mode defenses or the permission system"
+      ],
+      "suggested_angle": "Add a divergences section analyzing exit-code semantics, SSRF guard on HTTP hooks, and supply-chain risk of function hooks. Connect hooks to the permission pipeline and explain why hooks are NOT the final arbiter for safety-critical paths."
+    }
+  ],
+  "stats": {
+    "total_flags": 5,
+    "hard_flags": 0,
+    "soft_flags": 5,
+    "chapters_flagged": [26, 36, 50, 51, 54]
+  }
+}

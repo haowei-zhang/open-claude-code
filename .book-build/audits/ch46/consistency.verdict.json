@@ -1,0 +1,23 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "slug validation",
+      "definition": "The process of checking a user-controlled string against strict character-allowlist and length rules before joining it into a filesystem path, preventing directory-escape and path-traversal attacks."
+    },
+    {
+      "term": "fail-closed",
+      "definition": "A safety design principle where uncertainty or error states default to the most restrictive behavior, preventing data loss from false negatives. Contrasted with fail-open, where errors default to permissive behavior."
+    },
+    {
+      "term": "fast-resume path",
+      "definition": "An optimization that checks whether a worktree with the same slug already exists by reading the git internal pointer file directly, avoiding subprocess spawn overhead (~15ms) on every resume."
+    },
+    {
+      "term": "ephemeral worktree pattern",
+      "definition": "An exact-shape regex pattern that matches throwaway worktrees created by automated processes (AgentTool, WorkflowTool, bridgeMain) without matching user-named worktrees, used by cleanupStaleAgentWorktrees to avoid accidental deletion."
+    }
+  ]
+}

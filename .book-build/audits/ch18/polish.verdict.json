@@ -1,0 +1,20 @@
+{
+  "verdict": "rewrite",
+  "word_count": 3371,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 420,
+  "snippet_count": 15,
+  "snippets_in_data_structures_section": 6,
+  "snippets_in_control_flow_section": 7,
+  "oversized_snippets": [{"index": 14, "lines": 45}],
+  "unexplained_snippets": [],
+  "style_issues": [{"line": 176, "issue": "Duplicated paragraph opening: 'The core type that describes a subagent...' appears twice in succession"}]
+}

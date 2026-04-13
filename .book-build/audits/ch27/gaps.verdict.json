@@ -1,0 +1,18 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {
+      "required": "flowchart of memory promotion session -> memdir",
+      "found": false
+    }
+  ],
+  "uncovered_topics": [
+    "Memory promotion pipeline from session memory to persistent memdir",
+    "GrowthBook feature gate integration details"
+  ],
+  "citation_count": 15,
+  "diagram_count": 2,
+  "snippet_count": 15,
+  "top_files_without_snippets": []
+}

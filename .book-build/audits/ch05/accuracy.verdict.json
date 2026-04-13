@@ -1,0 +1,36 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 97,
+      "citation": "src/utils/settings/settings.ts:L91-L112",
+      "problem": "Indentation differs (2 spaces in chapter vs 4 spaces in source). Actual content starts at line 93, not 91."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 129,
+      "citation": "src/entrypoints/cli.tsx:L33-L43",
+      "problem": "If condition reformatted to single line vs multi-line in source. Missing biome-ignore comment. Line range slightly off."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 247,
+      "citation": "src/entrypoints/cli.tsx:L20-L26",
+      "problem": "Array formatting differs (3 lines in chapter vs 9 lines in source). Line number should be L21, not L20."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 76,
+      "citation": "src/utils/settings/settings.ts:L538-L547",
+      "problem": "Cannot fully verify line numbers; other snippets from this file show indentation drift, so this likely has similar drift."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 25,
+  "citation_verified": 21,
+  "snippet_total": 5,
+  "snippet_verbatim": 1,
+  "snippet_drift": 4,
+  "snippet_hallucinated": 0
+}

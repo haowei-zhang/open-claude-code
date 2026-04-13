@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "required_refs_found": 2,
+  "required_refs_total": 2,
+  "required_refs_missing": [],
+  "divergence_section_length_words": 290,
+  "issues": [
+    {
+      "type": "wrong_section",
+      "detail": "Chapter cites 'HER Pattern 3 (Tiered Memory)' when the withMemoryCorrectionHint pattern is more directly related to §5 Pattern 5 (Progressive Context Compaction). The required ref for Pattern 5 is substantively covered through compaction boundary discussion but not explicitly cited as Pattern 5."
+    }
+  ]
+}

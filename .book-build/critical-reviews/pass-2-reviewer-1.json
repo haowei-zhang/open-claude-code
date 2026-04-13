@@ -1,0 +1,26 @@
+{
+  "reviewer": 1,
+  "pass": 2,
+  "flags": [
+    {
+      "chapter_id": 50,
+      "severity": "soft",
+      "reasons": [
+        "Round 1 flagged this chapter for reading as API documentation rather than extracting architectural principles. The round 2 re-reading confirms the restructuring around operator-vs-agent observability tension is now present but the chapter still spends disproportionate space enumerating GrowthBook internals (env overrides, config overrides, cache-key attributes, refresh intervals) that are operational details rather than architectural insights",
+        "The divergences section now names the operator-vs-agent split but does not explain what a reader would need to DO to close the gap -- it diagnoses the problem without prescribing a concrete solution pattern",
+        "The edge-case section has grown substantially with details about formatCost precision, getAllGrowthBookFeatures, checkSecurityRestrictionGate etc. that dilute the central argument and make the chapter harder to navigate"
+      ],
+      "suggested_angle": "Cut the GrowthBook operational details to a single paragraph and expand the divergences section with a concrete pattern for closing the operator-to-agent loop: an in-process metrics bus interface with synchronous read access, showing what the API would look like and what call sites would change."
+    },
+    {
+      "chapter_id": 54,
+      "severity": "soft",
+      "reasons": [
+        "The chapter is thorough in cataloging all 17 failure modes but the many-to-many mapping between defenses and failure modes means the reader cannot quickly see which failure modes have the deepest structural defenses and which are most exposed",
+        "Failure modes 6.2, 6.4, 6.10, 6.17 are all marked 'prompt-level defense, no structural mechanism' but the chapter does not explain WHY cc chose prompt-level over structural enforcement for these specific modes -- is it a deliberate tradeoff or an oversight?",
+        "The token budget code snippets for 6.7 are duplicated from Chapter 10 without adding new analytical depth specific to the failure-mode framing"
+      ],
+      "suggested_angle": "Add a severity-exposure matrix at the start showing each failure mode's defense depth (structural/prompt/none) and exploitability (easy/hard/theoretical), so the reader immediately sees where the gaps matter most. For each prompt-level-only defense, add a one-sentence design rationale explaining why structural enforcement was not chosen."
+    }
+  ]
+}

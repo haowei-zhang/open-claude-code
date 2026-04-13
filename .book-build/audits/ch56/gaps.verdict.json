@@ -1,0 +1,14 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "Quality-gates pipeline interaction with shouldAutoCompact and compaction thresholds",
+    "Implementation of pollable flag in existing commandSemantics.ts/readOnlyValidation.ts",
+    "Migration path for in-progress sessions when new subsystems are deployed"
+  ],
+  "citation_count": 10,
+  "diagram_count": 2,
+  "snippet_count": 12,
+  "top_files_without_snippets": []
+}

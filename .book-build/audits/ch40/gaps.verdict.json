@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "MCP elicitation handling details - mentioned briefly but not covered with code evidence",
+    "MCP tool timeout configuration - described in prose but no source code citation for DEFAULT_MCP_TOOL_TIMEOUT_MS"
+  ],
+  "citation_count": 11,
+  "diagram_count": 3,
+  "snippet_count": 11,
+  "top_files_without_snippets": []
+}

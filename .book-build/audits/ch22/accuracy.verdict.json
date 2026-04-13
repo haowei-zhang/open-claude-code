@@ -1,0 +1,84 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 17,
+      "citation": "src/utils/tasks.ts:L76-L89",
+      "problem": "Chapter snippet omits inline comments from the source (e.g. '// present continuous form for spinner', '// agent ID', '// task IDs this task blocks', '// task IDs that block this task', '// arbitrary metadata'). Identifiers and structure match but comments were stripped."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 49,
+      "citation": "src/utils/tasks.ts:L69-L74",
+      "problem": "Chapter snippet adds blank line between TASK_STATUSES and TaskStatusSchema that is not present in source. Minor whitespace drift."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 65,
+      "citation": "src/utils/tasks.ts:L199-L210",
+      "problem": "Chapter snippet omits the 4-line comment block at L203-L205 ('In-process teammates use the leader's team name...'). Identifiers match."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 87,
+      "citation": "src/utils/tasks.ts:L221-L231",
+      "problem": "Chapter snippet omits the ensureTasksDir function that follows at L233, but the cited range L221-L231 only covers the two functions shown. Range is accurate, content matches."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 107,
+      "citation": "src/utils/tasks.ts:L488-L499",
+      "problem": "Chapter snippet adds a blank line before 'busyWithTasks' that does not exist in source. Minor whitespace drift."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 156,
+      "citation": "src/utils/tasks.ts:L284-L308",
+      "problem": "Chapter snippet matches source closely but omits blank lines and some comments between L288-L290. Identifiers preserved."
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 80,
+      "citation": "src/utils/tasks.ts:L862",
+      "problem": "Chapter claims DEFAULT_TASKS_MODE_TASK_LIST_ID is at L862 with value 'tasklist'. Source at L862 confirms this. However the chapter description says it 'provides a fallback task list ID for sessions that use the Tasks feature without being part of a team' which is an interpretation not explicitly stated in code comments. Acceptable."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 327,
+      "citation": "src/utils/tasks.ts:L511-L523",
+      "problem": "Chapter snippet matches source but omits 2-line comment at L514-L516. Identifiers preserved."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 357,
+      "citation": "src/tools/TaskCreateTool/TaskCreateTool.ts:L48-L138",
+      "problem": "Chapter snippet range L80-L114 is cited but actual snippet shown covers approximately L80-L113. The call() method structure matches but the chapter simplifies the code slightly (omits context.setAppState call at L116-L119). Content drift."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 392,
+      "citation": "src/tools/TaskUpdateTool/TaskUpdateTool.ts:L33-L66",
+      "problem": "Chapter snippet shows the inputSchema but omits the .describe() text that is present in source. Identifiers match but description strings differ."
+    }
+  ],
+  "uncited_sources": [
+    "src/tools/TaskCreateTool/constants.ts",
+    "src/tools/TaskCreateTool/prompt.ts",
+    "src/tools/TaskListTool/constants.ts",
+    "src/tools/TaskListTool/prompt.ts",
+    "src/tools/TaskGetTool/constants.ts",
+    "src/tools/TaskGetTool/prompt.ts",
+    "src/tools/TaskUpdateTool/constants.ts",
+    "src/tools/TaskUpdateTool/prompt.ts",
+    "src/tools/TaskStopTool/prompt.ts",
+    "src/tools/TaskStopTool/UI.tsx",
+    "src/tools/TaskOutputTool/constants.ts"
+  ],
+  "citation_total": 28,
+  "citation_verified": 28,
+  "snippet_total": 15,
+  "snippet_verbatim": 3,
+  "snippet_drift": 12,
+  "snippet_hallucinated": 0
+}

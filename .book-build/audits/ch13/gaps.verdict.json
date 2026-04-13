@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [
+    "src/tools/FileReadTool/imageProcessor.ts",
+    "src/tools/FileReadTool/UI.tsx",
+    "src/tools/FileEditTool/constants.ts",
+    "src/tools/FileEditTool/utils.ts",
+    "src/tools/FileEditTool/prompt.ts",
+    "src/tools/FileEditTool/UI.tsx",
+    "src/tools/FileWriteTool/prompt.ts",
+    "src/tools/FileWriteTool/UI.tsx",
+    "src/tools/GlobTool/prompt.ts",
+    "src/tools/GlobTool/UI.tsx",
+    "src/tools/GrepTool/prompt.ts",
+    "src/tools/GrepTool/UI.tsx",
+    "src/tools/NotebookEditTool/constants.ts",
+    "src/tools/NotebookEditTool/prompt.ts",
+    "src/tools/NotebookEditTool/UI.tsx"
+  ],
+  "missing_diagrams": [
+    {"required": "classDiagram of the file-tool family", "found": false}
+  ],
+  "uncovered_topics": [
+    "imageProcessor.ts — image resize/compression pipeline not discussed despite being a source file"
+  ],
+  "citation_count": 25,
+  "diagram_count": 2,
+  "snippet_count": 18,
+  "top_files_without_snippets": []
+}

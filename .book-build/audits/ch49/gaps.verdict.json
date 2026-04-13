@@ -1,0 +1,17 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {
+      "required": "classDiagram of Buddy sprite/gacha",
+      "found": false
+    }
+  ],
+  "uncovered_topics": [
+    "Other feature-gated experimental layers beyond KAIROS and Buddy"
+  ],
+  "citation_count": 29,
+  "diagram_count": 2,
+  "snippet_count": 9,
+  "top_files_without_snippets": []
+}

@@ -1,0 +1,23 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "ablation baseline",
+      "definition": "A testing mode enabled by the ABLATION_BASELINE feature flag that disables thinking, compaction, auto-memory, and background tasks for controlled comparison experiments."
+    },
+    {
+      "term": "drop-in convention",
+      "definition": "The managed-settings.d directory pattern where *.json files are loaded in alphabetical order and merged on top of the base managed-settings.json, matching the systemd/sudoers drop-in convention."
+    },
+    {
+      "term": "early input buffer",
+      "definition": "The startCapturingEarlyInput() mechanism that buffers terminal keystrokes while the main module loads, flushing them into the REPL once the Ink rendering pipeline is ready."
+    },
+    {
+      "term": "scroll drain",
+      "definition": "A mechanism that suspends background intervals during active terminal scrolling to prevent scroll jank, with a 150ms debounce timer that auto-clears."
+    }
+  ]
+}

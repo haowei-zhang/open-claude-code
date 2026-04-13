@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "classifier",
+      "used_as": "broad function classifying all tool actions including non-shell commands",
+      "should_be": "registry definition is narrow (shell commands only); chapter usage is more accurate than registry"
+    },
+    {
+      "term": "feature flag",
+      "used_as": "runtime GrowthBook flag (tengu_auto_mode_config)",
+      "should_be": "registry has 'feature gate' defined as compile-time boundary; these are different concepts and both terms are correct in their respective contexts"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "YOLO classifier",
+      "definition": "The LLM-based classifier that evaluates tool actions against a security policy using a two-stage XML pipeline with transcript projection and prompt caching."
+    },
+    {
+      "term": "transcript projection",
+      "definition": "The security-motivated transformation of the raw conversation into a compact transcript that excludes assistant text to prevent classifier manipulation."
+    },
+    {
+      "term": "two-stage classifier",
+      "definition": "A classification pipeline that runs a fast low-token stage first and a slower thinking stage only when the fast stage flags a potential block, reducing latency for clearly safe actions."
+    }
+  ]
+}

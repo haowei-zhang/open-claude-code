@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/tools/ListMcpResourcesTool/prompt.ts", "src/tools/ListMcpResourcesTool/UI.tsx", "src/tools/ReadMcpResourceTool/prompt.ts", "src/tools/ReadMcpResourceTool/UI.tsx"],
+  "missing_diagrams": [],
+  "uncovered_topics": ["McpAuthTool implementation details (no snippet from McpAuthTool.ts)", "ToolSearch keyword matching algorithm for MCP tools", "MCP tool collapse classification during compaction"],
+  "citation_count": 33,
+  "diagram_count": 2,
+  "snippet_count": 15,
+  "top_files_without_snippets": []
+}

@@ -1,0 +1,53 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 93,
+      "citation": "src/utils/worktree.ts:L181-L194",
+      "problem": "Line numbers off by 1; actual WorktreeCreateResult type starts at L180. Content matches but line range is wrong."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 118,
+      "citation": "src/utils/worktree.ts:L702-L778",
+      "problem": "createWorktreeForSession snippet is heavily abbreviated with // ... and /* ... */ markers replacing actual code. Not a verbatim extract from the stated line range."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 213,
+      "citation": "src/utils/worktree.ts:L510-L624",
+      "problem": "performPostCreationSetup shown as pseudocode/comments instead of actual source code. Not a verbatim extract."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 280,
+      "citation": "src/tools/ExitWorktreeTool/ExitWorktreeTool.ts:L203-L219",
+      "problem": "Slightly abbreviated version of validateInput change detection. Actual source has additional comments and slightly different message text (adds 'or use action: keep' clause)."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 390,
+      "citation": "src/utils/worktree.ts:L106-L138",
+      "problem": "symlinkDirectories function starts at L102 not L106. The 4-line gap is the JSDoc comment. Content matches but line range is off."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 452,
+      "citation": "src/utils/worktree.ts:L322-L366",
+      "problem": "Sparse checkout snippet is slightly abbreviated. Actual code has more detail around error messages."
+    }
+  ],
+  "uncited_sources": [
+    "src/tools/EnterWorktreeTool/constants.ts",
+    "src/tools/EnterWorktreeTool/UI.tsx",
+    "src/tools/ExitWorktreeTool/constants.ts",
+    "src/tools/ExitWorktreeTool/UI.tsx"
+  ],
+  "citation_total": 27,
+  "citation_verified": 21,
+  "snippet_total": 16,
+  "snippet_verbatim": 9,
+  "snippet_drift": 7,
+  "snippet_hallucinated": 0
+}

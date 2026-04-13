@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/tools/RemoteTriggerTool/UI.tsx"],
+  "missing_diagrams": [],
+  "uncovered_topics": ["WebSocket session management (brief mentions websocket sessions but chapter uses polling model)"],
+  "citation_count": 36,
+  "diagram_count": 2,
+  "snippet_count": 11,
+  "top_files_without_snippets": ["src/tools/RemoteTriggerTool/prompt.ts"]
+}

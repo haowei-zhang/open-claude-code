@@ -1,0 +1,48 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "wrong_line",
+      "chapter_line": 69,
+      "citation": "src/tasks/DreamTask/DreamTask.ts:L16-L19",
+      "problem": "DreamTurn type starts at L15, not L16. L16-L19 omits the 'export type DreamTurn = {' header."
+    },
+    {
+      "type": "wrong_line",
+      "chapter_line": 245,
+      "citation": "src/tasks/DreamTask/DreamTask.ts:L44-L74",
+      "problem": "registerDreamTask starts at L52, not L44. L44 is in the middle of isDreamTask."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 39,
+      "citation": "src/tasks/DreamTask/DreamTask.ts:L25-L41",
+      "problem": "JSDoc comments between fields (filesTouched, turns, priorMtime) omitted from snippet"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 72,
+      "citation": "src/tasks/DreamTask/DreamTask.ts:L16-L19",
+      "problem": "Line range off by one; export keyword on L15 not captured"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 199,
+      "citation": "src/services/autoDream/autoDream.ts:L216-L221",
+      "problem": "Leading blank line and trailing session-list portion omitted; line wrapping differs from source"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 167,
+      "citation": "src/services/autoDream/autoDream.ts:L268-L270",
+      "problem": "Comment on L269 ('Rewind mtime so time-gate passes again...') omitted from snippet"
+    }
+  ],
+  "uncited_sources": ["src/services/autoDream/config.ts"],
+  "citation_total": 44,
+  "citation_verified": 42,
+  "snippet_total": 9,
+  "snippet_verbatim": 5,
+  "snippet_drift": 4,
+  "snippet_hallucinated": 0
+}

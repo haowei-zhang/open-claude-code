@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [
+    "src/tools/WebFetchTool/utils.ts",
+    "src/tools/WebFetchTool/preapproved.ts",
+    "src/tools/WebFetchTool/prompt.ts",
+    "src/tools/WebFetchTool/UI.tsx",
+    "src/tools/WebSearchTool/prompt.ts",
+    "src/tools/WebSearchTool/UI.tsx"
+  ],
+  "missing_diagrams": [
+    {"required": "sequenceDiagram of web-content sanitization feeding into the model", "found": false}
+  ],
+  "uncovered_topics": [
+    "Domain blocklist preflight check (checkDomainBlocklist in utils.ts) - Anthropic server-side domain validation before fetch",
+    "Redirect safety handling (isPermittedRedirect, getWithPermittedRedirects) - open-redirect attack prevention",
+    "Resource consumption controls (MAX_URL_LENGTH, MAX_HTTP_CONTENT_LENGTH, FETCH_TIMEOUT_MS, MAX_REDIRECTS)",
+    "Caching architecture (LRU cache with 15-min TTL, separate domain-check cache with 5-min TTL)"
+  ],
+  "citation_count": 8,
+  "diagram_count": 2,
+  "snippet_count": 8,
+  "top_files_without_snippets": []
+}

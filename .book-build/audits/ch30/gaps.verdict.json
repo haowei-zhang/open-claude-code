@@ -1,0 +1,10 @@
+{
+  "verdict": "pass",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": ["teamContext lifecycle details", "speculation state lifecycle"],
+  "citation_count": 30,
+  "diagram_count": 2,
+  "snippet_count": 21,
+  "top_files_without_snippets": []
+}

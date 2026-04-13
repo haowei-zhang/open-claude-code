@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/services/autoDream/config.ts"],
+  "missing_diagrams": [{"required": "stateDiagram-v2 of the dream lifecycle", "found": false}],
+  "uncovered_topics": [],
+  "citation_count": 44,
+  "diagram_count": 2,
+  "snippet_count": 9,
+  "top_files_without_snippets": ["src/services/autoDream/consolidationLock.ts"]
+}

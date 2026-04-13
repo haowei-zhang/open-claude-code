@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "Pattern 3 (Tiered Memory) has no divergence entry in the 'Where cc diverges' section",
+    "Pattern 5 (Progressive Context Compaction) has no divergence entry in the 'Where cc diverges' section",
+    "Pattern 8 (Fork-Join Parallelism) has no divergence entry in the 'Where cc diverges' section",
+    "Pattern 10 (Command Risk Classification) has no divergence entry in the 'Where cc diverges' section"
+  ],
+  "citation_count": 34,
+  "diagram_count": 2,
+  "snippet_count": 14,
+  "top_files_without_snippets": []
+}

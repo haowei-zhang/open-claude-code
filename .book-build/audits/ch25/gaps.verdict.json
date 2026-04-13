@@ -1,0 +1,17 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "classDiagram of message types", "found": false}
+  ],
+  "uncovered_topics": [
+    "history_snip mechanism not substantively covered despite being listed in synopsis",
+    "content replacement not covered despite being listed in synopsis",
+    "normalizeMessagesForAPI function described but not shown in code snippet",
+    "reorderMessagesInUI mentioned but not shown in code snippet"
+  ],
+  "citation_count": 19,
+  "diagram_count": 2,
+  "snippet_count": 19,
+  "top_files_without_snippets": []
+}

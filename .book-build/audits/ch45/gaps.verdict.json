@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [{"required": "sequenceDiagram of parallel exploration agents", "found": false}],
+  "uncovered_topics": ["sequence diagram for parallel exploration agent dispatch and merge flow"],
+  "citation_count": 28,
+  "diagram_count": 2,
+  "snippet_count": 12,
+  "top_files_without_snippets": []
+}

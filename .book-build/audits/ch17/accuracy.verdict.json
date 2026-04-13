@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 53, "citation": "AskUserQuestionTool.tsx:L14-L24", "problem": "Description strings in the schema are abbreviated/shortened compared to actual source; identifiers and structure match" },
+    { "type": "snippet_drift", "chapter_line": 73, "citation": "BriefTool.ts:L22-L37", "problem": "Description strings truncated (e.g., 'The message for the user...' vs full 'The message for the user. Supports markdown formatting.')" },
+    { "type": "snippet_drift", "chapter_line": 92, "citation": "ConfigTool.ts:L36-L62", "problem": "Description strings truncated; structure and types match" }
+  ],
+  "uncited_sources": ["src/tools/TodoWriteTool/constants.ts", "src/tools/SendMessageTool/constants.ts"],
+  "citation_total": 24,
+  "citation_verified": 24,
+  "snippet_total": 11,
+  "snippet_verbatim": 8,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

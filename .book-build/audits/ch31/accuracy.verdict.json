@@ -1,0 +1,84 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 17,
+      "citation": "src/utils/settings/constants.ts:L7-L22",
+      "problem": "JSDoc comment (lines 3-6) converted to single-line // format; comment lines do not appear in stated range L7-L22"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 44,
+      "citation": "src/utils/settings/types.ts:L255-L260",
+      "problem": "Snippet content extends beyond stated line range (L255-L260) to approximately L265; range understated"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 66,
+      "citation": "src/utils/claudemd.ts:L229-L243",
+      "problem": "Multi-line comment (lines 235-240) trimmed without // ... marker; contentDiffersFromDisk and rawContent lines shifted"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 83,
+      "citation": "src/utils/claudemd.ts:L1-L9",
+      "problem": "JSDoc (/** ... */) converted to single-line // comments; line 6 omits trailing '- Instructions checked into the codebase'"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 103,
+      "citation": "src/utils/settings/settingsCache.ts:L5-L13",
+      "problem": "Blank lines between function definitions removed (lines 6, 10 in source)"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 128,
+      "citation": "src/utils/settings/settings.ts:L645-L669",
+      "problem": "Intermediate lines trimmed with // ...; some comments between trimmed sections omitted"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 150,
+      "citation": "src/utils/settings/settings.ts:L538-L547",
+      "problem": "Verbatim match confirmed; no issues"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 172,
+      "citation": "src/utils/settings/settings.ts:L322-L345",
+      "problem": "Function signature (lines ~316-321) included but not in stated range; blank lines removed"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 303,
+      "citation": "src/utils/settings/settings.ts:L882-L889",
+      "problem": "Verbatim match confirmed; no issues"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 321,
+      "citation": "src/utils/settings/types.ts:L519-L540",
+      "problem": "Multi-line comments trimmed; indentation differs from source; line 518 content included outside stated range"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 357,
+      "citation": "src/utils/settings/settings.ts:L639-L649",
+      "problem": "JSDoc comment on function (lines 641-644) omitted; intermediate lines trimmed with // ..."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 242,
+      "citation": "src/utils/claudemd.ts:L451-L454",
+      "problem": "Blank line between declarations removed; snippet extends slightly beyond stated line range"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 45,
+  "citation_verified": 42,
+  "snippet_total": 12,
+  "snippet_verbatim": 2,
+  "snippet_drift": 10,
+  "snippet_hallucinated": 0
+}

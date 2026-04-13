@@ -1,0 +1,10 @@
+{
+  "verdict": "pass",
+  "uncited_brief_files": ["src/tools/TodoWriteTool/constants.ts", "src/tools/ConfigTool/constants.ts", "src/tools/SendMessageTool/constants.ts"],
+  "missing_diagrams": [],
+  "uncovered_topics": [],
+  "citation_count": 24,
+  "diagram_count": 2,
+  "snippet_count": 11,
+  "top_files_without_snippets": []
+}

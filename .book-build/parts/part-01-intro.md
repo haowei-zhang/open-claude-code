@@ -1,0 +1,19 @@
+# Part I. Foundations and Framing
+
+This opening part establishes the intellectual framework for everything that follows. Before diving into source code, we need to answer three questions: why does this book exist, how should you read it, and what are you looking at?
+
+The theme of Part I is orientation. These four chapters are not about any single subsystem of cc; they are about positioning cc within the emerging discipline of harness engineering, giving you the conceptual tools to navigate the remaining fifty-three chapters, and mapping the repository so that every subsequent chapter has a place in your mental model.
+
+These chapters are grouped together because they form the prerequisites for all later analysis. Without understanding why this book exists and what harness engineering is, the detailed walkthroughs in later parts lose their motivation. Without understanding the citation conventions and reading paths, you cannot efficiently navigate the evidence. Without a map of the repository, every file path is an opaque string rather than a known location. Without understanding the runtime stack, every design decision seems arbitrary rather than constrained.
+
+Chapter 1 states the book's thesis -- that cc is the most mature public example of a long-running agent harness and a template for trustworthy autonomous systems. It positions cc in the context of the Harness Engineering Report (HER), the METR benchmarks that quantify the value of well-engineered harnesses, and the broader shift from prompt engineering to harness engineering as the discipline for building reliable autonomous systems. This chapter answers the "why" question: why should you invest time in studying a production codebase rather than reading research papers or building from scratch.
+
+Chapter 2 explains the book's architecture, reading paths, and the citation conventions you will encounter throughout. It describes the three reading paths available -- linear, subsystem-focused, and pattern-focused -- and provides the cross-reference table that maps HER patterns and failure modes to the chapters that cover them. It also establishes the diagram conventions (the five allowed Mermaid types), the chapter structure (the six mandatory sections), and the citation format used throughout the book.
+
+Chapter 3 maps the top-level directory tree of the cc repository. For each major folder it answers three questions: what lives here, why is it organized this way, and what are its connections to neighboring folders. This chapter provides the reader's orientation map before the deep dives begin, and connects the physical layout of the codebase to HER's eight-layer reference architecture.
+
+Chapter 4 examines the unusual runtime stack of TypeScript, Bun, React, and Ink. It explains why cc chose this combination -- TypeScript for type safety and ecosystem breadth, Bun for startup speed and bundling, React for structured terminal UI via the Ink framework, and feature-flagged bundling for distributability. It also covers the tradeoffs this stack introduces, including startup time considerations, the React-for-terminal-UI paradigm, and how this connects to HER's thesis that harnesses are language and runtime specific.
+
+By the end of this Part, you should have a clear understanding of the harness engineering moment that motivates this book, the conventions that govern how the book presents evidence, the physical layout of the cc repository, and the runtime architecture that shapes every subsequent design decision. You should also have a sense of which reading path suits your needs -- linear, subsystem-focused, or pattern-focused -- and be ready to begin the deep technical walkthroughs starting in Part II.
+
+Return to the Table of Contents in the front matter for an overview of all ten parts and fifty-seven chapters.

@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "forbidden_token_simply",
+      "chapter_id": 12,
+      "detail": "ch12-tool-dispatch-pipeline.md line 365: 'are simply skipped in the loop' uses forbidden token 'simply' as filler"
+    },
+    {
+      "type": "forbidden_token_simply",
+      "chapter_id": 54,
+      "detail": "ch54-seventeen-failure-modes-how-cc-defends.md line 248: 'the model simply marks tasks as completed' uses forbidden token 'simply' as filler"
+    }
+  ]
+}

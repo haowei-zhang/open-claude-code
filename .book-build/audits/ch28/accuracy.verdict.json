@@ -1,0 +1,35 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 714,
+      "citation": "src/services/compact/apiMicrocompact.ts:L35-L61",
+      "problem": "ContextEditStrategy type uses compact single-line formatting for object types (e.g., trigger?: { type: 'input_tokens'; value: number }) while the actual source code spreads these across multiple lines. Semantically identical but whitespace differs."
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 41,
+      "citation": "src/services/compact/snipCompact.ts",
+      "problem": "Chapter mentions snipCompact.ts as a feature-gated file, but this file does not exist in the repository. The snip functionality may be embedded elsewhere or the file may be in a different location."
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 41,
+      "citation": "src/services/contextCollapse/",
+      "problem": "Chapter references src/services/contextCollapse/ directory but this directory does not exist in the repository. Context collapse may be in a different location."
+    }
+  ],
+  "uncited_sources": [
+    "src/services/compact/compactWarningHook.ts",
+    "src/services/compact/compactWarningState.ts",
+    "src/services/compact/grouping.ts",
+    "src/services/compact/compact.ts (referenced in source_files but not all sections covered)"
+  ],
+  "citation_total": 30,
+  "citation_verified": 27,
+  "snippet_total": 30,
+  "snippet_verbatim": 28,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

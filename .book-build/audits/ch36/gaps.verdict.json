@@ -1,0 +1,18 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": ["src/utils/hooks.ts"],
+  "missing_diagrams": [
+    {"required": "erDiagram of all events with triggers", "found": false},
+    {"required": "flowchart of exit-code handling", "found": false}
+  ],
+  "uncovered_topics": [
+    "Hook execution runtime (src/utils/hooks.ts - 5022 LOC, completely uncited)",
+    "Hook result processing (exit code interpretation at runtime, stderr/stdout routing)",
+    "Hook timeout enforcement (process killing, SIGTERM/SIGKILL)",
+    "Hook input serialization (how JSON input is passed to each hook type)"
+  ],
+  "citation_count": 20,
+  "diagram_count": 2,
+  "snippet_count": 20,
+  "top_files_without_snippets": ["src/utils/hooks.ts"]
+}

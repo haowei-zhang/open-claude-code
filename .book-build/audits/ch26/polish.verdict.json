@@ -1,0 +1,29 @@
+{
+  "verdict": "revise",
+  "word_count": 5449,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 220,
+  "snippet_count": 27,
+  "snippets_in_data_structures_section": 6,
+  "snippets_in_control_flow_section": 10,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {
+      "line": 147,
+      "issue": "Duplicate paragraph: 'RelevantMemory and the retrieval result' section (lines 110-122) is repeated verbatim at lines 147-157, including the same type definition snippet."
+    },
+    {
+      "line": 672,
+      "issue": "Duplicate section: 'Memory and the already surfaced deduplication' appears twice, at lines 660-664 and again at lines 672-676."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "classifier",
+      "used_as": "auto-mode classifier",
+      "should_be": "classifier (without 'auto-mode' prefix, or consistently hyphenated)"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "synthetic message",
+      "definition": "A harness-generated message that never originates from the user or the model, used for flow control (INTERRUPT_MESSAGE, CANCEL_MESSAGE, REJECT_MESSAGE, NO_RESPONSE_REQUESTED)."
+    },
+    {
+      "term": "message normalization",
+      "definition": "The process of splitting multi-block messages into individual single-block messages with derived UUIDs, ensuring API structural requirements are met."
+    },
+    {
+      "term": "denial workaround guidance",
+      "definition": "The DENIAL_WORKAROUND_GUIDANCE pattern that constrains model behavior after permission denials, allowing reasonable workarounds while preventing malicious bypasses."
+    },
+    {
+      "term": "memory correction hint",
+      "definition": "A just-in-time behavioral nudge appended to rejection messages when auto-memory is enabled, steering the model toward saving feedback at the moment of denial."
+    },
+    {
+      "term": "short message ID",
+      "definition": "A 6-character base36 hash derived from a message UUID for use in the history_snip compaction system."
+    }
+  ]
+}

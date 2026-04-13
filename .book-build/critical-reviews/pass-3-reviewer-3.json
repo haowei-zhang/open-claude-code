@@ -1,0 +1,26 @@
+{
+  "reviewer": 3,
+  "pass": 3,
+  "flags": [
+    {
+      "chapter_id": 20,
+      "severity": "soft",
+      "reasons": [
+        "Word count 2616 is 784 words below minimum 3400 -- this is a structural completeness problem, not a polish issue",
+        "Agent definitions loading from ~/.claude/agents is described but the chapter does not address what prevents a malicious agent definition from being loaded (e.g., in a shared workstation or CI environment)",
+        "The frontmatter parser section is present but does not explain how validation failures are surfaced to the user"
+      ],
+      "suggested_angle": "Expand the chapter to meet minimum word count. Add a section on the trust model for agent definitions. Cover validation error paths and user-facing error messages."
+    },
+    {
+      "chapter_id": 50,
+      "severity": "soft",
+      "reasons": [
+        "Previous passes flagged as soft. Round 3 confirms the GrowthBook operational details still dilute the central architectural argument about the operator-vs-agent observability split",
+        "The PII marker pattern (AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS) is described mechanically but its effectiveness as a security control is not analyzed -- developers can simply cast to bypass it",
+        "Cost tracker bridges analytics and bootstrap state but the chapter does not explain what happens when the cost tracker itself fails or produces incorrect numbers"
+      ],
+      "suggested_angle": "Cut GrowthBook internals to one paragraph. Expand the operator-vs-agent observability split with a concrete in-process metrics bus design. Analyze the PII marker pattern's limitations and suggest stronger alternatives."
+    }
+  ]
+}

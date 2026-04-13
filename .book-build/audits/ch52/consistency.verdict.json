@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "five-layer defense-in-depth",
+      "definition": "HER Section 12.1's security model consisting of prompt-level guardrails, schema-level restrictions, runtime approval, tool-level validation, and lifecycle hooks, each acting as a progressive filter on tool invocations."
+    },
+    {
+      "term": "circuit-broken auto mode",
+      "definition": "A state in which auto mode has been permanently disabled for the current session after a server-side kill switch fires, preventing re-entry even on subsequent GrowthBook refreshes."
+    },
+    {
+      "term": "session token unlink",
+      "definition": "The security pattern of deleting a secret file from disk after the infrastructure that depends on it has been confirmed running, ensuring the secret is available for retry during init but invisible to the agent loop during operation."
+    }
+  ]
+}

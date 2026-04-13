@@ -1,0 +1,16 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/services/api/usage.ts", "src/services/api/errors.ts"],
+  "missing_diagrams": [
+    {"required": "flowchart of usage accounting and cost hooks", "found": false}
+  ],
+  "uncovered_topics": [
+    "first-token latency (first-token date)",
+    "rate limit handling as a dedicated topic",
+    "usage.ts module coverage"
+  ],
+  "citation_count": 18,
+  "diagram_count": 2,
+  "snippet_count": 5,
+  "top_files_without_snippets": ["src/services/api/usage.ts"]
+}

@@ -1,0 +1,16 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "classDiagram of classifier inputs", "found": false}
+  ],
+  "uncovered_topics": [
+    "YOLO scoring name origin and meaning",
+    "classifier approvals from user perspective",
+    "explicit risk-band mapping (read/write/destructive)"
+  ],
+  "citation_count": 25,
+  "diagram_count": 2,
+  "snippet_count": 15,
+  "top_files_without_snippets": []
+}

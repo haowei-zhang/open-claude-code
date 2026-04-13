@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "session memory",
+      "definition": "A structured Markdown file automatically maintained by a forked subagent during a conversation, capturing task state, errors, and progress in fixed sections, used as input for session-memory compaction."
+    },
+    {
+      "term": "extraction agent",
+      "definition": "A forked subagent with write access limited to a single file (the session memory file), implementing HER Pattern 7 for isolated context extraction."
+    },
+    {
+      "term": "section size budget",
+      "definition": "The dual constraint (MAX_SECTION_LENGTH per section, MAX_TOTAL_SESSION_MEMORY_TOKENS total) that prevents session memory from consuming excessive post-compact context."
+    }
+  ]
+}

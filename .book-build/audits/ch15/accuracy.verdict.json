@@ -1,0 +1,39 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 329,
+      "citation": "shouldDefer: true for ToolSearchTool",
+      "problem": "ToolSearchTool does NOT set shouldDefer: true. The isDeferredTool() function explicitly excludes it: 'if (tool.name === TOOL_SEARCH_TOOL_NAME) return false'. ToolSearchTool is the search mechanism itself and cannot be deferred."
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 63,
+      "citation": "eight operations",
+      "problem": "Chapter states LSPTool supports 'eight operations' but lists nine: goToDefinition, findReferences, hover, documentSymbol, workspaceSymbol, goToImplementation, prepareCallHierarchy, incomingCalls, outgoingCalls."
+    }
+  ],
+  "uncited_sources": [
+    "src/tools/LSPTool/formatters.ts",
+    "src/tools/LSPTool/schemas.ts",
+    "src/tools/LSPTool/symbolContext.ts",
+    "src/tools/LSPTool/prompt.ts",
+    "src/tools/LSPTool/UI.tsx",
+    "src/tools/ToolSearchTool/constants.ts",
+    "src/tools/ToolSearchTool/prompt.ts",
+    "src/services/lsp/LSPClient.ts",
+    "src/services/lsp/LSPServerInstance.ts",
+    "src/services/lsp/LSPServerManager.ts",
+    "src/services/lsp/LSPDiagnosticRegistry.ts",
+    "src/services/lsp/manager.ts",
+    "src/services/lsp/config.ts",
+    "src/services/lsp/passiveFeedback.ts"
+  ],
+  "citation_total": 7,
+  "citation_verified": 7,
+  "snippet_total": 8,
+  "snippet_verbatim": 7,
+  "snippet_drift": 0,
+  "snippet_hallucinated": 0
+}

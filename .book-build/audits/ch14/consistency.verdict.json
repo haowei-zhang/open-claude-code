@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [{"term": "tool use", "used_as": "tool call", "should_be": "tool use"}],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "flag-level allowlisting", "definition": "The practice of validating individual CLI flags for complex commands rather than using command-level regexes, implemented via COMMAND_ALLOWLIST with typed FlagArgType entries"},
+    {"term": "parser differential", "definition": "A security vulnerability where the validator and the shell interpreter disagree on the parsing of a command string, enabling bypass attacks"},
+    {"term": "fixed-point command stripping", "definition": "The iterative approach to stripping env vars and wrapper commands from shell invocations, applying both operations until no new candidates are produced"}
+  ]
+}

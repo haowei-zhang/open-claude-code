@@ -1,0 +1,14 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "No concrete schema for structured handoff file format",
+    "Git-based conflict resolution for multi-agent work not discussed",
+    "Stale assumption pruning mechanism not addressed"
+  ],
+  "citation_count": 37,
+  "diagram_count": 3,
+  "snippet_count": 10,
+  "top_files_without_snippets": []
+}

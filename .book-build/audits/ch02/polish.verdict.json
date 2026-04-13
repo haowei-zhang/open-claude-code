@@ -1,0 +1,21 @@
+{
+  "verdict": "revise",
+  "word_count": 2381,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 148,
+  "snippet_count": 0,
+  "snippets_in_data_structures_section": 0,
+  "snippets_in_control_flow_section": 0,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [],
+  "meta_chapter_note": "Snippet minimums waived for meta-chapters. Primary issue: word_count 2381 is below min_words 2550 (169 short). Takeaways at 148 is below 150-word minimum."
+}

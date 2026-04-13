@@ -1,0 +1,36 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "bad_citation",
+      "chapter_line": 42,
+      "citation": "extractQuotaStatusFromError at src/services/api/claude.ts:L98",
+      "problem": "Function is imported from src/services/claudeAiLimits.ts, not defined in claude.ts"
+    },
+    {
+      "type": "bad_citation",
+      "chapter_line": 42,
+      "citation": "addToTotalSessionCost at src/services/api/claude.ts:L146",
+      "problem": "Function is imported from src/cost-tracker.ts, not defined in claude.ts"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 47,
+      "citation": "NonNullableUsage type attributed to src/services/api/logging.ts",
+      "problem": "Type is defined in src/entrypoints/sdk/sdkUtilityTypes.js and re-exported from logging.ts"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 17,
+      "citation": "src/services/api/claude.ts:L131-L143",
+      "problem": "Line numbers off by 2; actual imports start at L133"
+    }
+  ],
+  "uncited_sources": ["src/services/api/usage.ts"],
+  "citation_total": 18,
+  "citation_verified": 14,
+  "snippet_total": 5,
+  "snippet_verbatim": 3,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "verification nudge", "definition": "The advisory signal in TodoWrite that fires when the main-thread agent completes 3+ tasks without a verification step, appending a NOTE block to the tool result reminding the model to spawn the verification subagent."},
+    {"term": "entitlement-activation gate", "definition": "The two-layer availability pattern where a tool requires both entitlement (enrolled in experiment/feature flag) and activation (explicit user opt-in), as implemented by Brief's isBriefEntitled() + isBriefEnabled()."},
+    {"term": "structured message protocol", "definition": "A discriminated-union message schema for inter-agent communication supporting typed lifecycle events (shutdown_request, shutdown_response, plan_approval_response) with request IDs for correlation."},
+    {"term": "safety-check decision reason", "definition": "A permission decision reason type (decisionReason.type === 'safetyCheck') that makes a tool immune to bypassPermissions and auto-mode classifiers, used for cross-machine communication in SendMessage."},
+    {"term": "auto-resume on send", "definition": "The pattern where SendMessage attempts resumeAgentBackground() when targeting a stopped agent, restarting it with the incoming message as prompt."}
+  ]
+}

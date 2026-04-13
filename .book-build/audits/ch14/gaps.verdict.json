@@ -1,0 +1,10 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": ["src/tools/BashTool/bashPermissions.ts", "src/tools/BashTool/pathValidation.ts", "src/tools/BashTool/prompt.ts", "src/tools/PowerShellTool/PowerShellTool.tsx", "src/tools/PowerShellTool/powershellSecurity.ts", "src/tools/PowerShellTool/powershellPermissions.ts", "src/tools/PowerShellTool/commandSemantics.ts", "src/tools/PowerShellTool/destructiveCommandWarning.ts", "src/tools/PowerShellTool/modeValidation.ts", "src/tools/PowerShellTool/pathValidation.ts", "src/tools/PowerShellTool/readOnlyValidation.ts", "src/tools/PowerShellTool/prompt.ts", "src/tools/PowerShellTool/toolName.ts"],
+  "missing_diagrams": [{"required": "classDiagram of the classifier pipeline", "found": false}],
+  "uncovered_topics": ["PowerShell variant", "bashPermissions.ts permission rule system", "BashTool.tsx main component integration"],
+  "citation_count": 15,
+  "diagram_count": 2,
+  "snippet_count": 18,
+  "top_files_without_snippets": ["src/tools/BashTool/BashTool.tsx"]
+}

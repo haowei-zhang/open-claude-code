@@ -1,0 +1,25 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "subagent",
+      "used_as": "sub-agents",
+      "should_be": "subagent"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "beta header latching",
+      "definition": "The pattern where an API beta header stays enabled for the rest of a session once activated, preventing prompt cache invalidation from feature toggles."
+    },
+    {
+      "term": "cache break",
+      "definition": "The event where the API's prompt cache is invalidated, detected by comparing cache_creation_input_tokens against the previous request's, requiring full re-processing of input tokens."
+    },
+    {
+      "term": "full jitter",
+      "definition": "A retry backoff strategy where the delay is uniformly distributed between 0 and the current backoff interval, preventing thundering herd effects when multiple agents retry simultaneously."
+    }
+  ]
+}

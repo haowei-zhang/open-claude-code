@@ -1,0 +1,14 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "runAgent.ts sync path deep dive — only 1 small snippet from 2436-line file, main function body not shown",
+    "Remote agent polling loop implementation — no code from pollRemoteSessionEvents or fetchSession",
+    "Auto-background transition implementation — no code for runAsyncAgentLifecycle or timer mechanism"
+  ],
+  "citation_count": 14,
+  "diagram_count": 3,
+  "snippet_count": 14,
+  "top_files_without_snippets": []
+}

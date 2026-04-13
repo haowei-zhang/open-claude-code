@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "dream consolidation",
+      "definition": "A background process that reviews, deduplicates, and prunes memory files during idle time, implemented via a three-gate system (time, sessions, lock) and a forked subagent."
+    },
+    {
+      "term": "consolidation lock",
+      "definition": "A filesystem-based lock file whose mtime serves as the lastConsolidatedAt timestamp and whose body contains the holder's PID, preventing concurrent consolidation across processes."
+    },
+    {
+      "term": "three-gate cascade",
+      "definition": "A pattern for background task scheduling where progressively more expensive checks (time, workload, lock) are evaluated in order, minimizing wasted computation when upstream gates would have rejected the task."
+    }
+  ]
+}

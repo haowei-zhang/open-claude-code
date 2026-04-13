@@ -1,0 +1,26 @@
+{
+  "reviewer": 3,
+  "pass": 1,
+  "flags": [
+    {
+      "chapter_id": 49,
+      "severity": "soft",
+      "reasons": [
+        "At 3200 words (near the 2975 minimum) and with last_verdict 'rewrite', the chapter may be underweight for covering KAIROS assistant, Buddy, and experimental layers -- three distinct subsystems crammed into minimal space",
+        "The 'Where cc diverges' section for experimental features should be particularly sharp (these are the features where cc is actively exploring new ground), but the chapter risks being descriptive rather than analytical about what these experiments prove or disprove about the harness engineering discipline",
+        "The Buddy/Tamagotchi system has interesting implications for the over-trust risk cited in HER Section 18, but the connection is underexplored"
+      ],
+      "suggested_angle": "Expand the analysis of how the Buddy system interacts with HER Section 18's over-trust risk -- a companion that tracks DEBUGGING/CHAOS/SNARK stats may increase user attachment to the agent, which is both a feature and a risk. This tension is the most interesting thing about the experimental layer."
+    },
+    {
+      "chapter_id": 57,
+      "severity": "soft",
+      "reasons": [
+        "The closing chapter has only 6 citations (the minimum) and sits at 3841 words (near the 3400 minimum) -- as the book's final statement about the harness engineering discipline, it should be more expansive",
+        "As a meta-chapter meant to zoom out and reflect, the chapter risks summarizing what was already said rather than synthesizing new insights that only emerge from reading the full book",
+        "The open research questions and call to action are the chapter's most valuable contribution but they need to be sharper -- specific unsolved problems with concrete evidence from cc's implementation rather than general platitudes about the field"
+      ],
+      "suggested_angle": "Identify the 3-5 specific architectural tensions revealed by cc's implementation that cannot be resolved within the current discipline's framework -- these are the genuine open research questions, not 'more research is needed' but 'here is the specific thing cc tried that broke in an interesting way.'"
+    }
+  ]
+}

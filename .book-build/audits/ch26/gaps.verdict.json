@@ -1,0 +1,13 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "erDiagram of memdir storage", "found": false},
+    {"required": "classDiagram of memory types and frontmatter", "found": false}
+  ],
+  "uncovered_topics": [],
+  "citation_count": 14,
+  "diagram_count": 2,
+  "snippet_count": 27,
+  "top_files_without_snippets": []
+}

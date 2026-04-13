@@ -1,0 +1,10 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "remote trigger", "definition": "A REST API configuration object on claude.ai CCR that defines a cloud-side agent; invoked via POST /v1/code/triggers/{id}/run to start a remote session."},
+    {"term": "completion checker", "definition": "A type-specific function registered via registerCompletionChecker() that determines remote task completion by checking external state (e.g., PR merge status) on every poll tick."},
+    {"term": "polling-based event stream", "definition": "A pull-based coordination model where the local session periodically fetches remote agent events via HTTP, as opposed to push-based WebSocket or webhook callbacks."}
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "reviewer": 1,
+  "pass": 3,
+  "flags": [
+    {
+      "chapter_id": 20,
+      "severity": "soft",
+      "reasons": [
+        "Word count (2616) is significantly below min_words (3400) -- the chapter is materially incomplete",
+        "Agent discovery and loading are described mechanically but the chapter does not explain what makes a well-structured agent definition versus a poorly-structured one",
+        "Frontmatter parser is covered but the security implications of loading arbitrary markdown+YAML from disk are not addressed"
+      ],
+      "suggested_angle": "Expand to meet minimum word count. Add a section on what constitutes a well-formed vs malformed agent definition with concrete examples. Address the supply-chain risk of agent definitions loaded from shared directories."
+    },
+    {
+      "chapter_id": 41,
+      "severity": "soft",
+      "reasons": [
+        "snippets_drift count of 10 is the highest in the entire book, suggesting significant accuracy problems with quoted code",
+        "Chapter describes MCP tool passthrough but does not explain the security implications of tools whose schemas are not under cc's control",
+        "Deferred loading mechanism is explained but the chapter does not connect to the broader ToolSearch system's limitations identified in Chapter 15"
+      ],
+      "suggested_angle": "Fix all drifting snippets first. Then expand the security analysis: what happens when an MCP tool returns malformed output, how does the harness defend against schema-less tool results, and what is the recovery path when an MCP server crashes mid-call."
+    },
+    {
+      "chapter_id": 2,
+      "severity": "soft",
+      "reasons": [
+        "Citations count of 0 is a hard miss -- the meta-chapter that explains how to read the book should reference the chapters it maps to",
+        "HER cross-reference table is promised in the synopsis but not delivered in the body -- the chapter describes the mapping but does not provide the actual table",
+        "Reading paths section is thin -- does not help a reader who wants to read only about security, or only about multi-agent, or only about the tool system"
+      ],
+      "suggested_angle": "Add at least 6 citations to the chapters and HER sections referenced. Add the explicit cross-reference table mapping HER patterns/failure modes to chapter numbers. Add 3-4 curated reading paths for different reader profiles."
+    }
+  ]
+}

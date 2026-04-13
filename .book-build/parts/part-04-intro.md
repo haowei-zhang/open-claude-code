@@ -1,0 +1,25 @@
+# Part IV. Sub-Agents, Tasks, and Multi-Agent Dispatch
+
+A single agent running a single query loop can accomplish a great deal, but the most demanding workflows require coordination among multiple agents operating concurrently. Part IV covers cc's multi-agent architecture: from the Agent Tool that spawns sub-agents, through the three execution modes, to the coordinator that orchestrates swarms and the task system that tracks durable units of work.
+
+The theme of Part IV is multi-agent dispatch and coordination. These seven chapters are grouped together because they form the complete multi-agent subsystem: the Agent Tool provides the interface, the execution modes determine how sub-agents run, the coordinator orchestrates teams, tasks provide durable tracking, teammates enable in-process collaboration, and dream tasks perform background consolidation. Together, they represent cc's answer to the challenge of scaling beyond a single agent -- a challenge that HER addresses in its discussion of three tiers of multi-agent orchestration and the Generator-Evaluator pattern.
+
+Multi-agent dispatch is where cc's architecture becomes genuinely novel. Most agent frameworks treat sub-agent spawning as an afterthought -- a simple function call that creates a child process. cc treats it as a first-class concern with three distinct execution modes (sync, fork, and remote), a durable task tracking system, a team coordination layer, and a background consolidation mechanism. This sophistication reflects hard-won experience: naive sub-agent implementations quickly run into context anxiety (failure mode 6.5), tool explosion (failure mode 6.8), and checkpoint-restore side effects (failure mode 6.16).
+
+Chapter 18 examines the Agent Tool surface -- its input schema (description, prompt, subagent_type, model, run_in_background, team_name, mode, isolation, cwd), validation, and output return. The Agent Tool is the single entry point through which all sub-agents are spawned, and its input schema reveals the design space that cc has chosen to support.
+
+Chapter 19 compares the three execution modes: in-process sync agents, forked subagents, and remote CCR agents, including their tradeoffs in shared versus isolated state and communication paths. The choice of execution mode determines whether the sub-agent shares the parent's context (sync), gets a forked copy (fork), or runs on a completely separate machine (remote). Each mode has distinct implications for latency, isolation, and resource consumption.
+
+Chapter 20 covers how cc discovers and loads agent definitions from `~/.claude/agents`, plugin agents, and built-ins, with the Markdown plus YAML frontmatter contract. Agent definitions are the configuration surface that determines what sub-agents are available and how they are initialized. Understanding this discovery mechanism is essential for anyone extending cc with custom agents.
+
+Chapter 21 explores the feature-gated `coordinator/coordinatorMode.ts` -- how multi-agent swarms are orchestrated, message routing, and team lifecycle. The coordinator is cc's most ambitious multi-agent feature: it manages teams of agents that can communicate via file-based message passing, enabling collaborative workflows that no single agent could accomplish alone.
+
+Chapter 22 dissects the task system: task records, status transitions, blocking relationships, filesystem locking, storage paths, high-water mark, and the seven task types. Tasks are the durable unit of work that survives across agent lifetimes. They implement the one-task-per-session rule documented in HER and the three-file state pattern that ensures consistency even in the face of crashes.
+
+Chapter 23 covers tmux-based teammates, in-process teammate tasks, `SendMessageTool`, and idle hooks. Teammates are long-running sub-agents that persist for the duration of a session, communicating via SendMessage and coordinating through shared workspace state. They represent the in-process tier of cc's three-tier multi-agent architecture.
+
+Chapter 24 examines `DreamTask` and `autoDream` -- the background memory consolidation loop, firing conditions, and interaction with the memory subsystem. Dream tasks are cc's implementation of HER's Pattern 4 (Dream Consolidation): when the agent is idle, a background process reviews recent activity, extracts memories, and consolidates them into the memdir store. This is the mechanism by which cc learns from its own experience within a session.
+
+By the end of this Part, you should understand how cc spawns, manages, and coordinates multiple concurrent agents; how tasks provide durable tracking across agent lifetimes; how teammates communicate within a session; and how dream tasks perform background consolidation when the agent is idle. This understanding is essential for Part V (which covers the memory system that dream tasks write to), Part VIII (which covers long-running work patterns), and Part X (which evaluates cc's multi-agent architecture against HER's patterns).
+
+Return to the Table of Contents in the front matter for an overview of all ten parts and fifty-seven chapters.

@@ -1,0 +1,13 @@
+{
+  "verdict": "pass",
+  "required_refs_found": 2,
+  "required_refs_total": 2,
+  "required_refs_missing": [],
+  "divergence_section_length_words": 380,
+  "issues": [
+    {
+      "type": "weak_divergence",
+      "detail": "Chapter claims 23 events but source has 27; also claims events exceed HER's '25+' but 23 < 25 is contradictory"
+    }
+  ]
+}

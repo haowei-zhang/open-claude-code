@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "classDiagram of Tool interface and concrete implementations", "found": false},
+    {"required": "flowchart of buildTool() behavior", "found": false}
+  ],
+  "uncovered_topics": [],
+  "citation_count": 17,
+  "diagram_count": 2,
+  "snippet_count": 16,
+  "top_files_without_snippets": []
+}

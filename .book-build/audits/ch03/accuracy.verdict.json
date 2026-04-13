@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 121,
+      "citation": "src/main.tsx:L9-L20",
+      "problem": "Caption claims L9-L20 but shown content maps to L1-L9 in the actual file"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 297,
+      "citation": "src/main.tsx:L69-L71",
+      "problem": "Lazy require comment is at L68 not L69; off-by-one"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 63,
+  "citation_verified": 61,
+  "snippet_total": 9,
+  "snippet_verbatim": 7,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

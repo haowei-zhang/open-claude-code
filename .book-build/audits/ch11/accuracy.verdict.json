@@ -1,0 +1,42 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "wrong_line",
+      "chapter_line": 53,
+      "citation": "src/Tool.ts:L367-L369",
+      "problem": "aliases field is at line 371, not L367"
+    },
+    {
+      "type": "wrong_line",
+      "chapter_line": 285,
+      "citation": "src/Tool.ts:L374-L378",
+      "problem": "searchHint field is at line 378, not L374"
+    },
+    {
+      "type": "wrong_line",
+      "chapter_line": 273,
+      "citation": "src/Tool.ts:L439-L449",
+      "problem": "shouldDefer/alwaysLoad fields are at lines 442-449, not L439"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 37,
+      "citation": "src/Tool.ts:L379-L404",
+      "problem": "Snippet omits internal comments and extra fields (inputJSONSchema, outputSchema, inputsEquivalent) present in the actual source range"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 254,
+      "citation": "src/services/tools/toolExecution.ts:L615-L680",
+      "problem": "Snippet shows only 6 lines but cites a 65-line range; heavily trimmed"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 17,
+  "citation_verified": 12,
+  "snippet_total": 16,
+  "snippet_verbatim": 11,
+  "snippet_drift": 5,
+  "snippet_hallucinated": 0
+}

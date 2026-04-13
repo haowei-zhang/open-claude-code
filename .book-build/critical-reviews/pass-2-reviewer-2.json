@@ -1,0 +1,26 @@
+{
+  "reviewer": 2,
+  "pass": 2,
+  "flags": [
+    {
+      "chapter_id": 51,
+      "severity": "soft",
+      "reasons": [
+        "The chapter covers debug logging, diagnostics, and the doctor screen but reads more as a feature walkthrough than an architectural analysis -- it describes WHAT each subsystem does without extracting the deeper pattern about why cc's observability is post-hoc rather than real-time",
+        "The dual-identity observation (ant vs external debug logging) is mentioned but its architectural implications are not explored: this asymmetry means production incidents from external users are harder to diagnose, which is a significant operational risk for any team building on cc",
+        "The HER cross-reference to Section 6.6 (silent failures) is present but token -- the chapter does not explain how the debug log format could be used to build automated silent-failure detection, which would be the natural next step from the observability gap analysis"
+      ],
+      "suggested_angle": "Restructure around the post-hoc vs real-time observability spectrum. Show where cc sits (firmly post-hoc), what the architectural constraints are that prevent real-time self-monitoring, and what a reader would need to add to move toward real-time failure detection."
+    },
+    {
+      "chapter_id": 26,
+      "severity": "soft",
+      "reasons": [
+        "The ETH Zurich finding that context files reduce task success rates while increasing cost is mentioned in the overview but not carried through the rest of the chapter as a design constraint -- the chapter should explain how cc's memory system navigates this tension",
+        "The closed four-type taxonomy (user/feedback/project/reference) is presented without explaining why these four specifically, or what happens when content does not fit any type -- is content dropped, coerced, or is there an escape hatch?",
+        "The side-query relevance evaluation (a secondary API call to determine which topic files to load) is a significant architectural decision that adds latency and cost to every query, but the chapter does not quantify this overhead or discuss the tradeoff"
+      ],
+      "suggested_angle": "Add a section on the cost-benefit tension: the ETH Zurich finding implies memdir could hurt performance if the index is too verbose. Explain how cc's 200-line cap and type exclusions respond to this finding, and quantify the side-query overhead so readers can assess whether the tiered approach is worth it for their use case."
+    }
+  ]
+}

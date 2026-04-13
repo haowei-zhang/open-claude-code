@@ -1,0 +1,33 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "feature gate",
+      "used_as": "feature flag",
+      "should_be": "feature gate"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "coordinator mode",
+      "definition": "An operational mode where the parent agent orchestrates worker subagents instead of implementing directly, gated by a compile-time feature gate and a runtime environment variable."
+    },
+    {
+      "term": "scratchpad",
+      "definition": "A feature-gated shared directory for durable cross-worker knowledge sharing in coordinator mode, allowing workers to read and write without permission prompts."
+    },
+    {
+      "term": "worker",
+      "definition": "A subagent with subagent_type: worker dispatched by the coordinator to research, implement, or verify code changes in an isolated context."
+    },
+    {
+      "term": "synthesis",
+      "definition": "The coordinator's process of reading and understanding worker findings before delegating follow-up work, producing a specific implementation spec with file paths, line numbers, and expected outcomes."
+    },
+    {
+      "term": "continue-vs-spawn decision",
+      "definition": "The coordinator's decision whether to continue an existing worker via SendMessage or spawn a fresh worker via AgentTool, based on context overlap between the worker's current context and the next task."
+    }
+  ]
+}

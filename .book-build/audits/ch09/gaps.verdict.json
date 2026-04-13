@@ -1,0 +1,19 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {
+      "required": "classDiagram of prompt fragment sources",
+      "found": false
+    }
+  ],
+  "uncovered_topics": [
+    "Effort and plan mode modifications to system prompt",
+    "Tool schema injection into system prompt",
+    "Hooks as prompt source"
+  ],
+  "citation_count": 15,
+  "diagram_count": 2,
+  "snippet_count": 4,
+  "top_files_without_snippets": []
+}

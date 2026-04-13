@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_hallucinated",
+      "chapter_line": 80,
+      "citation": "src/bridge/replBridge.ts:L91-L173",
+      "problem": "BridgeCoreParams snippet shows onUserMessage?: (msg: SDKMessage, done: boolean) => boolean but actual source has onUserMessage?: (text: string, sessionId: string) => boolean. The parameter names and types are wrong."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 362,
+      "citation": "src/bridge/bridgeMain.ts:L202-L270",
+      "problem": "heartbeatActiveWorkItems snippet strips all logForDebugging, logEvent, logger.logVerbose, logger.logError calls and associated try/catch detail, simplifying the real code significantly."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 401,
+      "citation": "src/bridge/bridgeMain.ts:L279-L313",
+      "problem": "tokenRefresh snippet strips logger.logVerbose, logger.logError, and logForDebugging calls from the v2 branch, simplifying the real code."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 14,
+  "citation_verified": 11,
+  "snippet_total": 14,
+  "snippet_verbatim": 11,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 1
+}

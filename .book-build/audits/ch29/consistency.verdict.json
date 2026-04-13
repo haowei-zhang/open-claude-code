@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "append-only discipline", "definition": "The design principle that no entry is ever modified after write; deletions are represented by omission or explicit removal. Core to cc's session persistence model."},
+    {"term": "progress bridge", "definition": "The map that chains through consecutive legacy progress entries and rewrites subsequent messages' parentUuid to skip past them, maintaining chain integrity across entries no longer in the type union."},
+    {"term": "head/tail read", "definition": "The optimization pattern of reading only the first and last 64KB of a JSONL file to extract metadata (first prompt, last title, last tag) without parsing the full content."},
+    {"term": "session stamping", "definition": "The practice of re-stamping provenance fields (sessionId, cwd, entrypoint, version) after message spreads to prevent cross-session contamination in forked or resumed sessions."},
+    {"term": "metadata re-append", "definition": "The pattern of unconditionally re-writing session metadata entries near EOF after compaction or on exit to keep them within the 64KB tail window for fast reads."}
+  ]
+}

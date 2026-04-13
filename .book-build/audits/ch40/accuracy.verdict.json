@@ -1,0 +1,60 @@
+{
+  "verdict": "rewrite",
+  "issues": [
+    {
+      "type": "snippet_hallucinated",
+      "chapter_line": 196,
+      "citation": "src/services/mcp/client.ts:L177-L186",
+      "problem": "Chapter shows 'McpToolCallError extends TelemetrySafeError' but source at those lines has obfuscated names 'McpToolCallError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS extends TelemetrySafeError_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS'. Non-trimmed lines do not match the referenced range."
+    },
+    {
+      "type": "snippet_hallucinated",
+      "chapter_line": 244,
+      "citation": "src/entrypoints/mcp.ts:L35-L57",
+      "problem": "Chapter shows simplified server setup without cache/readFileState lines, but source at those lines includes additional setup (READ_FILE_STATE_CACHE_SIZE, createFileStateCacheWithSizeLimit, setCwd). The quoted code does not appear in the referenced range."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 13,
+      "citation": "src/services/mcp/types.ts:L180-L227",
+      "problem": "Whitespace drift: serverInfo field shown inline in chapter but on separate lines in source (L185-L188)."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 99,
+      "citation": "src/services/mcp/config.ts:L69-L81",
+      "problem": "Whitespace drift: formatting differences between chapter and source (brace placement)."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 117,
+      "citation": "src/services/mcp/config.ts:L88-L131",
+      "problem": "Whitespace drift: comment formatting and brace placement differ between chapter and source."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 153,
+      "citation": "src/services/mcp/config.ts:L202-L212",
+      "problem": "Whitespace drift: source has braces on own lines, chapter compresses if-else formatting."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 178,
+      "citation": "src/services/mcp/client.ts:L188-L206",
+      "problem": "Whitespace drift: source has braces on own lines, chapter compresses formatting."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 267,
+      "citation": "src/services/mcp/MCPConnectionManager.tsx:L7-L15",
+      "problem": "Whitespace drift: source uses semicolons, chapter omits them; minor formatting differences."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 11,
+  "citation_verified": 11,
+  "snippet_total": 11,
+  "snippet_verbatim": 3,
+  "snippet_drift": 6,
+  "snippet_hallucinated": 2
+}

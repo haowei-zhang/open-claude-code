@@ -1,0 +1,23 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "failure mode",
+      "definition": "A categorization of how long-running agents can fail, as defined by HER Section 6, covering 17 specific modes from context rot to specification gaming."
+    },
+    {
+      "term": "diminishing-returns detection",
+      "definition": "The heuristic in checkTokenBudget() that compares token deltas across consecutive loop iterations, stopping the query loop when progress falls below DIMINISHING_THRESHOLD for at least 3 continuations."
+    },
+    {
+      "term": "defense-in-depth",
+      "definition": "A security architecture pattern where multiple independent defensive layers are stacked, so that failure of one layer does not compromise the system. cc implements this for prompt injection with permission models, classifiers, SSRF guards, and denial tracking."
+    },
+    {
+      "term": "cost metering",
+      "definition": "The real-time tracking of token and dollar costs per session and per model, implemented in src/cost-tracker.ts via addToTotalSessionCost and related functions."
+    }
+  ]
+}

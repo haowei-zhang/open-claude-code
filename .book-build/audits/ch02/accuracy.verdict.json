@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "issues": [{"type": "unsupported_claim", "chapter_line": 19, "citation": "Part 4 table entry", "problem": "Chapter uses 'Subagents' but manifest title is 'Sub-Agents, Tasks, and Multi-Agent Dispatch' - minor naming inconsistency"}],
+  "uncited_sources": [],
+  "citation_total": 0,
+  "citation_verified": 0,
+  "snippet_total": 0,
+  "snippet_verbatim": 0,
+  "snippet_drift": 0,
+  "snippet_hallucinated": 0,
+  "meta_chapter_note": "No source files listed; snippet/citation minimums waived for meta-chapters. Single naming inconsistency is informational, not a fail."
+}

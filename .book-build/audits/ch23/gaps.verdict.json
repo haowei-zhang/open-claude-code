@@ -1,0 +1,14 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/tools/SendMessageTool/constants.ts", "src/tools/SendMessageTool/prompt.ts", "src/tools/SendMessageTool/UI.tsx"],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "tmux-based teammates (mentioned in synopsis but not covered)",
+    "idle hooks mechanism (mentioned in synopsis but not covered)",
+    "teammate spawning via TeamCreateTool (referenced in diagram but not discussed)"
+  ],
+  "citation_count": 39,
+  "diagram_count": 2,
+  "snippet_count": 8,
+  "top_files_without_snippets": ["src/tools/SendMessageTool/prompt.ts"]
+}

@@ -1,0 +1,25 @@
+{
+  "reviewer": 2,
+  "pass": 1,
+  "flags": [
+    {
+      "chapter_id": 41,
+      "severity": "hard",
+      "reasons": [
+        "10 of 15 code snippets show drift (66% drift rate), indicating the chapter's code citations do not match the actual source files -- for a chapter about MCP tool passthrough and deferred loading, factual inaccuracy in the code references undermines the chapter's core purpose",
+        "The last_verdict is 'revise' but snippet drift this severe suggests the chapter may have been drafted from documentation or design intent rather than from reading the actual source code, meaning the mechanisms described may not be what actually runs",
+        "A chapter about deferred loading and permission passthrough is architecturally sensitive -- if the described permission flow is wrong, readers will build insecure MCP integrations"
+      ],
+      "suggested_angle": "Re-derive the chapter from the actual source files in src/tools/MCPTool/ and src/services/mcp/, verifying every snippet verbatim. Focus on the permission passthrough chain specifically, as that is the security-critical path where inaccuracy does the most damage."
+    },
+    {
+      "chapter_id": 11,
+      "severity": "soft",
+      "reasons": [
+        "5 of 16 snippets show drift (31%), and this chapter defines the foundational Tool contract that all other tool chapters build on -- drift at the foundation propagates misunderstanding upward",
+        "The chapter covers buildTool and the Tool interface thoroughly but does not adequately explain why the contract takes this specific shape versus alternatives (e.g., why Zod+JSONSchema dual validation rather than one or the other)"
+      ],
+      "suggested_angle": "Verify all drifted snippets against source and fix. Add a section explaining the design constraints that produced the dual-schema (Zod for runtime validation + JSONSchema for model-facing description) contract, which is a non-obvious choice that other harness builders will need to understand."
+    }
+  ]
+}

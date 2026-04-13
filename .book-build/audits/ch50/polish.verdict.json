@@ -1,0 +1,22 @@
+{
+  "verdict": "revise",
+  "word_count": 4703,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 1780,
+  "snippet_count": 9,
+  "snippets_in_data_structures_section": 5,
+  "snippets_in_control_flow_section": 4,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {"line": 262, "issue": "Developer takeaways section is 1780 words, well above 150-300 word limit for prose paragraph format. It is a numbered list of 10 items with extensive prose per item."}
+  ]
+}

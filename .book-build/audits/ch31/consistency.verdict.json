@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "settings cascade",
+      "definition": "The five-source merge hierarchy (plugin → user → project → local → flag → policy) that deep-merges configuration from multiple sources with later sources overriding earlier ones."
+    },
+    {
+      "term": "first-source-wins",
+      "definition": "The policy within the policySettings source where the highest-priority policy source with content takes over entirely, rather than merging with lower-priority policy sources."
+    },
+    {
+      "term": "managed settings",
+      "definition": "Enterprise-administered settings from the policySettings source, loaded from remote API, MDM (HKLM/plist), managed-settings.json (with drop-in directory), or HKCU registry."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_hallucinated",
+      "chapter_line": 362,
+      "citation": "src/ink/screen.ts:L1404-L1418",
+      "problem": "MCP cleanup code attributed to screen.ts but those lines contain blitRegion logic. Code is from mcp/client.ts."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 16,
+      "citation": "src/ink/ink.tsx:L76-L123",
+      "problem": "Shows cursorDeclaration and displayCursor fields not at those lines; actual source has different fields."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 195,
+      "citation": "src/ink/Ansi.tsx:L32-L109",
+      "problem": "Actual code uses React compiler runtime (_c/$ memo slots); chapter shows clean equivalent that is not verbatim."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 174,
+      "citation": "src/ink/output.ts:L170-L199",
+      "problem": "Simplified reset() method with omitted lines and added summary comments."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 341,
+      "citation": "src/ink/screen.ts:L186-L200",
+      "problem": "Simplified withCurrentMatch; actual code includes underline code additions and more complex filter logic."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 546,
+      "citation": "src/ink/ink.tsx:L471-L494",
+      "problem": "Simplified version of captureScrolledRows logic; actual code has more complex guard conditions."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 24,
+  "citation_verified": 23,
+  "snippet_total": 18,
+  "snippet_verbatim": 11,
+  "snippet_drift": 6,
+  "snippet_hallucinated": 1
+}

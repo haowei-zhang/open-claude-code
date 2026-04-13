@@ -1,0 +1,36 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "bad_citation",
+      "chapter_line": 279,
+      "citation": "src/tools/SendMessageTool/SendMessageTool.ts:L142-L150",
+      "problem": "Cited as agentNameRegistry definition, but L142-L150 is findTeammateColor function. agentNameRegistry is an AppState property, not defined in SendMessageTool.ts."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 95,
+      "citation": "src/utils/hooks/sessionHooks.ts:L14-L46",
+      "problem": "SessionHookMatcher type in chapter omits onHookSuccess from hooks array items; omits OnHookSuccess type definition present in source."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 250,
+      "citation": "src/utils/hooks/sessionHooks.ts:L64-L108",
+      "problem": "addFunctionHook signature in chapter omits sessionId and matcher parameters that exist in source; function ends at L114 not L108."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 13,
+      "citation": "src/tools/SendMessageTool/SendMessageTool.ts:L67-L87",
+      "problem": "Input schema cited as L67-L87 but schema definition extends to L87 with type alias at L88."
+    }
+  ],
+  "uncited_sources": ["src/tools/SendMessageTool/constants.ts", "src/tools/SendMessageTool/prompt.ts", "src/tools/SendMessageTool/UI.tsx"],
+  "citation_total": 39,
+  "citation_verified": 38,
+  "snippet_total": 8,
+  "snippet_verbatim": 5,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

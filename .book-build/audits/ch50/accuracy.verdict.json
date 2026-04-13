@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 29,
+      "citation": "src/services/analytics/index.ts:L17-L19",
+      "problem": "Line range L17-L19 is misleading: the type declaration is only on line 19. Lines 17-18 are doc comments, not shown in snippet."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 192,
+      "citation": "src/services/analytics/growthbook.ts:L526-L537",
+      "problem": "Line range L526-L537 omits inline comments present in actual source between L526 and L537. The snippet includes code up to L545 but trims comments, making the line range inaccurate."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 46,
+  "citation_verified": 44,
+  "snippet_total": 9,
+  "snippet_verbatim": 7,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

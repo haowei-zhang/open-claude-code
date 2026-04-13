@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "stateDiagram-v2 for effort levels", "found": false}
+  ],
+  "uncovered_topics": [
+    "Effort-to-model mapping: how EffortValue selects model/thinking",
+    "How fast mode 'flips the loop' beyond system-prompt injection"
+  ],
+  "citation_count": 15,
+  "diagram_count": 2,
+  "snippet_count": 7,
+  "top_files_without_snippets": []
+}

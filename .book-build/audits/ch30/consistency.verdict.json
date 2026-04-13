@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "structural sharing",
+      "definition": "The pattern where setState creates a new root object while sharing unchanged sub-trees by reference, enabling Object.is identity checks for efficient re-render skipping in reactive state systems."
+    },
+    {
+      "term": "onChange diff",
+      "definition": "The centralized diff pattern in onChangeAppState that compares old and new state to trigger side effects, ensuring any setState call automatically propagates changes to all consumers."
+    },
+    {
+      "term": "selector discipline",
+      "definition": "The practice of ensuring useAppState selectors return stable references (existing sub-object references) rather than creating new objects, to prevent infinite re-renders in useSyncExternalStore-backed hooks."
+    }
+  ]
+}

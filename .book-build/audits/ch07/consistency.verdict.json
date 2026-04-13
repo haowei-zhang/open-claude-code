@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "query loop", "definition": "The async generator function in src/query.ts that orchestrates the cycle of API calls, tool dispatch, compaction, and budget checks; the central execution engine of cc."},
+    {"term": "state destructuring pattern", "definition": "The pattern where mutable State is destructured at the top of each loop iteration and reassigned at each continue site, making state transitions explicit and testable."},
+    {"term": "stop hook", "definition": "A user-defined hook evaluated at the Stop lifecycle event when the model declares completion, allowing the harness to inject continuation messages and prevent premature completion."},
+    {"term": "reactive compact", "definition": "An emergency compaction triggered reactively when the API rejects a request for exceeding the context window, using a more aggressive strategy than proactive autocompact."},
+    {"term": "task budget", "definition": "An API-level budget for the whole agentic turn (output_config.task_budget), distinct from the client-side token budget, with remaining computed per iteration from cumulative API usage."}
+  ]
+}

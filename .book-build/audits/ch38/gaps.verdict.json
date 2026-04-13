@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [{"required": "classDiagram of skill frontmatter", "found": false}],
+  "uncovered_topics": [
+    "The chapter does not discuss the SkillTool's output schema or result types for inline vs forked execution",
+    "The chapter does not cover the SkillTool's description/prompt text that the model sees in the tool listing"
+  ],
+  "citation_count": 13,
+  "diagram_count": 3,
+  "snippet_count": 13,
+  "top_files_without_snippets": []
+}

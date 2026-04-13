@@ -1,0 +1,10 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "passthrough permission", "definition": "A permission result type (behavior: 'passthrough') where the tool invocation requires user approval unless a rule explicitly allows it, used for MCP tools whose code is not controlled by the harness."},
+    {"term": "session-retry loop", "definition": "A retry pattern in MCP tool calls that automatically retries once on McpSessionExpiredError after clearing the connection cache and obtaining a fresh client."},
+    {"term": "batched connection processing", "definition": "The startup pattern of connecting to MCP servers in parallel groups partitioned by transport type (local vs remote) with different concurrency limits."}
+  ]
+}

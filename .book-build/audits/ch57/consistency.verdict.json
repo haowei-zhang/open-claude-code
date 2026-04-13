@@ -1,0 +1,12 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [{"term": "subagent", "used_as": "sub-agent", "should_be": "subagent"}],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "Ouroboros problem", "definition": "When both generator and evaluator are LLMs, who validates the validator? Named in HER §9.2 and §18.2 as a fundamental limitation of LLM-based evaluation."},
+    {"term": "Stone Soup attribution", "definition": "The misattribution of massive human engineering effort to AI capability, where specification, monitoring, and correction labor is invisible in productivity metrics."},
+    {"term": "greenfield bias", "definition": "The tendency for agent benchmarks and results to be more impressive on new projects without existing architecture constraints, versus brownfield work on existing codebases."},
+    {"term": "compound failure problem", "definition": "The mathematical result that per-step reliability compounds poorly over many steps: 95% per-step yields only 36% over 20 steps, and doubling task duration quadruples failure rate."},
+    {"term": "scale confusion", "definition": "The conflation of harnesses operating at very different complexity levels (bash loop ~10 lines, generator-evaluator ~100s, full orchestration ~1000s, reference architecture aspirational) as if they were points on a single continuum."}
+  ]
+}

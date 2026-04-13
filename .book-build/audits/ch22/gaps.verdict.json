@@ -1,0 +1,26 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [
+    "src/tools/TaskCreateTool/constants.ts",
+    "src/tools/TaskCreateTool/prompt.ts",
+    "src/tools/TaskListTool/constants.ts",
+    "src/tools/TaskListTool/prompt.ts",
+    "src/tools/TaskGetTool/constants.ts",
+    "src/tools/TaskGetTool/prompt.ts",
+    "src/tools/TaskUpdateTool/constants.ts",
+    "src/tools/TaskUpdateTool/prompt.ts",
+    "src/tools/TaskStopTool/prompt.ts",
+    "src/tools/TaskStopTool/UI.tsx",
+    "src/tools/TaskOutputTool/constants.ts"
+  ],
+  "missing_diagrams": [],
+  "uncovered_topics": [
+    "TaskStopTool's deprecated KillShell alias and backward compatibility story",
+    "TaskOutputTool's blocking wait and timeout semantics",
+    "The relationship between the task registry in AppState and the filesystem-based persistence"
+  ],
+  "citation_count": 70,
+  "diagram_count": 3,
+  "snippet_count": 15,
+  "top_files_without_snippets": []
+}

@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "erDiagram of worktree storage layout", "found": false}
+  ],
+  "uncovered_topics": [
+    "The --worktree startup path in cli.tsx/setup.ts that creates a worktree at session start (different from mid-session EnterWorktreeTool)",
+    "The worktree state persistence via saveWorktreeState/sessionStorage for session resume"
+  ],
+  "citation_count": 27,
+  "diagram_count": 2,
+  "snippet_count": 16,
+  "top_files_without_snippets": []
+}

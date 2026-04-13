@@ -1,0 +1,29 @@
+{
+  "verdict": "revise",
+  "word_count": 3525,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 487,
+  "snippet_count": 14,
+  "snippets_in_data_structures_section": 4,
+  "snippets_in_control_flow_section": 4,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {
+      "line": 355,
+      "issue": "Duplicate paragraph: 'The bridge detects system sleep/wake events by monitoring the gap between poll cycles' appears identically in the Sleep/wake detection section and the Session archive and cleanup section."
+    },
+    {
+      "line": 453,
+      "issue": "Developer takeaways section is 487 words, exceeding the 150-300 word limit."
+    }
+  ]
+}

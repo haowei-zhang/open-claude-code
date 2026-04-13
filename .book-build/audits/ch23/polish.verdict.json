@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "word_count": 3020,
+  "forbidden_tokens_found": [],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 240,
+  "snippet_count": 8,
+  "snippets_in_data_structures_section": 5,
+  "snippets_in_control_flow_section": 2,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {"line": 5, "issue": "Snippet at line 5 (SessionHooksState) is only 3 lines, below 8-line minimum"},
+    {"line": 6, "issue": "Snippet at line 6 (queuePendingMessage) is only 6 lines, below 8-line minimum"},
+    {"line": 1, "issue": "Word count 3020 is below minimum 3400"}
+  ]
+}

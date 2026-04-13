@@ -1,0 +1,27 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "MCP server connection",
+      "definition": "A discriminated union tracking the lifecycle state of an MCP server connection through five states: pending, connected, failed, needs-auth, and disabled."
+    },
+    {
+      "term": "MCP transport",
+      "definition": "The communication channel between cc and an MCP server, implemented as stdio (child process), SSE, HTTP, WebSocket, or SDK (in-process)."
+    },
+    {
+      "term": "Cross-App Access",
+      "definition": "An enterprise authentication pattern where MCP servers authenticate through a corporate Identity Provider (IdP) rather than their own OAuth flow, enabling SSO across all MCP servers."
+    },
+    {
+      "term": "MCP tool collapse classification",
+      "definition": "The heuristic categorization of MCP tools for compaction, determining which tool results can be safely summarized during context compaction based on tool name patterns, result size, and recency."
+    },
+    {
+      "term": "server signature deduplication",
+      "definition": "The signature-based approach to preventing duplicate MCP server configurations, where stdio servers use the command array and URL-based servers use the unwrapped CCR proxy URL as the deduplication key."
+    }
+  ]
+}

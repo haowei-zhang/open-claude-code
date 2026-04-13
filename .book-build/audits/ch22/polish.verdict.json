@@ -1,0 +1,28 @@
+{
+  "verdict": "revise",
+  "word_count": 4265,
+  "forbidden_tokens_found": [
+    {"token": "simply", "count": 1},
+    {"token": "just (filler)", "count": 1}
+  ],
+  "sections_present": {
+    "Overview": true,
+    "Data structures and contracts": true,
+    "Control flow": true,
+    "Edge cases and failure modes": true,
+    "Where cc diverges from the published pattern": true,
+    "Developer takeaways for building a long-running agent": true
+  },
+  "takeaways_word_count": 275,
+  "snippet_count": 15,
+  "snippets_in_data_structures_section": 7,
+  "snippets_in_control_flow_section": 8,
+  "oversized_snippets": [],
+  "unexplained_snippets": [],
+  "style_issues": [
+    {"line": 533, "issue": "Forbidden token 'simply' (standalone) - 'the caller simply sees Task not found'"},
+    {"line": 411, "issue": "Forbidden token 'just' (filler) - 'the agent just closed out a list'"},
+    {"line": 243, "issue": "Run-on sentence (~85 words) about claimTaskWithBusyCheck"},
+    {"line": 469, "issue": "Duplicate paragraph - auto-owner assignment described twice (L415-L435 and L469)"}
+  ]
+}

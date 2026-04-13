@@ -1,0 +1,42 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "wrong_line",
+      "chapter_line": 28,
+      "citation": "src/utils/debug.ts:L19-L25",
+      "problem": "Snippet caption says L19-L25 but includes the type export from L18. The type 'DebugLogLevel' is exported on line 18, not 19. Caption should be L18-L26."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 28,
+      "citation": "src/utils/debug.ts:L19-L25",
+      "problem": "Snippet content includes the DebugLogLevel type export which is on L18, not within the claimed L19-L25 range. Whitespace/formatting drift from source."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 45,
+      "citation": "src/utils/debug.ts:L158-L189",
+      "problem": "Whitespace drift from source in BufferedWriter configuration snippet."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 107,
+      "citation": "src/utils/debug.ts:L203-L228",
+      "problem": "Minor content drift in logForDebugging snippet - blank line at L215 handling differs."
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 138,
+      "citation": "src/utils/debug.ts:L44-L57",
+      "problem": "Whitespace drift in isDebugMode snippet."
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 19,
+  "citation_verified": 15,
+  "snippet_total": 7,
+  "snippet_verbatim": 3,
+  "snippet_drift": 4,
+  "snippet_hallucinated": 0
+}

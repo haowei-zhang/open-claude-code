@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 14,
+      "citation": "src/types/command.ts:L175-L207",
+      "problem": "Line range off by 1 (actual L175-206); missing isMcp?: boolean field present at L185"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 54,
+      "citation": "src/types/command.ts:L168-L174",
+      "problem": "Line range off by 1 (actual L169-173)"
+    }
+  ],
+  "uncited_sources": ["src/utils/processUserInput/processSlashCommand.tsx"],
+  "citation_total": 10,
+  "citation_verified": 10,
+  "snippet_total": 10,
+  "snippet_verbatim": 8,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

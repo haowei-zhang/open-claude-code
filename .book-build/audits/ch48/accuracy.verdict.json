@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 42, "citation": "src/tools/RemoteTriggerTool/RemoteTriggerTool.ts:L35-L42", "problem": "outputSchema ends at L40, cited range L35-L42" },
+    { "type": "snippet_drift", "chapter_line": 114, "citation": "src/tools/RemoteTriggerTool/RemoteTriggerTool.ts:L78-L151", "problem": "Snippet truncated with `// ... update, run` instead of showing full switch cases" },
+    { "type": "snippet_drift", "chapter_line": 342, "citation": "src/tasks/RemoteAgentTask/RemoteAgentTask.tsx:L47-L53", "problem": "reviewProgress field at L44-L50, not L47-L53" }
+  ],
+  "uncited_sources": ["src/tools/RemoteTriggerTool/UI.tsx"],
+  "citation_total": 36,
+  "citation_verified": 33,
+  "snippet_total": 11,
+  "snippet_verbatim": 8,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

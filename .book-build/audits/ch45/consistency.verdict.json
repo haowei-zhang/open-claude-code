@@ -1,0 +1,11 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "PewterLedgerVariant", "definition": "A GrowthBook experiment variant controlling plan file size in plan mode V2, with arms trim/cut/cap representing progressively stricter verbosity reduction"},
+    {"term": "interview phase", "definition": "An optional plan-mode phase (gated by tengu_plan_mode_interview_phase or USER_TYPE=ant) where the agent asks clarifying questions before finalizing the plan"},
+    {"term": "mode trap", "definition": "A state the model can enter but cannot leave, such as plan mode in channel-based sessions where the approval dialog cannot be displayed"},
+    {"term": "prePlanMode", "definition": "A field in the permission context that stores the user's permission mode before entering plan mode, used to restore it on exit"}
+  ]
+}

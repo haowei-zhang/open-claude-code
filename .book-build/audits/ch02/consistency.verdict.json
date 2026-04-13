@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [{"term": "subagent", "used_as": "Sub-agents", "should_be": "subagents"}, {"term": "subagent", "used_as": "sub-agent", "should_be": "subagent"}],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "meta-chapter", "definition": "A structural chapter that maps between the HER theoretical framework and the technical chapters, serving as connective tissue rather than a source-code deep dive."},
+    {"term": "reading path", "definition": "A recommended traversal order through the book's chapters, selected by reader role or goal (sequential, subsystem, or HER path)."},
+    {"term": "cross-reference table", "definition": "A structured mapping from HER patterns, failure modes, or best practices to the specific chapters and source files that address them."}
+  ]
+}

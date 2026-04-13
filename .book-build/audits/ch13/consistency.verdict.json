@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "readFileState",
+      "definition": "A Map<string, ReadFileEntry> maintained in ToolUseContext that records every file the model has read, along with content, modification timestamp, offset, and limit; used to enforce the read-before-write contract and read deduplication."
+    },
+    {
+      "term": "read-before-write contract",
+      "definition": "The invariant enforced by Write, Edit, and NotebookEdit tools that the model must have read a file before modifying it, preventing blind overwrites and silent data loss."
+    },
+    {
+      "term": "file-history backup",
+      "definition": "A content-hash-keyed backup created before file edits, stored at ~/.claude/file-history/{sessionId}/{sha256-hash}@v{N}, providing checkpoint-restore semantics for undo operations."
+    }
+  ]
+}

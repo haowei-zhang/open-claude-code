@@ -1,0 +1,16 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "snippet_drift", "chapter_line": 81, "citation": "filesystem.ts:L620-L665", "problem": "checkPathSafetyForAutoEdit snippet only shows signature; chapter range L620-L665 implies full function but only the signature is quoted" },
+    { "type": "snippet_drift", "chapter_line": 249, "citation": "filesystem.ts:L716-L743", "problem": "pathInWorkingPath snippet has slight whitespace differences from source" },
+    { "type": "snippet_drift", "chapter_line": 292, "citation": "filesystem.ts:L394-L407", "problem": "ensureScratchpadDir snippet omits intermediate comment lines from source range" },
+    { "type": "snippet_drift", "chapter_line": 339, "citation": "filesystem.ts:L546-L601", "problem": "hasSuspiciousWindowsPathPattern snippet omits comment lines between code blocks" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 21,
+  "citation_verified": 21,
+  "snippet_total": 13,
+  "snippet_verbatim": 9,
+  "snippet_drift": 4,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,11 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "typeahead engine", "definition": "The multi-source suggestion aggregation system in useTypeahead that merges slash commands, file paths, shell completions, Slack channels, and agent names into a unified ranked list with debouncing and stale-result filtering."},
+    {"term": "ghost text", "definition": "An inline completion hint rendered as dimmed text after the cursor position, providing the most likely suggestion without requiring the user to open a suggestion menu."},
+    {"term": "hold-to-talk", "definition": "A voice input protocol where the user presses and holds a key to record audio, releasing it to send for transcription, with auto-repeat key event handling and release timeout detection."},
+    {"term": "keybinding context", "definition": "A string identifier (e.g., 'Global', 'Transcript', 'Prompt') that determines when a keyboard handler is active, enabling context-aware key routing where the most specific context takes priority."}
+  ]
+}

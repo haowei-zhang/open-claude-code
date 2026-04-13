@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "required_refs_found": 1,
+  "required_refs_total": 1,
+  "required_refs_missing": [],
+  "divergence_section_length_words": 3500,
+  "issues": [
+    {
+      "type": "weak_divergence",
+      "detail": "HER §21 reference is a single sentence embedded in a subsection about selection scroll-following; should be integrated more substantively across the chapter"
+    }
+  ]
+}

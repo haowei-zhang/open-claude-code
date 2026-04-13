@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "structured handoff", "definition": "The pattern of writing a progress file before clearing context and resuming from the file, used as the escape hatch for compaction failure and session-to-session transition."},
+    {"term": "compaction death spiral", "definition": "The self-reinforcing failure mode where each failed compaction attempt adds tokens to the context, making the next attempt less likely to succeed."},
+    {"term": "cost gate", "definition": "A mechanism that aborts or degrades a session when spend exceeds a configured threshold, implementing three tiers: soft cap (warning + model downgrade), hard cap (stop new tasks), and kill switch (immediate abort)."},
+    {"term": "evaluator ouroboros", "definition": "The degenerate case where using an LLM evaluator to grade LLM output creates a circular validation loop, named after the Ouroboros problem identified in HER §9.2."},
+    {"term": "back-pressure stack", "definition": "The tiered quality gate pipeline (Type System → Linter → Unit Tests → Integration Tests → E2E Tests) where only failures surface to agent context, making success silent."}
+  ]
+}

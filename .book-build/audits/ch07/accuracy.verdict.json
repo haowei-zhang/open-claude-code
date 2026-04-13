@@ -1,0 +1,24 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 200,
+      "citation": "stripAdvisorBlocks()",
+      "problem": "Function referenced but not verifiable as import or call in query.ts; may exist in messages.ts but not directly called from visible query loop code"
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 220,
+      "citation": "ensureToolResultPairing() in src/utils/messages.ts",
+      "problem": "Function referenced as invariant check but not visible as import or call in query.ts"
+    }
+  ],
+  "uncited_sources": ["src/QueryEngine.ts"],
+  "citation_total": 16,
+  "citation_verified": 14,
+  "snippet_total": 4,
+  "snippet_verbatim": 4,
+  "snippet_drift": 0,
+  "snippet_hallucinated": 0
+}

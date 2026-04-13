@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "dispatch pipeline",
+      "definition": "The ordered sequence of stages a tool invocation passes through (validation, permission, execution, post-hooks), from model intent to result."
+    },
+    {
+      "term": "sibling abort",
+      "definition": "The mechanism by which a Bash tool error cancels sibling concurrent tool executions via a child abort controller, without aborting the parent query."
+    },
+    {
+      "term": "speculative classifier check",
+      "definition": "A pattern where a bash classifier result is raced against a timeout during the permission decision flow, allowing auto-approval of common commands without showing a dialog."
+    }
+  ]
+}

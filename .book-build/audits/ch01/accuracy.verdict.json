@@ -1,0 +1,15 @@
+{
+  "verdict": "revise",
+  "issues": [
+    { "type": "wrong_line", "chapter_line": 88, "citation": "src/main.tsx:L9-L20", "problem": "Snippet includes comment block at lines 1-8, but citation says L9-L20. Actual L9 is the import statement, not the comment." },
+    { "type": "snippet_drift", "chapter_line": 29, "citation": "src/entrypoints/cli.tsx:L33-L42", "problem": "if statement shown as single line but actual source uses multi-line formatting (args.length check split across 4 lines)" },
+    { "type": "snippet_drift", "chapter_line": 173, "citation": "src/entrypoints/cli.tsx:L288-L298", "problem": "Off-by-one: includes comment from L287 but citation says L288" }
+  ],
+  "uncited_sources": [],
+  "citation_total": 7,
+  "citation_verified": 6,
+  "snippet_total": 4,
+  "snippet_verbatim": 2,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

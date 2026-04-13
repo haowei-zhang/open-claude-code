@@ -1,0 +1,19 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "classDiagram of the Ink virtual DOM", "found": false},
+    {"required": "stateDiagram-v2 of focus management", "found": false}
+  ],
+  "uncovered_topics": [
+    "Focus management is only 3 sentences despite being in the synopsis",
+    "Keyboard handling and parse-keypress pipeline not discussed",
+    "The renderer.ts module not examined despite being the diff-to-terminal bridge",
+    "Yoga layout system deserves more thorough treatment beyond onComputeLayout",
+    "The reconciler (reconciler.ts) not examined in detail"
+  ],
+  "citation_count": 24,
+  "diagram_count": 2,
+  "snippet_count": 18,
+  "top_files_without_snippets": []
+}

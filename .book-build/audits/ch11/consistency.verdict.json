@@ -1,0 +1,9 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "backfillObservableInput", "definition": "A method that injects derived fields (e.g., expanded file paths) into a shallow clone of the tool input for hooks and permission checks, without modifying the original input passed to call()."},
+    {"term": "fail-closed default", "definition": "A default value for a safety-critical method that assumes the most restrictive behavior when the method is not explicitly implemented, ensuring that omission cannot lead to unsafe execution."}
+  ]
+}

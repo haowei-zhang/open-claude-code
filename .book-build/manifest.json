@@ -1,0 +1,2804 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "id_padded": "01",
+      "title": "Why This Book Exists: The Harness Engineering Moment",
+      "slug": "why-this-book-exists",
+      "part": 1,
+      "synopsis": "Positions cc in the emerging discipline of harness engineering. States the book's thesis: cc is the most mature public example of a long-running agent harness and a template for trustworthy autonomous systems.",
+      "source_files": [
+        "src/main.tsx",
+        "src/entrypoints/cli.tsx",
+        "README.md"
+      ],
+      "her_refs": [
+        "§1 Agent = Model + Harness",
+        "§2 Evolution prompt→context→harness",
+        "§17 TerminalBench 2.0 24.9pp spread"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart model + harness = agent block diagram",
+        "(b) timeline flowchart METR task-duration doubling"
+      ],
+      "target_words": 3000,
+      "min_words": 2550,
+      "max_words": 3750,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 2,
+        "diagrams": 2,
+        "polish": 3,
+        "consistency": 2,
+        "gaps": 3,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3129,
+      "citations": 7,
+      "diagram_count": 3,
+      "snippet_count": 4,
+      "snippets_verbatim": 2,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 2,
+      "id_padded": "02",
+      "title": "Book Architecture, Reading Paths, and Citation Conventions",
+      "slug": "book-architecture-reading-paths",
+      "part": 1,
+      "synopsis": "Explains how to read the book, citation format, diagram conventions, cross-ref table from HER patterns/failure modes/best practices to chapters.",
+      "source_files": [],
+      "her_refs": [
+        "§5 12 patterns index",
+        "§6 17 failure modes index",
+        "§20 12 best practices"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of the book's parts and dependencies",
+        "(b) flowchart mapping HER patterns to chapter numbers"
+      ],
+      "target_words": 3000,
+      "min_words": 2550,
+      "max_words": 3750,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 2,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 3,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 2574,
+      "citations": 0,
+      "diagram_count": 2,
+      "snippet_count": 0,
+      "snippets_verbatim": null,
+      "snippets_drift": null,
+      "snippets_hallucinated": null,
+      "needs_verify": null,
+      "brief_checksum": "",
+      "meta_chapter": true
+    },
+    {
+      "id": 3,
+      "id_padded": "03",
+      "title": "A Guided Tour of the Repository",
+      "slug": "guided-tour-of-repository",
+      "part": 1,
+      "synopsis": "Maps the top-level directory tree. For each major folder answers: what lives here, why, connections to neighbors. Reader's orientation map before deep dives.",
+      "source_files": [
+        "src/main.tsx"
+      ],
+      "her_refs": [
+        "§21 Reference Architecture 8 Layers mapped onto cc folders"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart directory dependency graph",
+        "(b) classDiagram of top-level modules",
+        "(c) flowchart mapping HER 8-layer reference architecture onto cc folders"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 2,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3672,
+      "citations": 63,
+      "diagram_count": 3,
+      "snippet_count": 9,
+      "snippets_verbatim": 7,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 4,
+      "id_padded": "04",
+      "title": "TypeScript, Bun, React, Ink: The Unusual Runtime Stack",
+      "slug": "typescript-bun-react-ink-runtime",
+      "part": 1,
+      "synopsis": "Why cc is TS+Bun+React+Ink. Tradeoffs (startup time, distributability, React for structured terminal UI, feature-flagged bundling). Connects to HER's thesis that harnesses are language/runtime-specific.",
+      "source_files": [
+        "src/ink/ink.tsx",
+        "src/ink/screen.ts",
+        "src/utils/bundledMode.ts"
+      ],
+      "her_refs": [
+        "§4 Fowler taxonomy",
+        "§12 supply chain"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart runtime stack Bun → main.tsx → Ink tree → terminal",
+        "(b) stateDiagram-v2 for bundle modes"
+      ],
+      "target_words": 3500,
+      "min_words": 2975,
+      "max_words": 4375,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 2,
+        "diagrams": 2,
+        "polish": 3,
+        "consistency": 2,
+        "gaps": 3,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3111,
+      "citations": 7,
+      "diagram_count": 2,
+      "snippet_count": 6,
+      "snippets_verbatim": 5,
+      "snippets_drift": 1,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 5,
+      "id_padded": "05",
+      "title": "Bootstrap: From `bun run` to Running Loop",
+      "slug": "bootstrap-from-bun-run-to-running-loop",
+      "part": 2,
+      "synopsis": "Startup from `cli.tsx` through fast-path flags, MDM prefetch, keychain prefetch, version check, TLS, policy limits, mTLS, OAuth, graceful shutdown registration.",
+      "source_files": [
+        "src/entrypoints/cli.tsx",
+        "src/entrypoints/init.ts",
+        "src/bootstrap/state.ts",
+        "src/utils/settings/settings.ts"
+      ],
+      "her_refs": [
+        "§10 Session Protocol (ORIENT/SETUP)",
+        "§12 TLS/mTLS defense in depth"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram cli.tsx → init.ts → main.tsx with every side-effect labeled",
+        "(b) stateDiagram-v2 for the boot state machine"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3949,
+      "citations": 25,
+      "diagram_count": 2,
+      "snippet_count": 6,
+      "snippets_verbatim": 6,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 6,
+      "id_padded": "06",
+      "title": "`main.tsx` and the Command Router",
+      "slug": "main-tsx-and-command-router",
+      "part": 2,
+      "synopsis": "Deep dive into the ~4,700 LOC `main.tsx`. CLI subcommands, parsing, `renderAndRun`, bifurcation between headless and interactive modes.",
+      "source_files": [
+        "src/main.tsx"
+      ],
+      "her_refs": [
+        "§7 Configuration Surfaces (entry flags as a surface)"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of command routing decisions",
+        "(b) sequenceDiagram headless vs interactive launch"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3882,
+      "citations": 28,
+      "diagram_count": 2,
+      "snippet_count": 4,
+      "snippets_verbatim": 4,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 7,
+      "id_padded": "07",
+      "title": "The Query Loop: Heartbeat of the Agent",
+      "slug": "query-loop-heartbeat-of-agent",
+      "part": 2,
+      "synopsis": "Exhaustive walkthrough of `queryLoop()` in `src/query.ts`. Async generator protocol, StreamEvent vs Message types, tool dispatch points, interruption points, how the loop bridges model streaming and tool execution.",
+      "source_files": [
+        "src/query.ts",
+        "src/QueryEngine.ts",
+        "src/query/config.ts",
+        "src/query/deps.ts",
+        "src/query/stopHooks.ts",
+        "src/query/tokenBudget.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 6 Explore-Plan-Act Loop",
+        "§6.1 Context Rot",
+        "§6.2 Premature Completion",
+        "§6.7 Infinite Loops"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of a full query iteration",
+        "(b) stateDiagram-v2 of query loop states",
+        "(c) flowchart of stop-hook evaluation and token budget checks"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 6061,
+      "citations": 18,
+      "diagram_count": 3,
+      "snippet_count": 6,
+      "snippets_verbatim": 6,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 8,
+      "id_padded": "08",
+      "title": "Talking to Anthropic: `services/api/claude.ts` and Streaming",
+      "slug": "talking-to-anthropic-streaming",
+      "part": 2,
+      "synopsis": "Anthropic SDK wrapper. Streaming, fallback model, token metering, retries, prompt cache break detection, rate limits, first-token date, usage accumulation.",
+      "source_files": [
+        "src/services/api/claude.ts",
+        "src/services/api/usage.ts",
+        "src/services/api/errors.ts",
+        "src/services/api/logging.ts"
+      ],
+      "her_refs": [
+        "§13 cost management (observation masking)",
+        "§6.14 Model regression from provider updates"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of a streaming request with retry",
+        "(b) stateDiagram-v2 of request lifecycle including fallback",
+        "(c) flowchart of usage accounting and cost hooks"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5057,
+      "citations": 18,
+      "diagram_count": 3,
+      "snippet_count": 5,
+      "snippets_verbatim": 3,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 9,
+      "id_padded": "09",
+      "title": "System Prompts and Prompt Assembly",
+      "slug": "system-prompts-and-prompt-assembly",
+      "part": 2,
+      "synopsis": "`src/constants/prompts.ts` (~900 LOC) and how cc composes the final system prompt per query from base, environment, tools, skills, memories, hooks, effort, plan mode.",
+      "source_files": [
+        "src/constants/prompts.ts",
+        "src/utils/analyzeContext.ts",
+        "src/utils/claudemd.ts",
+        "src/utils/context.ts"
+      ],
+      "her_refs": [
+        "§7.1 Persistent Instruction File",
+        "§5 Pattern 2 Scoped Context Assembly",
+        "§7.1 ETH Zurich AGENTS.md finding"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of prompt assembly layers",
+        "(b) classDiagram of prompt fragment sources"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5300,
+      "citations": 15,
+      "diagram_count": 3,
+      "snippet_count": 4,
+      "snippets_verbatim": 4,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 10,
+      "id_padded": "10",
+      "title": "Token Budgets, Effort, and Fast Mode",
+      "slug": "token-budgets-effort-fast-mode",
+      "part": 2,
+      "synopsis": "How cc tracks and bounds token consumption, how 'effort' selects model/thinking, how fast mode flips the loop.",
+      "source_files": [
+        "src/query/tokenBudget.ts",
+        "src/services/tokenEstimation.ts",
+        "src/state/AppStateStore.ts"
+      ],
+      "her_refs": [
+        "§13 Cost and Budgeting",
+        "§9.4 Model Routing (Opus/Sonnet/Haiku tiers)"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 for effort levels",
+        "(b) flowchart of token-budget-triggered actions"
+      ],
+      "target_words": 3500,
+      "min_words": 2975,
+      "max_words": 4375,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 3,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4047,
+      "citations": 15,
+      "diagram_count": 3,
+      "snippet_count": 7,
+      "snippets_verbatim": 7,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 11,
+      "id_padded": "11",
+      "title": "Anatomy of a Tool: `Tool.ts`, `buildTool`, and the Base Type",
+      "slug": "anatomy-of-a-tool",
+      "part": 3,
+      "synopsis": "The tool contract — Zod/JSONSchema input, `call()`, concurrency flags, deferral, max result size. Walks through `buildTool` helper.",
+      "source_files": [
+        "src/Tool.ts",
+        "src/tools.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 11 Single-Purpose Tool Design",
+        "§4 Fowler computational vs inferential"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of the Tool interface and concrete implementations",
+        "(b) flowchart of buildTool() behavior"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 1,
+        "diagrams": 3,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 3,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4295,
+      "citations": 17,
+      "diagram_count": 2,
+      "snippet_count": 16,
+      "snippets_verbatim": 14,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 12,
+      "id_padded": "12",
+      "title": "Tool Dispatch Pipeline",
+      "slug": "tool-dispatch-pipeline",
+      "part": 3,
+      "synopsis": "How a requested tool call travels: `validateInput → canUseTool → runPreToolUseHooks → tool.call → runPostToolUseHooks → result normalization`. Read-only parallelism and write serialization.",
+      "source_files": [
+        "src/services/tools/toolExecution.ts",
+        "src/services/tools/toolOrchestration.ts",
+        "src/services/tools/toolHooks.ts",
+        "src/services/tools/StreamingToolExecutor.ts",
+        "src/hooks/useCanUseTool.tsx"
+      ],
+      "her_refs": [
+        "§5 Pattern 12 Deterministic Lifecycle Hooks",
+        "§6.8 Tool Explosion",
+        "§6.6 Silent Failures"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of a successful tool dispatch",
+        "(b) sequenceDiagram of a denied dispatch",
+        "(c) stateDiagram-v2 of deferral / concurrency scheduling"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5604,
+      "citations": 21,
+      "diagram_count": 4,
+      "snippet_count": 21,
+      "snippets_verbatim": 21,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 13,
+      "id_padded": "13",
+      "title": "File System Tools: Read, Write, Edit, Glob, Grep, Notebook",
+      "slug": "file-system-tools",
+      "part": 3,
+      "synopsis": "File tools, safety checks, multi-edit semantics, image/pdf/notebook support, glob/grep semantics, relationship to file-history snapshots.",
+      "source_files": [
+        "src/tools/FileReadTool/FileReadTool.ts",
+        "src/tools/FileReadTool/imageProcessor.ts",
+        "src/tools/FileReadTool/limits.ts",
+        "src/tools/FileReadTool/prompt.ts",
+        "src/tools/FileReadTool/UI.tsx",
+        "src/tools/FileWriteTool/FileWriteTool.ts",
+        "src/tools/FileWriteTool/prompt.ts",
+        "src/tools/FileWriteTool/UI.tsx",
+        "src/tools/FileEditTool/FileEditTool.ts",
+        "src/tools/FileEditTool/constants.ts",
+        "src/tools/FileEditTool/types.ts",
+        "src/tools/FileEditTool/utils.ts",
+        "src/tools/FileEditTool/prompt.ts",
+        "src/tools/FileEditTool/UI.tsx",
+        "src/tools/GlobTool/GlobTool.ts",
+        "src/tools/GlobTool/prompt.ts",
+        "src/tools/GlobTool/UI.tsx",
+        "src/tools/GrepTool/GrepTool.ts",
+        "src/tools/GrepTool/prompt.ts",
+        "src/tools/GrepTool/UI.tsx",
+        "src/tools/NotebookEditTool/NotebookEditTool.ts",
+        "src/tools/NotebookEditTool/constants.ts",
+        "src/tools/NotebookEditTool/prompt.ts",
+        "src/tools/NotebookEditTool/UI.tsx",
+        "src/utils/fileHistory.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 11",
+        "§6.4 Placeholder Implementations",
+        "§6.15 Data Leakage Between Contexts"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of Edit tool with pre-read and snapshot",
+        "(b) classDiagram of the file-tool family"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 2,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4626,
+      "citations": 26,
+      "diagram_count": 3,
+      "snippet_count": 18,
+      "snippets_verbatim": 18,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 14,
+      "id_padded": "14",
+      "title": "The Bash Tool, Classifiers, and Sandboxing",
+      "slug": "bash-tool-classifiers-sandboxing",
+      "part": 3,
+      "synopsis": "`BashTool` and its safety subsystem. Command classification, destructive patterns, mode validation, sandbox detection, PowerShell variant.",
+      "source_files": [
+        "src/tools/BashTool/BashTool.tsx",
+        "src/tools/BashTool/bashSecurity.ts",
+        "src/tools/BashTool/bashPermissions.ts",
+        "src/tools/BashTool/commandSemantics.ts",
+        "src/tools/BashTool/destructiveCommandWarning.ts",
+        "src/tools/BashTool/modeValidation.ts",
+        "src/tools/BashTool/pathValidation.ts",
+        "src/tools/BashTool/readOnlyValidation.ts",
+        "src/tools/BashTool/shouldUseSandbox.ts",
+        "src/tools/BashTool/prompt.ts",
+        "src/tools/PowerShellTool/PowerShellTool.tsx",
+        "src/tools/PowerShellTool/powershellSecurity.ts",
+        "src/tools/PowerShellTool/powershellPermissions.ts",
+        "src/tools/PowerShellTool/commandSemantics.ts",
+        "src/tools/PowerShellTool/destructiveCommandWarning.ts",
+        "src/tools/PowerShellTool/modeValidation.ts",
+        "src/tools/PowerShellTool/pathValidation.ts",
+        "src/tools/PowerShellTool/readOnlyValidation.ts",
+        "src/tools/PowerShellTool/prompt.ts",
+        "src/tools/PowerShellTool/toolName.ts",
+        "src/utils/permissions/bashClassifier.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 10 Command Risk Classification",
+        "§6.16 Checkpoint-Restore Side Effects",
+        "§12.4 Security Threat Model"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of a Bash command's risk classification",
+        "(b) classDiagram of the classifier pipeline",
+        "(c) stateDiagram-v2 for sandbox / permission decisions"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 5194,
+      "citations": 30,
+      "diagram_count": 3,
+      "snippet_count": 7,
+      "snippets_verbatim": 5,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 15,
+      "id_padded": "15",
+      "title": "Search, LSP, and Code Analysis Tools",
+      "slug": "search-lsp-code-analysis-tools",
+      "part": 3,
+      "synopsis": "`GrepTool`, `LSPTool`, `ToolSearchTool`. Progressive tool disclosure and why it matters for large catalogs.",
+      "source_files": [
+        "src/tools/LSPTool/LSPTool.ts",
+        "src/tools/LSPTool/formatters.ts",
+        "src/tools/LSPTool/schemas.ts",
+        "src/tools/LSPTool/symbolContext.ts",
+        "src/tools/LSPTool/prompt.ts",
+        "src/tools/LSPTool/UI.tsx",
+        "src/tools/ToolSearchTool/ToolSearchTool.ts",
+        "src/tools/ToolSearchTool/constants.ts",
+        "src/tools/ToolSearchTool/prompt.ts",
+        "src/services/lsp/LSPClient.ts",
+        "src/services/lsp/LSPServerInstance.ts",
+        "src/services/lsp/LSPServerManager.ts",
+        "src/services/lsp/LSPDiagnosticRegistry.ts",
+        "src/services/lsp/manager.ts",
+        "src/services/lsp/config.ts",
+        "src/services/lsp/passiveFeedback.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 9 Progressive Tool Expansion",
+        "§6.8 Tool Explosion"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of ToolSearch → deferred tool → first call",
+        "(b) classDiagram of LSP client lifecycle"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4398,
+      "citations": 7,
+      "diagram_count": 4,
+      "snippet_count": 8,
+      "snippets_verbatim": 7,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 16,
+      "id_padded": "16",
+      "title": "Web Tools: `WebFetch`, `WebSearch`, and SSRF Defense",
+      "slug": "web-tools-ssrf-defense",
+      "part": 3,
+      "synopsis": "Web tool implementations, SSRF guard, caching, how web access is gated. Ties to prompt-injection threat model.",
+      "source_files": [
+        "src/tools/WebFetchTool/WebFetchTool.ts",
+        "src/tools/WebFetchTool/utils.ts",
+        "src/tools/WebFetchTool/preapproved.ts",
+        "src/tools/WebFetchTool/prompt.ts",
+        "src/tools/WebFetchTool/UI.tsx",
+        "src/tools/WebSearchTool/WebSearchTool.ts",
+        "src/tools/WebSearchTool/prompt.ts",
+        "src/tools/WebSearchTool/UI.tsx",
+        "src/utils/hooks/ssrfGuard.ts"
+      ],
+      "her_refs": [
+        "§6.13 Prompt Injection",
+        "§6.12 Hallucinated Tool Calls"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of a WebFetch call with SSRF guard",
+        "(b) sequenceDiagram of web-content sanitization feeding into the model"
+      ],
+      "target_words": 3500,
+      "min_words": 2975,
+      "max_words": 4375,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3439,
+      "citations": 8,
+      "diagram_count": 3,
+      "snippet_count": 8,
+      "snippets_verbatim": 8,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 17,
+      "id_padded": "17",
+      "title": "TodoWrite, AskUserQuestion, Brief, Config, SendMessage",
+      "slug": "todo-askuser-brief-config-sendmessage",
+      "part": 3,
+      "synopsis": "The 'meta' tools that structure sessions: TodoWrite (self-planning), AskUserQuestion (HITL), Brief, Config, SendMessage (teammate comms).",
+      "source_files": [
+        "src/tools/TodoWriteTool/TodoWriteTool.ts",
+        "src/tools/TodoWriteTool/constants.ts",
+        "src/tools/TodoWriteTool/prompt.ts",
+        "src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx",
+        "src/tools/AskUserQuestionTool/prompt.ts",
+        "src/tools/BriefTool/BriefTool.ts",
+        "src/tools/BriefTool/attachments.ts",
+        "src/tools/BriefTool/upload.ts",
+        "src/tools/BriefTool/prompt.ts",
+        "src/tools/BriefTool/UI.tsx",
+        "src/tools/ConfigTool/ConfigTool.ts",
+        "src/tools/ConfigTool/supportedSettings.ts",
+        "src/tools/ConfigTool/constants.ts",
+        "src/tools/ConfigTool/prompt.ts",
+        "src/tools/ConfigTool/UI.tsx",
+        "src/tools/SendMessageTool/SendMessageTool.ts",
+        "src/tools/SendMessageTool/constants.ts",
+        "src/tools/SendMessageTool/prompt.ts",
+        "src/tools/SendMessageTool/UI.tsx"
+      ],
+      "her_refs": [
+        "§11 Human-in-the-Loop Design Patterns",
+        "§5 Pattern 5 Progressive Context Compaction"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 of a todo item lifecycle",
+        "(b) sequenceDiagram of AskUserQuestion interrupting the loop"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 2,
+        "diagrams": 1,
+        "polish": 3,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3400,
+      "citations": 24,
+      "diagram_count": 2,
+      "snippet_count": 11,
+      "snippets_verbatim": 8,
+      "snippets_drift": 3,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 18,
+      "id_padded": "18",
+      "title": "The Agent Tool: Entry, Inputs, and Lifecycle",
+      "slug": "agent-tool-entry-inputs-lifecycle",
+      "part": 4,
+      "synopsis": "`AgentTool` surface. Inputs (description, prompt, subagent_type, model, run_in_background, team_name, mode, isolation, cwd), validation, output return.",
+      "source_files": [
+        "src/tools/AgentTool/AgentTool.tsx"
+      ],
+      "her_refs": [
+        "§7.4 Sub-Agents as a configuration surface",
+        "§5 Pattern 7 Context-Isolated Subagents",
+        "§5 Pattern 8 Fork-Join Parallelism"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of AgentTool input schema",
+        "(b) flowchart of AgentTool input validation and dispatch selection"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 4335,
+      "citations": 14,
+      "diagram_count": 3,
+      "snippet_count": 14,
+      "snippets_verbatim": 14,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 19,
+      "id_padded": "19",
+      "title": "Sync vs Fork vs Remote: The Execution Modes",
+      "slug": "sync-vs-fork-vs-remote-execution",
+      "part": 4,
+      "synopsis": "In-process sync agents, forked subagents, remote CCR agents. Tradeoffs, shared vs isolated state, communication paths.",
+      "source_files": [
+        "src/tools/AgentTool/runAgent.ts",
+        "src/tools/AgentTool/forkSubagent.ts",
+        "src/utils/forkedAgent.ts",
+        "src/tasks/RemoteAgentTask/RemoteAgentTask.tsx",
+        "src/tasks/LocalAgentTask/LocalAgentTask.tsx"
+      ],
+      "her_refs": [
+        "§9.1 Three Tiers of Multi-Agent Orchestration",
+        "§6.5 Context Anxiety"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram for sync mode",
+        "(b) sequenceDiagram for fork mode",
+        "(c) sequenceDiagram for remote mode"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5680,
+      "citations": 14,
+      "diagram_count": 3,
+      "snippet_count": 14,
+      "snippets_verbatim": 14,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 20,
+      "id_padded": "20",
+      "title": "Agent Definitions: Loading, Frontmatter, and Built-Ins",
+      "slug": "agent-definitions-loading-frontmatter",
+      "part": 4,
+      "synopsis": "How cc discovers and loads agents from `~/.claude/agents`, plugin agents, built-ins. Markdown + YAML frontmatter contract.",
+      "source_files": [
+        "src/tools/AgentTool/loadAgentsDir.ts",
+        "src/utils/plugins/loadPluginAgents.ts",
+        "src/utils/frontmatterParser.ts"
+      ],
+      "her_refs": [
+        "§7.4 Sub-agents configuration surface",
+        "§5 Pattern 2 Scoped Context Assembly"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of agent discovery across directories",
+        "(b) classDiagram of AgentDefinition shape"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 3,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5353,
+      "citations": 14,
+      "diagram_count": 2,
+      "snippet_count": 14,
+      "snippets_verbatim": 14,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 21,
+      "id_padded": "21",
+      "title": "Multi-Agent Coordinator: The Swarm Layer",
+      "slug": "multi-agent-coordinator-swarm-layer",
+      "part": 4,
+      "synopsis": "The feature-gated `coordinator/coordinatorMode.ts` — how multi-agent swarms are orchestrated, message routing, team lifecycle.",
+      "source_files": [
+        "src/coordinator/coordinatorMode.ts"
+      ],
+      "her_refs": [
+        "§9.2 Generator-Evaluator pattern and Ouroboros problem",
+        "§9.3 Agent Communication (file-based)",
+        "§5 Pattern 8"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of coordinator structures",
+        "(b) sequenceDiagram of team creation and message routing",
+        "(c) stateDiagram-v2 of team lifecycle"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 5280,
+      "citations": 21,
+      "diagram_count": 4,
+      "snippet_count": 6,
+      "snippets_verbatim": 6,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 22,
+      "id_padded": "22",
+      "title": "Tasks: A Durable Unit of Work",
+      "slug": "tasks-durable-unit-of-work",
+      "part": 4,
+      "synopsis": "Task records, status transitions, blocking relationships, filesystem locking, storage paths, high-water mark, the seven task types.",
+      "source_files": [
+        "src/utils/tasks.ts",
+        "src/tasks/LocalAgentTask/LocalAgentTask.tsx",
+        "src/tasks/RemoteAgentTask/RemoteAgentTask.tsx",
+        "src/tasks/DreamTask/DreamTask.ts",
+        "src/tasks/LocalMainSessionTask.ts",
+        "src/tools/TaskCreateTool/TaskCreateTool.ts",
+        "src/tools/TaskCreateTool/constants.ts",
+        "src/tools/TaskCreateTool/prompt.ts",
+        "src/tools/TaskListTool/TaskListTool.ts",
+        "src/tools/TaskListTool/constants.ts",
+        "src/tools/TaskListTool/prompt.ts",
+        "src/tools/TaskGetTool/TaskGetTool.ts",
+        "src/tools/TaskGetTool/constants.ts",
+        "src/tools/TaskGetTool/prompt.ts",
+        "src/tools/TaskUpdateTool/TaskUpdateTool.ts",
+        "src/tools/TaskUpdateTool/constants.ts",
+        "src/tools/TaskUpdateTool/prompt.ts",
+        "src/tools/TaskStopTool/TaskStopTool.ts",
+        "src/tools/TaskStopTool/prompt.ts",
+        "src/tools/TaskStopTool/UI.tsx",
+        "src/tools/TaskOutputTool/TaskOutputTool.tsx",
+        "src/tools/TaskOutputTool/constants.ts"
+      ],
+      "her_refs": [
+        "§10.1 One-Task-Per-Session rule",
+        "§8.2 Three-File State Pattern",
+        "§10.3 Session Protocol"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 of task status transitions",
+        "(b) classDiagram of the seven task types",
+        "(c) sequenceDiagram of task create/lock/update/complete"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5883,
+      "citations": 70,
+      "diagram_count": 3,
+      "snippet_count": 15,
+      "snippets_verbatim": 15,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 23,
+      "id_padded": "23",
+      "title": "Teammates and In-Process Collaboration",
+      "slug": "teammates-in-process-collaboration",
+      "part": 4,
+      "synopsis": "tmux-based teammates, in-process teammate tasks, `SendMessageTool`, idle hooks.",
+      "source_files": [
+        "src/tools/SendMessageTool/SendMessageTool.ts",
+        "src/tools/SendMessageTool/constants.ts",
+        "src/tools/SendMessageTool/prompt.ts",
+        "src/tools/SendMessageTool/UI.tsx",
+        "src/utils/hooks/sessionHooks.ts"
+      ],
+      "her_refs": [
+        "§9.1 in-process tier",
+        "§11.5 Handoff Protocols"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of a teammate message exchange",
+        "(b) stateDiagram-v2 of teammate life (active/idle/shutdown)"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4240,
+      "citations": 39,
+      "diagram_count": 2,
+      "snippet_count": 8,
+      "snippets_verbatim": 5,
+      "snippets_drift": 3,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 24,
+      "id_padded": "24",
+      "title": "Dream Tasks: Background Consolidation",
+      "slug": "dream-tasks-background-consolidation",
+      "part": 4,
+      "synopsis": "`DreamTask` and `autoDream` — background memory consolidation loop, firing conditions, interaction with memories.",
+      "source_files": [
+        "src/tasks/DreamTask/DreamTask.ts",
+        "src/services/autoDream/autoDream.ts",
+        "src/services/autoDream/consolidationLock.ts",
+        "src/services/autoDream/consolidationPrompt.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 4 Dream Consolidation",
+        "§21 Layer 8 Learning and Adaptation"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 of the dream lifecycle",
+        "(b) sequenceDiagram of consolidation with lock"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4365,
+      "citations": 46,
+      "diagram_count": 3,
+      "snippet_count": 11,
+      "snippets_verbatim": 9,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 25,
+      "id_padded": "25",
+      "title": "Messages and the Conversation Model",
+      "slug": "messages-and-conversation-model",
+      "part": 5,
+      "synopsis": "`src/utils/messages.ts` and `src/types/message.ts` — message types, `<history_snip>`, compact boundaries, attachments, content replacement.",
+      "source_files": [
+        "src/utils/messages.ts",
+        "src/utils/attachments.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 5",
+        "§6.1 Context Rot"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of message types",
+        "(b) flowchart of message lifecycle"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 4400,
+      "citations": 19,
+      "diagram_count": 3,
+      "snippet_count": 17,
+      "snippets_verbatim": 15,
+      "snippets_drift": 2,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 26,
+      "id_padded": "26",
+      "title": "Memdir: Tiered Memory on Disk",
+      "slug": "memdir-tiered-memory-on-disk",
+      "part": 5,
+      "synopsis": "Memdir architecture. MEMORY.md index, per-memory `.md` files, types (user/feedback/project/reference), age, scan, relevance retrieval.",
+      "source_files": [
+        "src/memdir/memdir.ts",
+        "src/memdir/memoryTypes.ts",
+        "src/memdir/paths.ts",
+        "src/memdir/findRelevantMemories.ts",
+        "src/memdir/memoryScan.ts",
+        "src/memdir/memoryAge.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 3 Tiered Memory",
+        "§7.1 Persistent Instruction File"
+      ],
+      "diagram_reqs": [
+        "(a) erDiagram of memdir storage",
+        "(b) flowchart of memory retrieval per query",
+        "(c) classDiagram of memory types and frontmatter"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 2,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5184,
+      "citations": 48,
+      "diagram_count": 3,
+      "snippet_count": 8,
+      "snippets_verbatim": 8,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 27,
+      "id_padded": "27",
+      "title": "Session Memory and Memory Extraction",
+      "slug": "session-memory-and-extraction",
+      "part": 5,
+      "synopsis": "`services/SessionMemory/` and memory extraction pipelines, prompts that drive it, feature gates.",
+      "source_files": [
+        "src/services/SessionMemory/sessionMemory.ts",
+        "src/services/SessionMemory/prompts.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 3 Tiered Memory",
+        "§6.3 Self-Evaluation Bias"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of memory extraction after a session",
+        "(b) flowchart of memory promotion session → memdir"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 4098,
+      "citations": 15,
+      "diagram_count": 2,
+      "snippet_count": 10,
+      "snippets_verbatim": 10,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 28,
+      "id_padded": "28",
+      "title": "Compaction Hierarchy: Five Stages of Context Rescue",
+      "slug": "compaction-hierarchy-five-stages",
+      "part": 5,
+      "synopsis": "`<history_snip>` → Microcompact → Context Collapse → Autocompact → Hard Reset. Triggers, preservation semantics, discard semantics.",
+      "source_files": [
+        "src/services/compact/compact.ts",
+        "src/services/compact/autoCompact.ts",
+        "src/services/compact/microCompact.ts",
+        "src/services/compact/timeBasedMCConfig.ts",
+        "src/services/compact/postCompactCleanup.ts",
+        "src/utils/messages.ts",
+        "src/services/compact/apiMicrocompact.ts",
+        "src/services/compact/sessionMemoryCompact.ts",
+        "src/services/compact/compactWarningHook.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 5 Progressive Context Compaction",
+        "§8 Context Management",
+        "§8.1 Observation Masking (52% cost reduction)",
+        "§6.1 Context Rot"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of the five-stage hierarchy",
+        "(b) stateDiagram-v2 of compaction triggers",
+        "(c) sequenceDiagram of a microcompact pass"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 6193,
+      "citations": 44,
+      "diagram_count": 4,
+      "snippet_count": 31,
+      "snippets_verbatim": 29,
+      "snippets_drift": 1,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 29,
+      "id_padded": "29",
+      "title": "Session Persistence and Resume",
+      "slug": "session-persistence-and-resume",
+      "part": 5,
+      "synopsis": "JSONL sessions, entry types, tombstones, head/tail reading, resume flow.",
+      "source_files": [
+        "src/utils/sessionStorage.ts",
+        "src/utils/sessionStoragePortable.ts"
+      ],
+      "her_refs": [
+        "§6.16 Checkpoint-Restore Side Effects (ACRFence)",
+        "§10.3 Session Protocol"
+      ],
+      "diagram_reqs": [
+        "(a) erDiagram of session storage layout",
+        "(b) stateDiagram-v2 of a session's persistence lifecycle",
+        "(c) sequenceDiagram of a resume flow"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5298,
+      "citations": 57,
+      "diagram_count": 3,
+      "snippet_count": 6,
+      "snippets_verbatim": 6,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 30,
+      "id_padded": "30",
+      "title": "AppState: The Redux-like Store",
+      "slug": "appstate-redux-like-store",
+      "part": 5,
+      "synopsis": "`AppState.tsx`, `AppStateStore.ts`, `onChangeAppState.ts` — shape, reducers, subscribers, teamContext.",
+      "source_files": [
+        "src/state/AppState.tsx",
+        "src/state/AppStateStore.ts",
+        "src/state/onChangeAppState.ts",
+        "src/bootstrap/state.ts"
+      ],
+      "her_refs": [
+        "§21 Layer 2 Session Management"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of store shape",
+        "(b) sequenceDiagram of a state change propagating to subscribers"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3787,
+      "citations": 30,
+      "diagram_count": 2,
+      "snippet_count": 21,
+      "snippets_verbatim": 21,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 31,
+      "id_padded": "31",
+      "title": "CLAUDE.md, Settings Cascade, and Managed Settings",
+      "slug": "claudemd-settings-cascade-managed",
+      "part": 5,
+      "synopsis": "Loading order (org → user → project → dir → env → flags), managed settings for enterprise, CLAUDE.md discovery and role.",
+      "source_files": [
+        "src/utils/settings/settings.ts",
+        "src/utils/settings/types.ts",
+        "src/utils/settings/settingsCache.ts",
+        "src/utils/claudemd.ts"
+      ],
+      "her_refs": [
+        "§7.1 CLAUDE.md / AGENTS.md",
+        "§7 Six Configuration Surfaces"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of settings cascade precedence",
+        "(b) classDiagram of settings sources"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 4850,
+      "citations": 45,
+      "diagram_count": 3,
+      "snippet_count": 8,
+      "snippets_verbatim": 8,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 32,
+      "id_padded": "32",
+      "title": "The Permission Model: Modes and Rules",
+      "slug": "permission-model-modes-and-rules",
+      "part": 6,
+      "synopsis": "Permission modes (default, plan, acceptEdits, bypassPermissions, dontAsk, auto). Rule parsing and evaluation.",
+      "source_files": [
+        "src/utils/permissions/permissions.ts",
+        "src/utils/permissions/PermissionMode.ts",
+        "src/utils/permissions/PermissionRule.ts"
+      ],
+      "her_refs": [
+        "§12 Guardrails",
+        "§11 Human-in-the-Loop",
+        "§6.13 Prompt Injection"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 of permission modes",
+        "(b) flowchart of rule evaluation",
+        "(c) classDiagram of rule types"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4917,
+      "citations": 42,
+      "diagram_count": 3,
+      "snippet_count": 9,
+      "snippets_verbatim": 9,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 33,
+      "id_padded": "33",
+      "title": "Bash Classifier and YOLO Scoring",
+      "slug": "bash-classifier-yolo-scoring",
+      "part": 6,
+      "synopsis": "`bashClassifier.ts`, yoloClassifier, classifier approvals. How commands are mapped to risk bands and how auto mode uses classification.",
+      "source_files": [
+        "src/utils/permissions/bashClassifier.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 10 Command Risk Classification",
+        "§12.4 Security Threat Model"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of the classifier decision tree",
+        "(b) classDiagram of classifier inputs"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 4280,
+      "citations": 25,
+      "diagram_count": 3,
+      "snippet_count": 15,
+      "snippets_verbatim": 15,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 34,
+      "id_padded": "34",
+      "title": "Filesystem Permissions and Path Guards",
+      "slug": "filesystem-permissions-path-guards",
+      "part": 6,
+      "synopsis": "`filesystem.ts`, symlink traversal defense, glob allow/deny, denial tracking.",
+      "source_files": [
+        "src/utils/permissions/filesystem.ts",
+        "src/utils/permissions/denialTracking.ts"
+      ],
+      "her_refs": [
+        "§12.4 Data Exfiltration",
+        "§6.15 Data Leakage"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of path validation",
+        "(b) stateDiagram-v2 of denial tracking"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4424,
+      "citations": 21,
+      "diagram_count": 2,
+      "snippet_count": 17,
+      "snippets_verbatim": 17,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 35,
+      "id_padded": "35",
+      "title": "`useCanUseTool`: The Engine Hook",
+      "slug": "usecanusetool-engine-hook",
+      "part": 6,
+      "synopsis": "The ~200 LOC React hook that evaluates permission decisions, interacts with UI prompts, enforces plan mode.",
+      "source_files": [
+        "src/hooks/useCanUseTool.tsx"
+      ],
+      "her_refs": [
+        "§11.2 Tiered Escalation",
+        "§11.3 Async Approval"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of the hook responding to a tool request",
+        "(b) stateDiagram-v2 of the approval UI",
+        "(c) flowchart of fallback decisions when no rule matches"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4695,
+      "citations": 20,
+      "diagram_count": 3,
+      "snippet_count": 17,
+      "snippets_verbatim": 17,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 36,
+      "id_padded": "36",
+      "title": "The Hook Schema and Lifecycle Events",
+      "slug": "hook-schema-lifecycle-events",
+      "part": 6,
+      "synopsis": "Hook schema in `schemas/hooks.ts`. Each event documented with trigger, payload, effect. Hook types: command, prompt, http, agent, function. Exit code semantics.",
+      "source_files": [
+        "src/schemas/hooks.ts",
+        "src/utils/hooks.ts",
+        "src/utils/hooks/hooksSettings.ts",
+        "src/utils/hooks/hooksConfigManager.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 12 Deterministic Lifecycle Hooks",
+        "§7 Configuration Surfaces"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of hook schema",
+        "(b) erDiagram of all events with triggers",
+        "(c) flowchart of exit-code handling"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 2,
+        "diagrams": 3,
+        "polish": 3,
+        "consistency": 1,
+        "gaps": 4,
+        "critical": 1
+      },
+      "last_verdict": "revise",
+      "word_count": 6146,
+      "citations": 63,
+      "diagram_count": 4,
+      "snippet_count": 10,
+      "snippets_verbatim": 10,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 37,
+      "id_padded": "37",
+      "title": "Hook Execution: Command, Prompt, HTTP, Agent, Function",
+      "slug": "hook-execution-command-prompt-http-agent-function",
+      "part": 6,
+      "synopsis": "Execution pipelines per hook type, registry, async hook registry, SSRF guard, session hooks.",
+      "source_files": [
+        "src/utils/hooks/execPromptHook.ts",
+        "src/utils/hooks/execAgentHook.ts",
+        "src/utils/hooks/execHttpHook.ts",
+        "src/utils/hooks/sessionHooks.ts",
+        "src/utils/hooks/registerSkillHooks.ts",
+        "src/utils/hooks/hookEvents.ts",
+        "src/utils/hooks/ssrfGuard.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 12",
+        "§12.4 Supply Chain Attacks via MCP/Skills/Hooks"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of a prompt hook",
+        "(b) sequenceDiagram of an HTTP hook with SSRF check"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5598,
+      "citations": 9,
+      "diagram_count": 2,
+      "snippet_count": 11,
+      "snippets_verbatim": 9,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 38,
+      "id_padded": "38",
+      "title": "Skills: Discovery, Frontmatter, Progressive Disclosure",
+      "slug": "skills-discovery-frontmatter-progressive-disclosure",
+      "part": 7,
+      "synopsis": "Skill directories, bundled skills, frontmatter fields, user-invocable vs triggered, inline vs fork context.",
+      "source_files": [
+        "src/skills/loadSkillsDir.ts",
+        "src/skills/bundledSkills.ts",
+        "src/tools/SkillTool/SkillTool.ts"
+      ],
+      "her_refs": [
+        "§7.3 Skills (Progressive Disclosure)",
+        "§5 Pattern 9",
+        "§12.4 Supply Chain via Skills"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of skill discovery",
+        "(b) stateDiagram-v2 of skill invocation modes (inline/fork)",
+        "(c) classDiagram of skill frontmatter"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5329,
+      "citations": 15,
+      "diagram_count": 4,
+      "snippet_count": 15,
+      "snippets_verbatim": 12,
+      "snippets_drift": 3,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 39,
+      "id_padded": "39",
+      "title": "Slash Commands: 90+ Commands and the Registry",
+      "slug": "slash-commands-registry",
+      "part": 7,
+      "synopsis": "`commands.ts` registry, prompt vs callback types, user-defined commands, argument substitution.",
+      "source_files": [
+        "src/commands.ts",
+        "src/utils/processUserInput/processSlashCommand.tsx",
+        "src/utils/slashCommandParsing.ts"
+      ],
+      "her_refs": [
+        "§7 Configuration Surfaces"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of slash-command types",
+        "(b) sequenceDiagram of slash-command parsing and dispatch"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 2,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5155,
+      "citations": 10,
+      "diagram_count": 3,
+      "snippet_count": 12,
+      "snippets_verbatim": 11,
+      "snippets_drift": 1,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 40,
+      "id_padded": "40",
+      "title": "MCP: Clients, Transports, and Lifecycle",
+      "slug": "mcp-clients-transports-lifecycle",
+      "part": 7,
+      "synopsis": "MCP transports, server lifecycle, reconnect strategy, OAuth, elicitation handling.",
+      "source_files": [
+        "src/services/mcp/client.ts",
+        "src/services/mcp/config.ts",
+        "src/services/mcp/auth.ts",
+        "src/services/mcp/types.ts",
+        "src/services/mcp/MCPConnectionManager.tsx",
+        "src/entrypoints/mcp.ts"
+      ],
+      "her_refs": [
+        "§7.2 MCP Servers",
+        "§12.4 Supply Chain via MCP",
+        "§6.15 Data Leakage"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of transports",
+        "(b) stateDiagram-v2 of server connection states",
+        "(c) sequenceDiagram of the OAuth flow"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 5400,
+      "citations": 11,
+      "diagram_count": 3,
+      "snippet_count": 8,
+      "snippets_verbatim": 8,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 41,
+      "id_padded": "41",
+      "title": "MCP Tools: Passthrough Permissions and Deferred Loading",
+      "slug": "mcp-tools-passthrough-permissions-deferred-loading",
+      "part": 7,
+      "synopsis": "`MCPTool`, `ListMcpResourcesTool`, `ReadMcpResourceTool`, `McpAuthTool`. Why MCP tools are deferred and how ToolSearch surfaces them.",
+      "source_files": [
+        "src/tools/MCPTool/MCPTool.ts",
+        "src/tools/ListMcpResourcesTool/ListMcpResourcesTool.ts",
+        "src/tools/ListMcpResourcesTool/prompt.ts",
+        "src/tools/ListMcpResourcesTool/UI.tsx",
+        "src/tools/ReadMcpResourceTool/ReadMcpResourceTool.ts",
+        "src/tools/ReadMcpResourceTool/prompt.ts",
+        "src/tools/ReadMcpResourceTool/UI.tsx"
+      ],
+      "her_refs": [
+        "§5 Pattern 9 Progressive Tool Expansion",
+        "§6.13 Prompt Injection via MCP responses"
+      ],
+      "diagram_reqs": [
+        "(a) sequenceDiagram of a deferred MCP tool first call",
+        "(b) classDiagram of MCP tool wrapper"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 3,
+        "consistency": 1,
+        "gaps": 3,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5627,
+      "citations": 33,
+      "diagram_count": 2,
+      "snippet_count": 16,
+      "snippets_verbatim": 5,
+      "snippets_drift": 5,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 42,
+      "id_padded": "42",
+      "title": "The Ink Renderer and Terminal Engine",
+      "slug": "ink-renderer-terminal-engine",
+      "part": 7,
+      "synopsis": "Custom React reconciler, Yoga layout, output rendering, focus, selection, ANSI handling.",
+      "source_files": [
+        "src/ink/ink.tsx",
+        "src/ink/screen.ts",
+        "src/ink/output.ts",
+        "src/ink/Ansi.tsx"
+      ],
+      "her_refs": [
+        "§21 reference architecture UX layer"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of the Ink virtual DOM",
+        "(b) sequenceDiagram of a keypress → render cycle",
+        "(c) stateDiagram-v2 of focus management"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 2,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 6659,
+      "citations": 24,
+      "diagram_count": 4,
+      "snippet_count": 18,
+      "snippets_verbatim": 18,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 43,
+      "id_padded": "43",
+      "title": "REPL, PromptInput, Typeahead, Voice, Keybindings",
+      "slug": "repl-promptinput-typeahead-voice-keybindings",
+      "part": 7,
+      "synopsis": "REPL screen, prompt composer, typeahead (~1,400 LOC hook), voice integration (~1,100 LOC hook), bridge/inbox, keybinding context.",
+      "source_files": [
+        "src/screens/REPL.tsx",
+        "src/components/PromptInput/PromptInput.tsx",
+        "src/hooks/useTypeahead.tsx",
+        "src/hooks/useVoice.ts",
+        "src/hooks/useGlobalKeybindings.tsx"
+      ],
+      "her_refs": [
+        "§11 Human-in-the-Loop",
+        "§7 Configuration Surfaces"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of REPL components",
+        "(b) sequenceDiagram of a prompt from keystroke to model send",
+        "(c) stateDiagram-v2 of voice capture"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5701,
+      "citations": 24,
+      "diagram_count": 4,
+      "snippet_count": 17,
+      "snippets_verbatim": 17,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 44,
+      "id_padded": "44",
+      "title": "Bridges: VS Code, JetBrains, and Web",
+      "slug": "bridges-vscode-jetbrains-web",
+      "part": 7,
+      "synopsis": "IDE bridge architecture, trusted devices, inbound attachments.",
+      "source_files": [
+        "src/bridge/replBridge.ts",
+        "src/bridge/bridgeMain.ts"
+      ],
+      "her_refs": [
+        "§9.1 local orchestrators",
+        "§12.4 Data Exfiltration via bridge"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of bridge transport layers",
+        "(b) sequenceDiagram of a VS Code → cc → model round trip"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4250,
+      "citations": 21,
+      "diagram_count": 3,
+      "snippet_count": 14,
+      "snippets_verbatim": 14,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 45,
+      "id_padded": "45",
+      "title": "Plan Mode V2: The Five-Phase Model",
+      "slug": "plan-mode-v2-five-phase-model",
+      "part": 8,
+      "synopsis": "Plan mode phases, parallel agent counts by subscription, read-only enforcement, plan storage.",
+      "source_files": [
+        "src/tools/EnterPlanModeTool/EnterPlanModeTool.ts",
+        "src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts",
+        "src/utils/planModeV2.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 6 Explore-Plan-Act Loop",
+        "§10.3 Session Protocol"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 of plan mode phases",
+        "(b) flowchart of plan-mode tool gating",
+        "(c) sequenceDiagram of parallel exploration agents"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5640,
+      "citations": 28,
+      "diagram_count": 3,
+      "snippet_count": 12,
+      "snippets_verbatim": 12,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 46,
+      "id_padded": "46",
+      "title": "Worktrees: Isolated Parallel Branches",
+      "slug": "worktrees-isolated-parallel-branches",
+      "part": 8,
+      "synopsis": "Worktree creation, slug validation, symlinked node_modules, worktree hooks, enter/exit tools.",
+      "source_files": [
+        "src/tools/EnterWorktreeTool/EnterWorktreeTool.ts",
+        "src/tools/EnterWorktreeTool/constants.ts",
+        "src/tools/EnterWorktreeTool/prompt.ts",
+        "src/tools/EnterWorktreeTool/UI.tsx",
+        "src/tools/ExitWorktreeTool/ExitWorktreeTool.ts",
+        "src/tools/ExitWorktreeTool/constants.ts",
+        "src/tools/ExitWorktreeTool/prompt.ts",
+        "src/tools/ExitWorktreeTool/UI.tsx",
+        "src/utils/worktree.ts"
+      ],
+      "her_refs": [
+        "§5 Pattern 8 Fork-Join Parallelism",
+        "§12.4 path traversal defense"
+      ],
+      "diagram_reqs": [
+        "(a) erDiagram of worktree storage layout",
+        "(b) stateDiagram-v2 of worktree lifecycle"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4840,
+      "citations": 27,
+      "diagram_count": 3,
+      "snippet_count": 16,
+      "snippets_verbatim": 16,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 47,
+      "id_padded": "47",
+      "title": "Cron, Schedule, Loop, and Wakeup",
+      "slug": "cron-schedule-loop-wakeup",
+      "part": 8,
+      "synopsis": "Scheduled tasks, max 50/project, storage, dynamic loop sentinel, monitor tool.",
+      "source_files": [
+        "src/tools/ScheduleCronTool/CronCreateTool.ts",
+        "src/tools/ScheduleCronTool/CronDeleteTool.ts",
+        "src/tools/ScheduleCronTool/CronListTool.ts",
+        "src/tools/ScheduleCronTool/prompt.ts",
+        "src/tools/ScheduleCronTool/UI.tsx",
+        "src/utils/cronTasks.ts",
+        "src/utils/cron.ts"
+      ],
+      "her_refs": [
+        "§10.2 Task Sizing Research (METR)",
+        "§10.1 One-Task-Per-Session"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of CronTask record",
+        "(b) stateDiagram-v2 of cron job lifecycle",
+        "(c) sequenceDiagram of loop-dynamic wakeup"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "rewrite",
+      "word_count": 5182,
+      "citations": 30,
+      "diagram_count": 3,
+      "snippet_count": 17,
+      "snippets_verbatim": 17,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 48,
+      "id_padded": "48",
+      "title": "Remote Agents and CCR Integration",
+      "slug": "remote-agents-ccr-integration",
+      "part": 8,
+      "synopsis": "RemoteTriggerTool, remote session manager, websocket sessions, how CCR binds to the local parent.",
+      "source_files": [
+        "src/tools/RemoteTriggerTool/RemoteTriggerTool.ts",
+        "src/tools/RemoteTriggerTool/prompt.ts",
+        "src/tools/RemoteTriggerTool/UI.tsx",
+        "src/tasks/RemoteAgentTask/RemoteAgentTask.tsx"
+      ],
+      "her_refs": [
+        "§9.1 cloud async tier",
+        "§6.16 Checkpoint-Restore"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of remote session",
+        "(b) sequenceDiagram of a remote trigger"
+      ],
+      "target_words": 5000,
+      "min_words": 4250,
+      "max_words": 6250,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 4262,
+      "citations": 37,
+      "diagram_count": 2,
+      "snippet_count": 13,
+      "snippets_verbatim": 11,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 49,
+      "id_padded": "49",
+      "title": "KAIROS Assistant, Buddy, and Experimental Layers",
+      "slug": "kairos-assistant-buddy-experimental",
+      "part": 8,
+      "synopsis": "Proactive assistant mode, Tamagotchi easter egg, feature-gated experiments. Why they matter for UX warmth and observability.",
+      "source_files": [
+        "src/assistant/sessionHistory.ts",
+        "src/buddy/companion.ts",
+        "src/buddy/sprites.ts"
+      ],
+      "her_refs": [
+        "§11 Human-in-the-Loop affordances",
+        "§18 Over-trust risk"
+      ],
+      "diagram_reqs": [
+        "(a) stateDiagram-v2 of Buddy stats (DEBUGGING/CHAOS/SNARK)",
+        "(b) classDiagram of Buddy sprite/gacha"
+      ],
+      "target_words": 3500,
+      "min_words": 2975,
+      "max_words": 4375,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 2,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 1
+      },
+      "last_verdict": "revise",
+      "word_count": 3323,
+      "citations": 17,
+      "diagram_count": 3,
+      "snippet_count": 10,
+      "snippets_verbatim": 10,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 50,
+      "id_padded": "50",
+      "title": "Analytics, Cost Tracking, and GrowthBook",
+      "slug": "analytics-cost-tracking-growthbook",
+      "part": 9,
+      "synopsis": "Sink interface, datadog, growthbook feature flags, first-party logging, tengu_* events, cost tracker, PII markers.",
+      "source_files": [
+        "src/services/analytics/index.ts",
+        "src/services/analytics/growthbook.ts",
+        "src/cost-tracker.ts"
+      ],
+      "her_refs": [
+        "§14 Observability (three pillars)",
+        "§13 Cost Management and Budgeting"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of sinks",
+        "(b) flowchart of event flow from tool call to sink",
+        "(c) stateDiagram-v2 for kill-switches"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 5,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 5,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 2
+      },
+      "last_verdict": "revise",
+      "word_count": 4927,
+      "citations": 46,
+      "diagram_count": 3,
+      "snippet_count": 9,
+      "snippets_verbatim": 9,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 51,
+      "id_padded": "51",
+      "title": "Debug Logs, Diagnostics, and Doctor",
+      "slug": "debug-logs-diagnostics-doctor",
+      "part": 9,
+      "synopsis": "Debug logging, diag logs, doctor screen, security review command, perf issue collection.",
+      "source_files": [
+        "src/utils/debug.ts"
+      ],
+      "her_refs": [
+        "§14.2 Observability Gap",
+        "§6.6 Silent Failures"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of logging layers",
+        "(b) sequenceDiagram of a doctor run"
+      ],
+      "target_words": 4500,
+      "min_words": 3825,
+      "max_words": 5625,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 2
+      },
+      "last_verdict": "revise",
+      "word_count": 5625,
+      "citations": 17,
+      "diagram_count": 3,
+      "snippet_count": 5,
+      "snippets_verbatim": 5,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 52,
+      "id_padded": "52",
+      "title": "Threat Model: CC Through the Lens of HER Section 12",
+      "slug": "threat-model-cc-through-her-section-12",
+      "part": 9,
+      "synopsis": "Walks HER's five-layer defense-in-depth and maps each layer to cc's concrete defenses. Covers prompt injection, supply chain (MCP/skills/plugins), system-prompt leakage, data exfiltration, checkpoint-restore.",
+      "source_files": [
+        "src/utils/permissions/permissions.ts",
+        "src/utils/permissions/PermissionMode.ts",
+        "src/utils/permissions/PermissionRule.ts",
+        "src/utils/permissions/bashClassifier.ts",
+        "src/utils/permissions/filesystem.ts",
+        "src/utils/permissions/denialTracking.ts",
+        "src/utils/permissions/yoloClassifier.ts",
+        "src/utils/permissions/permissionRuleParser.ts",
+        "src/utils/permissions/dangerousPatterns.ts",
+        "src/utils/permissions/autoModeState.ts",
+        "src/utils/hooks/ssrfGuard.ts",
+        "src/upstreamproxy/upstreamproxy.ts",
+        "src/upstreamproxy/relay.ts"
+      ],
+      "her_refs": [
+        "§12 Guardrails Safety and Security (full section)",
+        "§6.11–6.17 failure modes"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of the five-layer defense",
+        "(b) flowchart of a prompt-injection scenario and mitigations",
+        "(c) erDiagram mapping HER threats to cc files"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 1,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5249,
+      "citations": 46,
+      "diagram_count": 3,
+      "snippet_count": 14,
+      "snippets_verbatim": 13,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": ""
+    },
+    {
+      "id": 53,
+      "id_padded": "53",
+      "title": "The 12 HER Patterns Mapped to CC",
+      "slug": "twelve-her-patterns-mapped-to-cc",
+      "part": 10,
+      "synopsis": "One section per pattern. For each: the pattern (HER), cc's implementation (with file paths), divergences, gaps, lessons.",
+      "source_files": [],
+      "her_refs": [
+        "§5 all 12 patterns"
+      ],
+      "diagram_reqs": [
+        "(a) erDiagram mapping 12 patterns to cc subsystems",
+        "(b) flowchart showing pattern interactions in a running query"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5106,
+      "citations": 42,
+      "diagram_count": 2,
+      "snippet_count": 14,
+      "snippets_verbatim": 14,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": "",
+      "meta_chapter": true
+    },
+    {
+      "id": 54,
+      "id_padded": "54",
+      "title": "The 17 Failure Modes: How CC Defends (or Doesn't)",
+      "slug": "seventeen-failure-modes-how-cc-defends",
+      "part": 10,
+      "synopsis": "One subsection per failure mode. cc's defense (or absence of defense). Specific file/line evidence.",
+      "source_files": [],
+      "her_refs": [
+        "§6 all 17 failure modes"
+      ],
+      "diagram_reqs": [
+        "(a) erDiagram failure ↔ defense ↔ file",
+        "(b) flowchart of the failure-mode escalation ladder"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 3,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 4,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 6672,
+      "citations": 56,
+      "diagram_count": 3,
+      "snippet_count": 7,
+      "snippets_verbatim": 7,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": "",
+      "meta_chapter": true
+    },
+    {
+      "id": 55,
+      "id_padded": "55",
+      "title": "Reference Architecture: Building a Trustworthy Long-Running Agent",
+      "slug": "reference-architecture-trustworthy-long-running-agent",
+      "part": 10,
+      "synopsis": "Using HER's 8-layer reference architecture and cc's concrete implementations as a guide, sketches the architecture of a future 'launch and trust' coding agent.",
+      "source_files": [],
+      "her_refs": [
+        "§21 Reference Architecture",
+        "§20 20 Best Practices",
+        "§19 Decision Framework"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of the 8 layers instantiated with cc components",
+        "(b) sequenceDiagram of a long-running trust session",
+        "(c) stateDiagram-v2 of an agent operating under strict back-pressure"
+      ],
+      "target_words": 6000,
+      "min_words": 5100,
+      "max_words": 7500,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 2,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5496,
+      "citations": 37,
+      "diagram_count": 3,
+      "snippet_count": 11,
+      "snippets_verbatim": 10,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": "",
+      "meta_chapter": true
+    },
+    {
+      "id": 56,
+      "id_padded": "56",
+      "title": "What To Build Next: An Opinionated Roadmap",
+      "slug": "what-to-build-next-opinionated-roadmap",
+      "part": 10,
+      "synopsis": "Concrete roadmap for a team building on top of the cc codebase: what to keep, what to rewrite, what to add.",
+      "source_files": [],
+      "her_refs": [
+        "§11",
+        "§13",
+        "§14",
+        "§20"
+      ],
+      "diagram_reqs": [
+        "(a) classDiagram of proposed additions",
+        "(b) flowchart of the new quality-gates pipeline"
+      ],
+      "target_words": 5500,
+      "min_words": 4675,
+      "max_words": 6875,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 1,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 1,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 5969,
+      "citations": 10,
+      "diagram_count": 2,
+      "snippet_count": 12,
+      "snippets_verbatim": 7,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": "",
+      "meta_chapter": true
+    },
+    {
+      "id": 57,
+      "id_padded": "57",
+      "title": "Closing: Lessons for the Harness Engineering Discipline",
+      "slug": "closing-lessons-for-harness-engineering",
+      "part": 10,
+      "synopsis": "Zoom out. Reflections on what cc proves (and disproves) about the discipline. Open research questions. Call to action.",
+      "source_files": [],
+      "her_refs": [
+        "§18 Limitations",
+        "§10.2 METR",
+        "§15 Academic Research (NLAH, Meta-Harness, AutoHarness, ACRFence)"
+      ],
+      "diagram_reqs": [
+        "(a) flowchart of discipline maturity levels",
+        "(b) timeline flowchart of discipline evolution"
+      ],
+      "target_words": 4000,
+      "min_words": 3400,
+      "max_words": 5000,
+      "status": "audited",
+      "pass_counts": {
+        "accuracy": 2,
+        "crossref": 1,
+        "diagrams": 1,
+        "polish": 2,
+        "consistency": 2,
+        "gaps": 1,
+        "critical": 0
+      },
+      "last_verdict": "revise",
+      "word_count": 3978,
+      "citations": 6,
+      "diagram_count": 2,
+      "snippet_count": 7,
+      "snippets_verbatim": 5,
+      "snippets_drift": 0,
+      "snippets_hallucinated": 0,
+      "needs_verify": null,
+      "brief_checksum": "",
+      "meta_chapter": true
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "title": "Foundations and Framing",
+      "chapters": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 2,
+      "title": "Entry, Bootstrap, and the Runtime Spine",
+      "chapters": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 3,
+      "title": "The Tool System",
+      "chapters": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 4,
+      "title": "Sub-Agents, Tasks, and Multi-Agent Dispatch",
+      "chapters": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 5,
+      "title": "Context, Memory, and State",
+      "chapters": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 6,
+      "title": "Safety, Permissions, and Hooks",
+      "chapters": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 7,
+      "title": "Interaction Surfaces: Skills, Slash, MCP, UX",
+      "chapters": [
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 8,
+      "title": "Long-Running Work",
+      "chapters": [
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 9,
+      "title": "Observability, Cost, and Security",
+      "chapters": [
+        50,
+        51,
+        52
+      ],
+      "intro_status": "done"
+    },
+    {
+      "part": 10,
+      "title": "Synthesis and Future Development",
+      "chapters": [
+        53,
+        54,
+        55,
+        56,
+        57
+      ],
+      "intro_status": "done"
+    }
+  ],
+  "frontmatter_status": "done",
+  "glossary_status": "done",
+  "bibliography_status": "done",
+  "concordance_status": "done",
+  "convergence_log": [
+    {
+      "ts": "2026-04-13T05:58:53.568321+00:00",
+      "event": "bulk_status_promoted",
+      "chapters_promoted": 57
+    }
+  ]
+}

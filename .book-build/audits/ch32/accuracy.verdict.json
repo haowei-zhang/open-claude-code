@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 19,
+      "citation": "src/types/permissions.ts:L16-L29",
+      "problem": "Snippet caption says L16-L29 but includes INTERNAL_PERMISSION_MODES and PERMISSION_MODES content that is at L33-L38 in the source, outside the cited range"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 404,
+      "citation": "src/utils/permissions/permissionRuleParser.ts:L21-L29",
+      "problem": "Snippet omits the feature-gated Brief spread entry (...((feature('KAIROS') || feature('KAIROS_BRIEF')) && BRIEF_TOOL_NAME ? { Brief: BRIEF_TOOL_NAME } : {})) present at L26-L29 in the source"
+    },
+    {
+      "type": "wrong_line",
+      "chapter_line": 5,
+      "citation": "src/utils/permissions/permissions.ts:~1486 LOC",
+      "problem": "Actual permissions.ts is 1487 lines, close enough but not verified at exact line count"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 42,
+  "citation_verified": 39,
+  "snippet_total": 9,
+  "snippet_verbatim": 7,
+  "snippet_drift": 2,
+  "snippet_hallucinated": 0
+}

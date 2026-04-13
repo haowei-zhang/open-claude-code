@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": [],
+  "missing_diagrams": [],
+  "uncovered_topics": ["plan mode enforcement in useCanUseTool", "interactive dialog UI rendering component", "non-React execution contexts (headless, SDK, daemon mode)"],
+  "citation_count": 20,
+  "diagram_count": 3,
+  "snippet_count": 17,
+  "top_files_without_snippets": []
+}

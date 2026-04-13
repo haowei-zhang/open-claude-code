@@ -1,0 +1,18 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {"required": "classDiagram of logging layers", "found": false},
+    {"required": "sequenceDiagram of a doctor run", "found": false}
+  ],
+  "uncovered_topics": [
+    "doctor screen",
+    "security review command",
+    "perf issue collection",
+    "diag logs"
+  ],
+  "citation_count": 24,
+  "diagram_count": 2,
+  "snippet_count": 7,
+  "top_files_without_snippets": []
+}

@@ -1,0 +1,8 @@
+{
+  "verdict": "pass",
+  "required_refs_found": 2,
+  "required_refs_total": 2,
+  "required_refs_missing": [],
+  "divergence_section_length_words": 230,
+  "issues": []
+}

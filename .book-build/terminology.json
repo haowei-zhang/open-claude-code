@@ -1,0 +1,985 @@
+{
+  "version": 1,
+  "terms": [
+    {
+      "term": "tool",
+      "definition": "A typed, schema-validated operation exposed to the model via the tool dispatch pipeline, implemented as a Zod-defined input and a call() method."
+    },
+    {
+      "term": "subagent",
+      "definition": "An agent spawned by the parent agent via AgentTool, running in sync, forked, or remote mode with isolated context."
+    },
+    {
+      "term": "fork",
+      "definition": "A child process created via Bun.fork() to run a subagent with its own memory and event loop, communicating via IPC."
+    },
+    {
+      "term": "worktree",
+      "definition": "A git worktree providing an isolated working directory for parallel development branches, managed by EnterWorktreeTool/ExitWorktreeTool."
+    },
+    {
+      "term": "task",
+      "definition": "A durable unit of work tracked through status transitions (pending, in_progress, completed), stored on disk with filesystem locking."
+    },
+    {
+      "term": "skill",
+      "definition": "A reusable, frontmatter-defined capability discovered from ~/.claude/skills or bundled, invoked inline or in a forked context."
+    },
+    {
+      "term": "slash command",
+      "definition": "A user-invocable command parsed from the REPL input line, registered in commands.ts as either prompt or callback type."
+    },
+    {
+      "term": "hook",
+      "definition": "A deterministic lifecycle event handler (command, prompt, HTTP, agent, or function type) triggered at PreToolUse, PostToolUse, or other defined points."
+    },
+    {
+      "term": "permission mode",
+      "definition": "A named configuration governing tool-access behavior, such as default, plan, acceptEdits, bypassPermissions, dontAsk, or auto."
+    },
+    {
+      "term": "classifier",
+      "definition": "A function that maps a shell command string to a risk band (read, write, destructive) to drive permission decisions."
+    },
+    {
+      "term": "compaction",
+      "definition": "The process of reducing conversation context length by summarizing or discarding older messages to stay within token budgets."
+    },
+    {
+      "term": "microcompact",
+      "definition": "A lightweight compaction pass that trims tool results and history_snip blocks without invoking the model, preserving recent turns intact."
+    },
+    {
+      "term": "context collapse",
+      "definition": "A severe compaction stage triggered when token usage exceeds critical thresholds, aggressively summarizing the full conversation."
+    },
+    {
+      "term": "autocompact",
+      "definition": "An automatic compaction trigger that fires when the context window approaches capacity, initiated by the query loop."
+    },
+    {
+      "term": "memory",
+      "definition": "A persistent note stored in the memdir tiered-memory system, typed as user, feedback, project, or reference, with age tracking."
+    },
+    {
+      "term": "memdir",
+      "definition": "The disk-based tiered memory subsystem at ~/.claude/memories/ that stores, scans, and retrieves memory .md files for context injection."
+    },
+    {
+      "term": "session",
+      "definition": "A single invocation of the agent from startup to shutdown, persisted as JSONL entries with tombstones for resumability."
+    },
+    {
+      "term": "plan mode",
+      "definition": "A read-only operational mode that restricts the agent to exploration and planning before committing to file modifications."
+    },
+    {
+      "term": "harness",
+      "definition": "The outer runtime layer that orchestrates the model's interactions with tools, permissions, hooks, memory, and the user."
+    },
+    {
+      "term": "sensor",
+      "definition": "An observability input that feeds runtime state (cost, context size, error rates) back into the harness for adaptive decisions."
+    },
+    {
+      "term": "guide",
+      "definition": "A configuration-driven constraint that shapes agent behavior, such as CLAUDE.md instructions, settings, or managed policies."
+    },
+    {
+      "term": "back-pressure",
+      "definition": "A mechanism that throttles or redirects agent activity when resource limits (tokens, cost, time) are approached."
+    },
+    {
+      "term": "deferred tool",
+      "definition": "A tool not included in the initial prompt but loaded on demand via ToolSearch when the model requests it, reducing prompt size."
+    },
+    {
+      "term": "ToolSearch",
+      "definition": "The progressive tool expansion system that exposes a catalog of available tools and loads them lazily upon model request."
+    },
+    {
+      "term": "PreToolUse",
+      "definition": "A hook event fired before a tool's call() method executes, allowing interception, modification, or denial of the invocation."
+    },
+    {
+      "term": "PostToolUse",
+      "definition": "A hook event fired after a tool's call() method completes, enabling logging, validation, or post-processing of results."
+    },
+    {
+      "term": "manifest",
+      "definition": "The book-build state file (manifest.json) tracking all 57 chapters, their source files, audit pass counts, and convergence status."
+    },
+    {
+      "term": "generator-evaluator",
+      "definition": "A multi-agent pattern where one agent produces output and another evaluates it, used in cc's coordinator for quality gates."
+    },
+    {
+      "term": "checkpoint-restore",
+      "definition": "The ability to save and resume agent state across sessions, implemented via JSONL session persistence and tombstone entries."
+    },
+    {
+      "term": "observation masking",
+      "definition": "The technique of redacting or summarizing prior tool outputs to reduce token cost while preserving decision-relevant information."
+    },
+    {
+      "term": "meta-chapter",
+      "definition": "A structural chapter that maps between the HER theoretical framework and the technical chapters, serving as connective tissue rather than a source-code deep dive."
+    },
+    {
+      "term": "reading path",
+      "definition": "A recommended traversal order through the book's chapters, selected by reader role or goal (sequential, subsystem, or HER path)."
+    },
+    {
+      "term": "cross-reference table",
+      "definition": "A structured mapping from HER patterns, failure modes, or best practices to the specific chapters and source files that address them."
+    },
+    {
+      "term": "structural control",
+      "definition": "An architectural constraint in the harness that makes certain failure modes structurally impossible, as opposed to advisory controls (guides) or feedback controls (sensors). cc's permission system and tool dispatch pipeline are examples."
+    },
+    {
+      "term": "fast-path routing",
+      "definition": "The pattern in cli.tsx where the harness decides whether to load the model at all, routing to specialized handlers for version checks, bridge mode, daemon mode, and other non-model operations before falling through to the full CLI."
+    },
+    {
+      "term": "directory contract",
+      "definition": "The consistent subdirectory pattern each tool follows: a main implementation file, a prompt.ts for model description, and optionally a UI.tsx for terminal rendering."
+    },
+    {
+      "term": "feature gate",
+      "definition": "A compile-time boundary checked via feature() from bun:bundle that determines which code exists in the external build."
+    },
+    {
+      "term": "lazy require",
+      "definition": "A pattern using require() at call time instead of import time to break circular dependencies between modules."
+    },
+    {
+      "term": "bundled mode",
+      "definition": "The runtime state where cc executes as a Bun-compiled standalone executable, detected via Bun.embeddedFiles, which changes settings loading, update handling, and feature availability."
+    },
+    {
+      "term": "character interning",
+      "definition": "The optimization pattern in terminal rendering where unique characters are stored once in a pool and referenced by integer ID, enabling diff operations to compare IDs instead of strings."
+    },
+    {
+      "term": "pending state pattern",
+      "definition": "A module-scope variable with a feature() gate that is set during argv parsing and consumed later in the action handler, enabling dead-code elimination of feature-gated code paths."
+    },
+    {
+      "term": "eager settings loading",
+      "definition": "The pattern of parsing CLI flags before the Commander program is constructed, necessary when flags affect initialization behavior."
+    },
+    {
+      "term": "content-hash temp path",
+      "definition": "A temporary file path derived from a content hash rather than a random UUID, used to preserve API prompt cache hits across process boundaries."
+    },
+    {
+      "term": "ablation baseline",
+      "definition": "A testing mode enabled by the ABLATION_BASELINE feature flag that disables thinking, compaction, auto-memory, and background tasks for controlled comparison experiments."
+    },
+    {
+      "term": "drop-in convention",
+      "definition": "The managed-settings.d directory pattern where *.json files are loaded in alphabetical order and merged on top of the base managed-settings.json, matching the systemd/sudoers drop-in convention."
+    },
+    {
+      "term": "early input buffer",
+      "definition": "The startCapturingEarlyInput() mechanism that buffers terminal keystrokes while the main module loads, flushing them into the REPL once the Ink rendering pipeline is ready."
+    },
+    {
+      "term": "scroll drain",
+      "definition": "A mechanism that suspends background intervals during active terminal scrolling to prevent scroll jank, with a 150ms debounce timer that auto-clears."
+    },
+    {
+      "term": "beta header latching",
+      "definition": "The pattern where an API beta header stays enabled for the rest of a session once activated, preventing prompt cache invalidation from feature toggles."
+    },
+    {
+      "term": "cache break",
+      "definition": "The event where the API's prompt cache is invalidated, detected by comparing cache_creation_input_tokens against the previous request's, requiring full re-processing of input tokens."
+    },
+    {
+      "term": "full jitter",
+      "definition": "A retry backoff strategy where the delay is uniformly distributed between 0 and the current backoff interval, preventing thundering herd effects when multiple agents retry simultaneously."
+    },
+    {
+      "term": "query loop",
+      "definition": "The async generator function in src/query.ts that orchestrates the cycle of API calls, tool dispatch, compaction, and budget checks; the central execution engine of cc."
+    },
+    {
+      "term": "state destructuring pattern",
+      "definition": "The pattern where mutable State is destructured at the top of each loop iteration and reassigned at each continue site, making state transitions explicit and testable."
+    },
+    {
+      "term": "stop hook",
+      "definition": "A user-defined hook evaluated at the Stop lifecycle event when the model declares completion, allowing the harness to inject continuation messages and prevent premature completion."
+    },
+    {
+      "term": "reactive compact",
+      "definition": "An emergency compaction triggered reactively when the API rejects a request for exceeding the context window, using a more aggressive strategy than proactive autocompact."
+    },
+    {
+      "term": "task budget",
+      "definition": "An API-level budget for the whole agentic turn (output_config.task_budget), distinct from the client-side token budget, with remaining computed per iteration from cumulative API usage."
+    },
+    {
+      "term": "token budget",
+      "definition": "A client-side limit on the number of tokens consumed per agentic turn, enforced by BudgetTracker and checkTokenBudget() to detect diminishing returns and budget exhaustion."
+    },
+    {
+      "term": "diminishing-returns detector",
+      "definition": "The heuristic in checkTokenBudget() that compares token deltas across consecutive loop iterations, stopping the loop when progress falls below the DIMINISHING_THRESHOLD for at least 3 continuations."
+    },
+    {
+      "term": "token estimation pipeline",
+      "definition": "The three-tier counting system (API-based, Haiku fallback, rough heuristic) that provides token counts with decreasing accuracy and latency, used when the primary API endpoint is unavailable."
+    },
+    {
+      "term": "prompt assembly",
+      "definition": "The process of composing the system prompt from multiple sections in a specific layer order, including static cacheable sections and dynamic per-session sections separated by a boundary marker."
+    },
+    {
+      "term": "cache boundary",
+      "definition": "A control token (SYSTEM_PROMPT_DYNAMIC_BOUNDARY) that splits the system prompt array into static (globally cacheable) and dynamic (per-session) segments for API-level prompt caching."
+    },
+    {
+      "term": "memory loading hierarchy",
+      "definition": "The priority-ordered cascade of CLAUDE.md file loading: managed, user, project, local, auto-mem, team-mem, where later-loaded files take precedence."
+    },
+    {
+      "term": "conditional rule scoping",
+      "definition": "The mechanism by which .claude/rules/*.md files with frontmatter paths: globs are filtered at query time to inject only instructions relevant to the current file being operated on."
+    },
+    {
+      "term": "backfillObservableInput",
+      "definition": "A method that injects derived fields (e.g., expanded file paths) into a shallow clone of the tool input for hooks and permission checks, without modifying the original input passed to call()."
+    },
+    {
+      "term": "fail-closed default",
+      "definition": "A default value for a safety-critical method that assumes the most restrictive behavior when the method is not explicitly implemented, ensuring that omission cannot lead to unsafe execution."
+    },
+    {
+      "term": "dispatch pipeline",
+      "definition": "The ordered sequence of stages a tool invocation passes through (validation, permission, execution, post-hooks), from model intent to result."
+    },
+    {
+      "term": "sibling abort",
+      "definition": "The mechanism by which a Bash tool error cancels sibling concurrent tool executions via a child abort controller, without aborting the parent query."
+    },
+    {
+      "term": "speculative classifier check",
+      "definition": "A pattern where a bash classifier result is raced against a timeout during the permission decision flow, allowing auto-approval of common commands without showing a dialog."
+    },
+    {
+      "term": "readFileState",
+      "definition": "A Map<string, ReadFileEntry> maintained in ToolUseContext that records every file the model has read, along with content, modification timestamp, offset, and limit; used to enforce the read-before-write contract and read deduplication."
+    },
+    {
+      "term": "read-before-write contract",
+      "definition": "The invariant enforced by Write, Edit, and NotebookEdit tools that the model must have read a file before modifying it, preventing blind overwrites and silent data loss."
+    },
+    {
+      "term": "file-history backup",
+      "definition": "A content-hash-keyed backup created before file edits, stored at ~/.claude/file-history/{sessionId}/{sha256-hash}@v{N}, providing checkpoint-restore semantics for undo operations."
+    },
+    {
+      "term": "flag-level allowlisting",
+      "definition": "The practice of validating individual CLI flags for complex commands rather than using command-level regexes, implemented via COMMAND_ALLOWLIST with typed FlagArgType entries."
+    },
+    {
+      "term": "parser differential",
+      "definition": "A security vulnerability where the validator and the shell interpreter disagree on the parsing of a command string, enabling bypass attacks (e.g., xargs -i vs -I)."
+    },
+    {
+      "term": "fixed-point command stripping",
+      "definition": "The iterative approach to stripping env vars and wrapper commands from shell invocations, applying both operations until no new candidates are produced."
+    },
+    {
+      "term": "SSRF guard",
+      "definition": "The dns.lookup-compatible function in src/utils/hooks/ssrfGuard.ts that blocks connections to private, link-local, and CGNAT address ranges, preventing HTTP hooks from reaching cloud metadata endpoints."
+    },
+    {
+      "term": "preapproved URL",
+      "definition": "A URL whose hostname is on the PREAPPROVED_HOSTS allowlist, allowing WebFetchTool to skip explicit per-request permission checks for known-safe documentation sites."
+    },
+    {
+      "term": "domain-based permission rule",
+      "definition": "A permission rule that matches web tool access at the hostname level using the domain:hostname pattern, enabling fine-grained access control without requiring full URL specification."
+    },
+    {
+      "term": "IPv4-mapped IPv6 bypass",
+      "definition": "An SSRF attack vector where a private IPv4 address is encoded as an IPv6 address using the ::ffff:X.X.X.X format, bypassing IPv4-only address checks."
+    },
+    {
+      "term": "DNS-rebinding protection",
+      "definition": "The pattern of validating DNS-resolved IP addresses and passing the validated address directly to the TCP socket, closing the window where an attacker could serve different IPs on successive DNS resolutions."
+    },
+    {
+      "term": "progressive tool expansion",
+      "definition": "The mechanism by which cc starts with a small set of core tools and loads additional tools on demand via ToolSearch, reducing initial prompt size and improving selection accuracy."
+    },
+    {
+      "term": "keyword scoring",
+      "definition": "The weighted search algorithm in ToolSearchTool that parses queries into terms and matches them against tool name parts, search hints, and descriptions with different weights (10/12 for exact name match, 5/6 for partial, 4 for hint, 2 for description)."
+    },
+    {
+      "term": "search hint",
+      "definition": "A curated, high-signal capability phrase on a tool definition (e.g., 'search file contents with regex (ripgrep)') that scores higher than the full description in ToolSearchTool keyword matching."
+    },
+    {
+      "term": "head-limit pagination",
+      "definition": "The pattern in GrepTool and GlobTool where a default limit (250) caps result size, with explicit pagination signaling when truncation occurs, enabling the model to paginate with offset."
+    },
+    {
+      "term": "semantic type wrapper",
+      "definition": "A Zod schema wrapper (semanticNumber, semanticBoolean) that coerces string-typed fields from LLM JSON output into their proper types, reducing tool-call failures from type mismatches."
+    },
+    {
+      "term": "lazySchema",
+      "definition": "A wrapper function that defers Zod schema evaluation until first call, ensuring runtime feature flags are populated before schema construction."
+    },
+    {
+      "term": "auto-background",
+      "definition": "A mechanism that automatically transitions a synchronous subagent to asynchronous execution after a configurable timeout (default 120 seconds)."
+    },
+    {
+      "term": "fork recursion guard",
+      "definition": "A dual-guard mechanism preventing infinite recursive agent spawning: a message-scan guard checking FORK_BOILERPLATE_TAG and a querySource guard surviving autocompact."
+    },
+    {
+      "term": "verification nudge",
+      "definition": "The advisory signal in TodoWrite that fires when the main-thread agent completes 3+ tasks without a verification step, appending a NOTE block to the tool result reminding the model to spawn the verification subagent."
+    },
+    {
+      "term": "entitlement-activation gate",
+      "definition": "The two-layer availability pattern where a tool requires both entitlement (enrolled in experiment/feature flag) and activation (explicit user opt-in), as implemented by Brief's isBriefEntitled() + isBriefEnabled()."
+    },
+    {
+      "term": "structured message protocol",
+      "definition": "A discriminated-union message schema for inter-agent communication supporting typed lifecycle events (shutdown_request, shutdown_response, plan_approval_response) with request IDs for correlation."
+    },
+    {
+      "term": "safety-check decision reason",
+      "definition": "A permission decision reason type (decisionReason.type === 'safetyCheck') that makes a tool immune to bypassPermissions and auto-mode classifiers, used for cross-machine communication in SendMessage."
+    },
+    {
+      "term": "auto-resume on send",
+      "definition": "The pattern where SendMessage attempts resumeAgentBackground() when targeting a stopped agent, restarting it with the incoming message as prompt."
+    },
+    {
+      "term": "agent definition",
+      "definition": "A typed configuration object (built-in, custom, or plugin variant) that specifies an agent's tools, permissions, model, memory scope, and system prompt, discovered from multiple sources with layered precedence."
+    },
+    {
+      "term": "frontmatter",
+      "definition": "A YAML header delimited by --- markers at the top of a Markdown file, parsed into typed fields that configure agents, skills, or slash commands."
+    },
+    {
+      "term": "agent discovery",
+      "definition": "The process of loading agent definitions from multiple sources (built-in, plugin, user, project, flag, policy) with later sources overriding earlier ones for the same agentType."
+    },
+    {
+      "term": "MCP requirement filtering",
+      "definition": "The mechanism that removes agents from the active list when their declared requiredMcpServers do not match any configured MCP servers, preventing runtime failures from missing infrastructure."
+    },
+    {
+      "term": "cache-safe params",
+      "definition": "A set of API request parameters (system prompt, tools, model, context messages) captured immediately after assembly to ensure byte-identical prefixes between parent and fork children for prompt cache hits."
+    },
+    {
+      "term": "placeholder tool_result",
+      "definition": "A synthetic tool_result block with identical placeholder text (FORK_PLACEHOLDER_RESULT) inserted for every tool_use block in the parent's assistant message, ensuring all fork children produce byte-identical API request prefixes up to the per-child directive."
+    },
+    {
+      "term": "bubble permission model",
+      "definition": "A permission model where fork child processes route permission requests to the parent's terminal via IPC, since the child process has no terminal of its own, controlled by permissionMode: 'bubble' on the agent definition."
+    },
+    {
+      "term": "fork boilerplate",
+      "definition": "An XML-tagged instruction block wrapped in FORK_BOILERPLATE_TAG that is injected into fork child messages to prevent recursive forking, enforce structured output format, and constrain the child's behavior to its directive scope."
+    },
+    {
+      "term": "worktree path notice",
+      "definition": "An advisory message generated by buildWorktreeNotice() that warns fork children running in isolated worktrees to translate inherited context paths from the parent's working directory to the worktree root."
+    },
+    {
+      "term": "high water mark",
+      "definition": "A persistent counter file (.highwatermark) that stores the maximum task ID ever assigned, preventing ID reuse after deletion or reset operations."
+    },
+    {
+      "term": "task list identity",
+      "definition": "The mechanism by which getTaskListId() determines which task list an agent operates on, using a priority chain: environment variable, teammate context, team name, leader team name, or session ID."
+    },
+    {
+      "term": "task assignment notification",
+      "definition": "A JSON message sent via the teammate mailbox when a task's owner changes, ensuring the newly assigned teammate learns about the work without polling the task list."
+    },
+    {
+      "term": "reference sweeping",
+      "definition": "The O(N) operation performed after task deletion that removes references to the deleted task from all other tasks' blocks and blockedBy arrays, maintaining referential integrity."
+    },
+    {
+      "term": "verification nudge",
+      "definition": "The advisory signal in TaskUpdateTool that fires when the main-thread agent completes 3+ tasks without including a verification step, appending a reminder to spawn the verification subagent."
+    },
+    {
+      "term": "coordinator mode",
+      "definition": "An operational mode where the parent agent orchestrates worker subagents instead of implementing directly, gated by a compile-time feature gate and a runtime environment variable."
+    },
+    {
+      "term": "scratchpad",
+      "definition": "A feature-gated shared directory for durable cross-worker knowledge sharing in coordinator mode, allowing workers to read and write without permission prompts."
+    },
+    {
+      "term": "worker",
+      "definition": "A subagent with subagent_type: worker dispatched by the coordinator to research, implement, or verify code changes in an isolated context."
+    },
+    {
+      "term": "synthesis",
+      "definition": "The coordinator's process of reading and understanding worker findings before delegating follow-up work, producing a specific implementation spec with file paths, line numbers, and expected outcomes."
+    },
+    {
+      "term": "continue-vs-spawn decision",
+      "definition": "The coordinator's decision whether to continue an existing worker via SendMessage or spawn a fresh worker via AgentTool, based on context overlap between the worker's current context and the next task."
+    },
+    {
+      "term": "agent name registry",
+      "definition": "A Map in AppState that maps agent names to their task IDs, enabling SendMessageTool to address teammates by human-readable name rather than by task ID."
+    },
+    {
+      "term": "mailbox delivery",
+      "definition": "A file-based message delivery mechanism for inter-teammate communication that persists across process restarts, used as a fallback when in-process queue delivery is not possible."
+    },
+    {
+      "term": "queue-and-drain pattern",
+      "definition": "A message delivery pattern where incoming messages are queued in a pendingMessages array and drained at tool-round boundaries, preventing race conditions from mid-execution message injection."
+    },
+    {
+      "term": "permission mode inheritance",
+      "definition": "The mechanism by which a teammate transitioning from plan mode to implementation inherits the team lead's permission mode, with the exception that plan mode is replaced by default mode to prevent accidental write restrictions."
+    },
+    {
+      "term": "in-process vs process-based shutdown",
+      "definition": "The distinction between aborting an in-process teammate's AbortController (shared process) versus calling gracefulShutdown() for a process-based teammate (separate process), necessary because in-process teammates cannot be terminated by killing the process."
+    },
+    {
+      "term": "dream consolidation",
+      "definition": "A background process that reviews, deduplicates, and prunes memory files during idle time, implemented via a three-gate system (time, sessions, lock) and a forked subagent."
+    },
+    {
+      "term": "consolidation lock",
+      "definition": "A filesystem-based lock file whose mtime serves as the lastConsolidatedAt timestamp and whose body contains the holder's PID, preventing concurrent consolidation across processes."
+    },
+    {
+      "term": "three-gate cascade",
+      "definition": "A pattern for background task scheduling where progressively more expensive checks (time, workload, lock) are evaluated in order, minimizing wasted computation when upstream gates would have rejected the task."
+    },
+    {
+      "term": "side query",
+      "definition": "A secondary API call using a smaller model (typically Sonnet) to evaluate or select items without consuming the main model's context budget, used in memdir for relevance selection."
+    },
+    {
+      "term": "entrypoint",
+      "definition": "The MEMORY.md index file that is always loaded into context, serving as the compact catalog of available memory topic files, capped at 200 lines and 25KB."
+    },
+    {
+      "term": "staleness warning",
+      "definition": "A text injection appended to recalled memories older than one day via memoryFreshnessText(), reminding the model to verify claims before asserting them as fact."
+    },
+    {
+      "term": "synthetic message",
+      "definition": "A harness-generated message that never originates from the user or the model, used for flow control (INTERRUPT_MESSAGE, CANCEL_MESSAGE, REJECT_MESSAGE, NO_RESPONSE_REQUESTED)."
+    },
+    {
+      "term": "message normalization",
+      "definition": "The process of splitting multi-block messages into individual single-block messages with derived UUIDs, ensuring API structural requirements are met."
+    },
+    {
+      "term": "denial workaround guidance",
+      "definition": "The DENIAL_WORKAROUND_GUIDANCE pattern that constrains model behavior after permission denials, allowing reasonable workarounds while preventing malicious bypasses."
+    },
+    {
+      "term": "memory correction hint",
+      "definition": "A just-in-time behavioral nudge appended to rejection messages when auto-memory is enabled, steering the model toward saving feedback at the moment of denial."
+    },
+    {
+      "term": "short message ID",
+      "definition": "A 6-character base36 hash derived from a message UUID for use in the history_snip compaction system."
+    },
+    {
+      "term": "session memory",
+      "definition": "A structured Markdown file automatically maintained by a forked subagent during a conversation, capturing task state, errors, and progress in fixed sections, used as input for session-memory compaction."
+    },
+    {
+      "term": "extraction agent",
+      "definition": "A forked subagent with write access limited to a single file (the session memory file), implementing HER Pattern 7 for isolated context extraction."
+    },
+    {
+      "term": "section size budget",
+      "definition": "The dual constraint (MAX_SECTION_LENGTH per section, MAX_TOTAL_SESSION_MEMORY_TOKENS total) that prevents session memory from consuming excessive post-compact context."
+    },
+    {
+      "term": "hard reset",
+      "definition": "The fallback when all compaction stages have failed, requiring user intervention to resolve prompt_too_long errors."
+    },
+    {
+      "term": "circuit breaker",
+      "definition": "The mechanism that stops retrying autocompact after MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES consecutive failures, preventing unbounded API waste."
+    },
+    {
+      "term": "compact boundary",
+      "definition": "A SystemCompactBoundaryMessage that records the compaction type, pre-compact token count, and the UUID of the last message before compaction."
+    },
+    {
+      "term": "partial compaction",
+      "definition": "User-initiated compaction of a portion of the conversation, preserving either the prefix or suffix while summarizing the other half."
+    },
+    {
+      "term": "cache editing",
+      "definition": "The Anthropic API mechanism for removing tool results from the cached prompt prefix without invalidating the cache, used by the cached microcompact path."
+    },
+    {
+      "term": "append-only discipline",
+      "definition": "The design principle that no entry is ever modified after write; deletions are represented by omission or explicit removal. Core to cc's session persistence model."
+    },
+    {
+      "term": "progress bridge",
+      "definition": "The map that chains through consecutive legacy progress entries and rewrites subsequent messages' parentUuid to skip past them, maintaining chain integrity across entries no longer in the type union."
+    },
+    {
+      "term": "head/tail read",
+      "definition": "The optimization pattern of reading only the first and last 64KB of a JSONL file to extract metadata (first prompt, last title, last tag) without parsing the full content."
+    },
+    {
+      "term": "session stamping",
+      "definition": "The practice of re-stamping provenance fields (sessionId, cwd, entrypoint, version) after message spreads to prevent cross-session contamination in forked or resumed sessions."
+    },
+    {
+      "term": "metadata re-append",
+      "definition": "The pattern of unconditionally re-writing session metadata entries near EOF after compaction or on exit to keep them within the 64KB tail window for fast reads."
+    },
+    {
+      "term": "structural sharing",
+      "definition": "The pattern where setState creates a new root object while sharing unchanged sub-trees by reference, enabling Object.is identity checks for efficient re-render skipping in reactive state systems."
+    },
+    {
+      "term": "onChange diff",
+      "definition": "The centralized diff pattern in onChangeAppState that compares old and new state to trigger side effects, ensuring any setState call automatically propagates changes to all consumers."
+    },
+    {
+      "term": "selector discipline",
+      "definition": "The practice of ensuring useAppState selectors return stable references (existing sub-object references) rather than creating new objects, to prevent infinite re-renders in useSyncExternalStore-backed hooks."
+    },
+    {
+      "term": "bypass-immune",
+      "definition": "A property of safety checks that prevents them from being overridden by bypassPermissions mode, auto mode classifiers, or PreToolUse hook approvals, ensuring that critical security boundaries cannot be circumvented."
+    },
+    {
+      "term": "deny-first evaluation",
+      "definition": "The permission pipeline design where deny rules are checked before allow rules, ensuring that a deny rule from any source always takes precedence over an allow rule."
+    },
+    {
+      "term": "iron gate",
+      "definition": "The GrowthBook feature flag (tengu_iron_gate_closed) that controls whether the auto mode classifier fails closed (deny) or fails open (prompt) when the classifier is unavailable."
+    },
+    {
+      "term": "settings cascade",
+      "definition": "The five-source merge hierarchy (plugin \u2192 user \u2192 project \u2192 local \u2192 flag \u2192 policy) that deep-merges configuration from multiple sources with later sources overriding earlier ones."
+    },
+    {
+      "term": "first-source-wins",
+      "definition": "The policy within the policySettings source where the highest-priority policy source with content takes over entirely, rather than merging with lower-priority policy sources."
+    },
+    {
+      "term": "managed settings",
+      "definition": "Enterprise-administered settings from the policySettings source, loaded from remote API, MDM (HKLM/plist), managed-settings.json (with drop-in directory), or HKCU registry."
+    },
+    {
+      "term": "denial tracking",
+      "definition": "A subsystem that tracks consecutive and total permission denials to prevent classifier death spirals, falling back to interactive prompting after configurable thresholds."
+    },
+    {
+      "term": "path safety validation",
+      "definition": "The process of checking file paths against dangerous file/directory lists, suspicious Windows patterns, and Claude configuration files before allowing auto-edit operations."
+    },
+    {
+      "term": "internal path carve-out",
+      "definition": "An exception in the filesystem permission layer that allows the agent to access specific internal paths (plan files, scratchpads, session memory) without explicit permission, even when those paths reside within otherwise dangerous directories."
+    },
+    {
+      "term": "YOLO classifier",
+      "definition": "The LLM-based classifier that evaluates tool actions against a security policy using a two-stage XML pipeline with transcript projection and prompt caching."
+    },
+    {
+      "term": "transcript projection",
+      "definition": "The security-motivated transformation of the raw conversation into a compact transcript that excludes assistant text to prevent classifier manipulation."
+    },
+    {
+      "term": "two-stage classifier",
+      "definition": "A classification pipeline that runs a fast low-token stage first and a slower thinking stage only when the fast stage flags a potential block, reducing latency for clearly safe actions."
+    },
+    {
+      "term": "speculative classifier check",
+      "definition": "A pre-computed classifier result that is raced against a timeout before showing an interactive permission dialog, allowing the dialog to be skipped if the classifier returns a high-confidence match quickly."
+    },
+    {
+      "term": "resolve-once guard",
+      "definition": "An atomic check-and-mark primitive (createResolveOnce) that prevents multiple concurrent racers from resolving the same permission promise, using a claimed boolean to close the window between checking isResolved() and calling resolve()."
+    },
+    {
+      "term": "permission context",
+      "definition": "A frozen helper object that encapsulates the resolve function, abort detection, logging, and queue operations for a single permission evaluation, threaded through all handlers."
+    },
+    {
+      "term": "grace period",
+      "definition": "A configurable delay (200ms in the interactive handler) that prevents accidental user keypresses from canceling an in-progress automated check."
+    },
+    {
+      "term": "checkmark transition",
+      "definition": "A UI state in the permission dialog where an auto-approved action briefly shows a dimmed checkmark indicator before being removed, with different display durations based on terminal focus."
+    },
+    {
+      "term": "async rewake",
+      "definition": "A flag on command hooks that causes the hook to run in the background and wake the model if it exits with code 2, enabling blocking-error detection for long-running background tasks."
+    },
+    {
+      "term": "hook matcher",
+      "definition": "A grouping construct that associates one or more hooks with a matcher string, where the matcher is event-specific (tool names for PreToolUse/PostToolUse, notification types for Notification, etc.)."
+    },
+    {
+      "term": "exit code semantics",
+      "definition": "The three patterns (block-on-2, show-on-2, output-as-input) that define how a hook's exit code is interpreted for each lifecycle event."
+    },
+    {
+      "term": "once-hook",
+      "definition": "A hook with `once: true` that is removed after its first execution, useful for one-time setup commands."
+    },
+    {
+      "term": "env var interpolation",
+      "definition": "The mechanism in HTTP hooks that replaces `$VAR_NAME` or `${VAR_NAME}` patterns in header values with environment variable values, gated by an `allowedEnvVars` allowlist."
+    },
+    {
+      "term": "combined abort signal",
+      "definition": "The pattern of merging a parent abort signal with a timeout signal via createCombinedAbortSignal, used across all hook execution paths to enforce timeout boundaries. Distinct from a simple AbortController because it combines two independent abort sources."
+    },
+    {
+      "term": "three-outcome model",
+      "definition": "The hook result contract where every hook execution produces one of three primary outcomes: success, blocking, or non_blocking_error (plus cancelled for external interruption). This is a core invariant of the hook system."
+    },
+    {
+      "term": "session hook registry",
+      "definition": "The Map<string, SessionStore> structure keyed by session ID that stores ephemeral, in-memory hooks (both command and function type) for the duration of a session."
+    },
+    {
+      "term": "structured output enforcement",
+      "definition": "The pattern where a PostToolUse function hook checks whether the agent has called StructuredOutputTool and, if not, blocks the response and prompts the agent to use it. Used by agent hooks to guarantee structured responses."
+    },
+    {
+      "term": "hook event broadcasting",
+      "definition": "The lightweight pub/sub system in hookEvents.ts that broadcasts hook execution progress to SDK consumers and the UI, with a pending-events buffer for late-registered handlers."
+    },
+    {
+      "term": "safe-properties auto-allow",
+      "definition": "The optimization in SkillTool.checkPermissions that auto-allows skills whose only non-trivial properties are in the SAFE_SKILL_PROPERTIES set, reducing permission fatigue for safe skills."
+    },
+    {
+      "term": "conditional skill",
+      "definition": "A skill with a paths frontmatter field that is not loaded into the tool listing at startup but is activated when the model operates on files matching the declared glob patterns."
+    },
+    {
+      "term": "dynamic skill discovery",
+      "definition": "The process of discovering skills from .claude/skills directories encountered during file operations, as opposed to the startup-time scan."
+    },
+    {
+      "term": "command registry",
+      "definition": "The memoized collection of all Command objects assembled from built-in, skill-directory, plugin, bundled, and MCP sources, filtered by availability and feature gates."
+    },
+    {
+      "term": "bridge safety predicate",
+      "definition": "The isBridgeSafeCommand function that classifies commands into three tiers (prompt=safe, local-jsx=blocked, local=allowlist) for remote execution authorization."
+    },
+    {
+      "term": "command shadowing",
+      "definition": "The precedence mechanism where commands loaded earlier in the array take priority over later commands with the same name during findCommand lookup."
+    },
+    {
+      "term": "MCP server connection",
+      "definition": "A discriminated union tracking the lifecycle state of an MCP server connection through five states: pending, connected, failed, needs-auth, and disabled."
+    },
+    {
+      "term": "MCP transport",
+      "definition": "The communication channel between cc and an MCP server, implemented as stdio (child process), SSE, HTTP, WebSocket, or SDK (in-process)."
+    },
+    {
+      "term": "Cross-App Access",
+      "definition": "An enterprise authentication pattern where MCP servers authenticate through a corporate Identity Provider (IdP) rather than their own OAuth flow, enabling SSO across all MCP servers."
+    },
+    {
+      "term": "MCP tool collapse classification",
+      "definition": "The heuristic categorization of MCP tools for compaction, determining which tool results can be safely summarized during context compaction based on tool name patterns, result size, and recency."
+    },
+    {
+      "term": "server signature deduplication",
+      "definition": "The signature-based approach to preventing duplicate MCP server configurations, where stdio servers use the command array and URL-based servers use the unwrapped CCR proxy URL as the deduplication key."
+    },
+    {
+      "term": "passthrough permission",
+      "definition": "A permission result type (behavior: 'passthrough') where the tool invocation requires user approval unless a rule explicitly allows it, used for MCP tools whose code is not controlled by the harness."
+    },
+    {
+      "term": "session-retry loop",
+      "definition": "A retry pattern in MCP tool calls that automatically retries once on McpSessionExpiredError after clearing the connection cache and obtaining a fresh client."
+    },
+    {
+      "term": "batched connection processing",
+      "definition": "The startup pattern of connecting to MCP servers in parallel groups partitioned by transport type (local vs remote) with different concurrency limits."
+    },
+    {
+      "term": "screen differencing",
+      "definition": "The technique of comparing two screen buffers cell-by-cell to emit minimal terminal updates, used in cc's double-buffered rendering pipeline."
+    },
+    {
+      "term": "style transition caching",
+      "definition": "Pre-computing and caching the ANSI escape sequence needed to transition between any two style IDs, enabling zero-allocation style changes after the first call."
+    },
+    {
+      "term": "damage tracking",
+      "definition": "Maintaining a bounding rectangle of cells that changed during a render to limit the diff algorithm to only the modified region, skipping unchanged cells."
+    },
+    {
+      "term": "packed cell layout",
+      "definition": "Storing terminal cell data as two consecutive Int32 elements (character ID and packed style/hyperlink/width) in a contiguous array, eliminating per-cell object allocation."
+    },
+    {
+      "term": "clip stack",
+      "definition": "A stack of intersecting clip regions maintained during rendering to implement overflow: hidden behavior, where nested clips are intersected and writes are clipped to the innermost region."
+    },
+    {
+      "term": "bridge",
+      "definition": "A bidirectional transport layer connecting cc's in-process agent loop to external orchestrators (IDE extensions, web clients, SDK daemons), implementing message translation, session lifecycle management, OAuth token refresh, and permission proxying."
+    },
+    {
+      "term": "work-secret authentication",
+      "definition": "A per-session authentication mechanism where each spawned cc session is bound to a unique work secret generated at spawn time, preventing unauthorized clients from connecting to or injecting messages into a running session."
+    },
+    {
+      "term": "capacity wake signal",
+      "definition": "A signaling mechanism that wakes the work-polling loop immediately when a session completes, reducing latency between session completion and new work assignment from the polling interval to near-zero."
+    },
+    {
+      "term": "typeahead engine",
+      "definition": "The multi-source suggestion aggregation system in useTypeahead that merges slash commands, file paths, shell completions, Slack channels, and agent names into a unified ranked list with debouncing and stale-result filtering."
+    },
+    {
+      "term": "ghost text",
+      "definition": "An inline completion hint rendered as dimmed text after the cursor position, providing the most likely suggestion without requiring the user to open a suggestion menu."
+    },
+    {
+      "term": "hold-to-talk",
+      "definition": "A voice input protocol where the user presses and holds a key to record audio, releasing it to send for transcription, with auto-repeat key event handling and release timeout detection."
+    },
+    {
+      "term": "keybinding context",
+      "definition": "A string identifier that determines when a keyboard handler is active, enabling context-aware key routing where the most specific context takes priority."
+    },
+    {
+      "term": "slug validation",
+      "definition": "The process of checking a user-controlled string against strict character-allowlist and length rules before joining it into a filesystem path, preventing directory-escape and path-traversal attacks."
+    },
+    {
+      "term": "fail-closed",
+      "definition": "A safety design principle where uncertainty or error states default to the most restrictive behavior, preventing data loss from false negatives. Contrasted with fail-open, where errors default to permissive behavior."
+    },
+    {
+      "term": "fast-resume path",
+      "definition": "An optimization that checks whether a worktree with the same slug already exists by reading the git internal pointer file directly, avoiding subprocess spawn overhead (~15ms) on every resume."
+    },
+    {
+      "term": "ephemeral worktree pattern",
+      "definition": "An exact-shape regex pattern that matches throwaway worktrees created by automated processes (AgentTool, WorkflowTool, bridgeMain) without matching user-named worktrees, used by cleanupStaleAgentWorktrees to avoid accidental deletion."
+    },
+    {
+      "term": "PewterLedgerVariant",
+      "definition": "A GrowthBook experiment variant controlling plan file size in plan mode V2, with arms trim/cut/cap representing progressively stricter verbosity reduction"
+    },
+    {
+      "term": "interview phase",
+      "definition": "An optional plan-mode phase (gated by tengu_plan_mode_interview_phase or USER_TYPE=ant) where the agent asks clarifying questions before finalizing the plan"
+    },
+    {
+      "term": "mode trap",
+      "definition": "A state the model can enter but cannot leave, such as plan mode in channel-based sessions where the approval dialog cannot be displayed"
+    },
+    {
+      "term": "prePlanMode",
+      "definition": "A field in the permission context that stores the user's permission mode before entering plan mode, used to restore it on exit"
+    },
+    {
+      "term": "remote trigger",
+      "definition": "A REST API configuration object on claude.ai CCR that defines a cloud-side agent; invoked via POST /v1/code/triggers/{id}/run to start a remote session."
+    },
+    {
+      "term": "completion checker",
+      "definition": "A type-specific function registered via registerCompletionChecker() that determines remote task completion by checking external state (e.g., PR merge status) on every poll tick."
+    },
+    {
+      "term": "polling-based event stream",
+      "definition": "A pull-based coordination model where the local session periodically fetches remote agent events via HTTP, as opposed to push-based WebSocket or webhook callbacks."
+    },
+    {
+      "term": "cron jitter",
+      "definition": "Deterministic per-task delay applied to cron fire times to prevent thundering-herd conditions, derived from the task ID for reproducibility across restarts."
+    },
+    {
+      "term": "one-shot cron task",
+      "definition": "A cron task that fires once and is auto-deleted, as opposed to a recurring task which reschedules after firing."
+    },
+    {
+      "term": "session-only cron",
+      "definition": "A cron task held in process memory that never touches the filesystem and dies with the process when durable is false."
+    },
+    {
+      "term": "missed-task detection",
+      "definition": "The startup check that identifies cron tasks whose scheduled fire time passed while the REPL was closed, surfacing them for catch-up."
+    },
+    {
+      "term": "dynamic-pacing loop",
+      "definition": "A /loop mode using ScheduleWakeup with simple relative delays instead of cron expressions, allowing the loop to adjust its pace based on task progress and prompt cache warmth."
+    },
+    {
+      "term": "analytics sink",
+      "definition": "The backend interface (AnalyticsSink) that receives queued analytics events after attachment, implementing logEvent and logEventAsync methods for fanout to Datadog and first-party logging."
+    },
+    {
+      "term": "queue-then-drain",
+      "definition": "The pattern where events are buffered in an in-memory array until a sink is attached, then drained asynchronously via queueMicrotask to avoid blocking startup."
+    },
+    {
+      "term": "disk-cached feature flag",
+      "definition": "A GrowthBook feature flag value persisted to ~/.claude.json by a previous process, read without network I/O as a fallback when the in-memory payload is unavailable."
+    },
+    {
+      "term": "CACHED_OR_BLOCKING",
+      "definition": "A GrowthBook gate evaluation pattern that returns cached true values immediately but blocks on fresh server values when the cache says false, preventing unfair blocking from stale negative values."
+    },
+    {
+      "term": "PII marker type",
+      "definition": "A TypeScript type set to never that forces explicit casting before including string values in analytics metadata, preventing accidental inclusion of code snippets or file paths in events."
+    },
+    {
+      "term": "companion bones",
+      "definition": "The deterministic-from-identity traits of a Buddy companion (species, eye, hat, shiny, stats), always re-derived from a seeded PRNG and never persisted, preventing forgery or gaming."
+    },
+    {
+      "term": "companion soul",
+      "definition": "The persisted companion data stored in the user global config, merged with freshly-derived bones at display time so that stale bones fields in old-format configs get overridden."
+    },
+    {
+      "term": "five-layer defense-in-depth",
+      "definition": "HER Section 12.1's security model consisting of prompt-level guardrails, schema-level restrictions, runtime approval, tool-level validation, and lifecycle hooks, each acting as a progressive filter on tool invocations."
+    },
+    {
+      "term": "circuit-broken auto mode",
+      "definition": "A state in which auto mode has been permanently disabled for the current session after a server-side kill switch fires, preventing re-entry even on subsequent GrowthBook refreshes."
+    },
+    {
+      "term": "session token unlink",
+      "definition": "The security pattern of deleting a secret file from disk after the infrastructure that depends on it has been confirmed running, ensuring the secret is available for retry during init but invisible to the agent loop during operation."
+    },
+    {
+      "term": "debug log level",
+      "definition": "A five-tier verbosity filter (verbose, debug, info, warn, error) controlling which messages are written to the debug log file, configured via CLAUDE_CODE_DEBUG_LOG_LEVEL."
+    },
+    {
+      "term": "BufferedWriter",
+      "definition": "A write abstraction supporting immediate (synchronous) and buffered (asynchronous with periodic flush) modes, used by the debug logging system to balance crash safety against performance."
+    },
+    {
+      "term": "debug filter pattern",
+      "definition": "A module or function name pattern specified via --debug=pattern that filters debug output to matching entries, parsed by parseDebugFilter and applied by shouldShowDebugMessage."
+    },
+    {
+      "term": "latest symlink",
+      "definition": "An advisory symlink at ~/.claude/debug/latest pointing to the current session debug log file, created once per session by updateLatestDebugLogSymlink."
+    },
+    {
+      "term": "immediate mode",
+      "definition": "The debug writer mode where writes use appendFileSync to guarantee crash survival, active when --debug or DEBUG env var is set."
+    },
+    {
+      "term": "failure mode",
+      "definition": "A categorization of how long-running agents can fail, as defined by HER Section 6, covering 17 specific modes from context rot to specification gaming."
+    },
+    {
+      "term": "diminishing-returns detection",
+      "definition": "The heuristic in checkTokenBudget() that compares token deltas across consecutive loop iterations, stopping the query loop when progress falls below DIMINISHING_THRESHOLD for at least 3 continuations."
+    },
+    {
+      "term": "defense-in-depth",
+      "definition": "A security architecture pattern where multiple independent defensive layers are stacked, so that failure of one layer does not compromise the system. cc implements this for prompt injection with permission models, classifiers, SSRF guards, and denial tracking."
+    },
+    {
+      "term": "cost metering",
+      "definition": "The real-time tracking of token and dollar costs per session and per model, implemented in src/cost-tracker.ts via addToTotalSessionCost and related functions."
+    },
+    {
+      "term": "quality-gates pipeline",
+      "definition": "A deterministic checkpoint pipeline wired into the query loop that evaluates tool results with lint/type-check/test gates and routes verdicts to pass/fail/escalate actions."
+    },
+    {
+      "term": "loop detector",
+      "definition": "A sliding-window monitor that flags identical tool calls within a configurable time window, preventing infinite retry loops."
+    },
+    {
+      "term": "spend-rate monitor",
+      "definition": "A rolling-average anomaly detector that fires alerts when both cost-per-minute and tokens-per-minute exceed 2x their respective rolling averages."
+    },
+    {
+      "term": "escalation record",
+      "definition": "A context-rich payload attached to human-in-the-loop prompts carrying the agent's confidence, intent, prior attempts, options, and recommended action."
+    },
+    {
+      "term": "trace span",
+      "definition": "An OpenTelemetry-compatible observability record linking tool dispatches, subagent spawns, and model invocations into a causal trace tree."
+    },
+    {
+      "term": "structured handoff",
+      "definition": "The pattern of writing a progress file before clearing context and resuming from the file, used as the escape hatch for compaction failure and session-to-session transition."
+    },
+    {
+      "term": "compaction death spiral",
+      "definition": "The self-reinforcing failure mode where each failed compaction attempt adds tokens to the context, making the next attempt less likely to succeed."
+    },
+    {
+      "term": "cost gate",
+      "definition": "A mechanism that aborts or degrades a session when spend exceeds a configured threshold, implementing three tiers: soft cap (warning + model downgrade), hard cap (stop new tasks), and kill switch (immediate abort)."
+    },
+    {
+      "term": "evaluator ouroboros",
+      "definition": "The degenerate case where using an LLM evaluator to grade LLM output creates a circular validation loop, named after the Ouroboros problem identified in HER \u00a79.2."
+    },
+    {
+      "term": "back-pressure stack",
+      "definition": "The tiered quality gate pipeline (Type System \u2192 Linter \u2192 Unit Tests \u2192 Integration Tests \u2192 E2E Tests) where only failures surface to agent context, making success silent."
+    },
+    {
+      "term": "Ouroboros problem",
+      "definition": "When both generator and evaluator are LLMs, who validates the validator? Named in HER \u00a79.2 and \u00a718.2 as a fundamental limitation of LLM-based evaluation."
+    },
+    {
+      "term": "Stone Soup attribution",
+      "definition": "The misattribution of massive human engineering effort to AI capability, where specification, monitoring, and correction labor is invisible in productivity metrics."
+    },
+    {
+      "term": "greenfield bias",
+      "definition": "The tendency for agent benchmarks and results to be more impressive on new projects without existing architecture constraints, versus brownfield work on existing codebases."
+    },
+    {
+      "term": "compound failure problem",
+      "definition": "The mathematical result that per-step reliability compounds poorly over many steps: 95% per-step yields only 36% over 20 steps, and doubling task duration quadruples failure rate."
+    },
+    {
+      "term": "scale confusion",
+      "definition": "The conflation of harnesses operating at very different complexity levels (bash loop ~10 lines, generator-evaluator ~100s, full orchestration ~1000s, reference architecture aspirational) as if they were points on a single continuum."
+    }
+  ]
+}

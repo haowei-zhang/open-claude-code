@@ -1,0 +1,30 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 96,
+      "citation": "src/skills/loadSkillsDir.ts:L679-L714",
+      "problem": "Chapter omits conditional guards (isEnvTruthy, isSettingSourceEnabled, skillsLocked) from the Promise.all array; simplified version shown"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 263,
+      "citation": "src/tools/SkillTool/SkillTool.ts:L122-L289",
+      "problem": "Chapter replaces ~50 lines of telemetry/logging code with a single comment '// Report progress for tool uses'; significant omission"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 350,
+      "citation": "src/skills/bundledSkills.ts:L186-L193",
+      "problem": "Line range slightly off; SAFE_WRITE_FLAGS declaration starts at L180 not L186"
+    }
+  ],
+  "uncited_sources": [],
+  "citation_total": 13,
+  "citation_verified": 13,
+  "snippet_total": 13,
+  "snippet_verbatim": 10,
+  "snippet_drift": 3,
+  "snippet_hallucinated": 0
+}

@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {"term": "hard reset", "definition": "The fallback when all compaction stages have failed, requiring user intervention to resolve prompt_too_long errors."},
+    {"term": "circuit breaker", "definition": "The mechanism that stops retrying autocompact after MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES consecutive failures, preventing unbounded API waste."},
+    {"term": "compact boundary", "definition": "A SystemCompactBoundaryMessage that records the compaction type, pre-compact token count, and the UUID of the last message before compaction."},
+    {"term": "partial compaction", "definition": "User-initiated compaction of a portion of the conversation, preserving either the prefix or suffix while summarizing the other half."},
+    {"term": "cache editing", "definition": "The Anthropic API mechanism for removing tool results from the cached prompt prefix without invalidating the cache, used by the cached microcompact path."}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "verdict": "revise",
+  "diagram_count": 2,
+  "invalid_indices": [],
+  "trivial_indices": [],
+  "type_breakdown": {
+    "flowchart": 2,
+    "sequenceDiagram": 0,
+    "stateDiagram-v2": 0,
+    "classDiagram": 0,
+    "erDiagram": 0
+  },
+  "missing_mandated_diagrams": [
+    {"required": "classDiagram of Tool interface and concrete implementations", "found": false},
+    {"required": "flowchart of buildTool() behavior", "found": false}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/services/compact/compactWarningHook.ts"],
+  "missing_diagrams": [
+    {"required": "stateDiagram-v2 of compaction triggers", "found": false},
+    {"required": "sequenceDiagram of a microcompact pass", "found": false}
+  ],
+  "uncovered_topics": ["compact warning hook and suppression mechanism"],
+  "citation_count": 42,
+  "diagram_count": 2,
+  "snippet_count": 30,
+  "top_files_without_snippets": []
+}

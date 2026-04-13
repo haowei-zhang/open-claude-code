@@ -1,0 +1,33 @@
+{
+  "verdict": "revise",
+  "term_conflicts": [
+    {
+      "term": "subagent",
+      "used_as": "sub-agents",
+      "should_be": "subagents"
+    }
+  ],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    {
+      "term": "agent name registry",
+      "definition": "A Map in AppState that maps agent names to their task IDs, enabling SendMessageTool to address teammates by human-readable name rather than by task ID."
+    },
+    {
+      "term": "mailbox delivery",
+      "definition": "A file-based message delivery mechanism for inter-teammate communication that persists across process restarts, used as a fallback when in-process queue delivery is not possible."
+    },
+    {
+      "term": "queue-and-drain pattern",
+      "definition": "A message delivery pattern where incoming messages are queued in a pendingMessages array and drained at tool-round boundaries, preventing race conditions from mid-execution message injection."
+    },
+    {
+      "term": "permission mode inheritance",
+      "definition": "The mechanism by which a teammate transitioning from plan mode to implementation inherits the team lead's permission mode, with the exception that plan mode is replaced by default mode to prevent accidental write restrictions."
+    },
+    {
+      "term": "in-process vs process-based shutdown",
+      "definition": "The distinction between aborting an in-process teammate's AbortController (shared process) versus calling gracefulShutdown() for a process-based teammate (separate process), necessary because in-process teammates cannot be terminated by killing the process."
+    }
+  ]
+}

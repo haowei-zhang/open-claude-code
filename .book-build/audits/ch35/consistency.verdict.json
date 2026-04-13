@@ -1,0 +1,12 @@
+{
+  "verdict": "pass",
+  "term_conflicts": [],
+  "voice_drift": null,
+  "proposed_new_terms": [
+    { "term": "speculative classifier check", "definition": "A pre-computed classifier result that is raced against a timeout before showing an interactive permission dialog, allowing the dialog to be skipped if the classifier returns a high-confidence match quickly." },
+    { "term": "resolve-once guard", "definition": "An atomic check-and-mark primitive (createResolveOnce) that prevents multiple concurrent racers from resolving the same permission promise, using a claimed boolean to close the window between checking isResolved() and calling resolve()." },
+    { "term": "permission context", "definition": "A frozen helper object that encapsulates the resolve function, abort detection, logging, and queue operations for a single permission evaluation, threaded through all handlers." },
+    { "term": "grace period", "definition": "A configurable delay (200ms in the interactive handler) that prevents accidental user keypresses from canceling an in-progress automated check." },
+    { "term": "checkmark transition", "definition": "A UI state in the permission dialog where an auto-approved action briefly shows a dimmed checkmark indicator before being removed, with different display durations based on terminal focus." }
+  ]
+}

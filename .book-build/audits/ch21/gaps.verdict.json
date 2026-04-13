@@ -1,0 +1,15 @@
+{
+  "verdict": "rewrite",
+  "uncited_brief_files": [],
+  "missing_diagrams": [
+    {
+      "required": "classDiagram of coordinator structures",
+      "found": false
+    }
+  ],
+  "uncovered_topics": [],
+  "citation_count": 21,
+  "diagram_count": 3,
+  "snippet_count": 6,
+  "top_files_without_snippets": []
+}

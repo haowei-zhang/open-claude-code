@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "diagram_count": 2,
+  "invalid_indices": [1],
+  "trivial_indices": [],
+  "type_breakdown": {
+    "flowchart": 1,
+    "stateDiagram-v2": 1
+  }
+}

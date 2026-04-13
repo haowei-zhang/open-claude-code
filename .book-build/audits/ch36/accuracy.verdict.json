@@ -1,0 +1,54 @@
+{
+  "verdict": "revise",
+  "issues": [
+    {
+      "type": "snippet_drift",
+      "chapter_line": 19,
+      "citation": "src/schemas/hooks.ts:L31-L65",
+      "problem": "Line offset by 1; shell describe text differs; asyncRewake describe paraphrased"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 62,
+      "citation": "src/schemas/hooks.ts:L97-L126",
+      "problem": "headers describe and allowedEnvVars describe truncated from actual"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 80,
+      "citation": "src/schemas/hooks.ts:L128-L163",
+      "problem": "Agent hook prompt describe truncated; model default differs (actual says Haiku, chapter says 'default small fast model')"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 328,
+      "citation": "src/utils/hooks/hooksConfigManager.ts:L38-L47",
+      "problem": "PostToolUse line count off by 1"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 371,
+      "citation": "src/utils/hooks/hooksConfigManager.ts:L83-L86",
+      "problem": "UserPromptSubmit line numbers off by 2"
+    },
+    {
+      "type": "snippet_drift",
+      "chapter_line": 387,
+      "citation": "src/utils/hooks/hooksConfigManager.ts:L258-L263",
+      "problem": "CwdChanged line numbers off"
+    },
+    {
+      "type": "unsupported_claim",
+      "chapter_line": 7,
+      "citation": "23 distinct lifecycle events",
+      "problem": "Actual source has 27 events, not 23. Chapter table lists 25 unique event names in categories, plus PermissionRequest and StopFailure not in table = 27 total."
+    }
+  ],
+  "uncited_sources": ["src/utils/hooks.ts"],
+  "citation_total": 20,
+  "citation_verified": 17,
+  "snippet_total": 20,
+  "snippet_verbatim": 6,
+  "snippet_drift": 14,
+  "snippet_hallucinated": 0
+}

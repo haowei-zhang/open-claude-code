@@ -1,0 +1,36 @@
+{
+  "reviewer": 2,
+  "pass": 3,
+  "flags": [
+    {
+      "chapter_id": 20,
+      "severity": "soft",
+      "reasons": [
+        "Word count 2616 vs minimum 3400 -- chapter is materially undersized",
+        "No analysis of how plugin-provided agents differ from user-authored agents in terms of trust and security",
+        "The loading sequence is described but error paths (malformed frontmatter, missing fields, conflicting agent names) are not covered"
+      ],
+      "suggested_angle": "Expand to minimum word count. Add error handling paths. Add trust model comparison: plugin agents vs user agents vs built-in agents and what permission isolation each gets."
+    },
+    {
+      "chapter_id": 51,
+      "severity": "soft",
+      "reasons": [
+        "Previous passes flagged as soft. Round 3 re-reading confirms the chapter still reads as a feature walkthrough without extracting the deeper architectural pattern about post-hoc vs real-time observability",
+        "The dual-identity observation (ant vs external) is present but its implications for production incident diagnosis are still underexplored",
+        "Doctor screen and security review command are listed but not connected back to the harness's ability to detect its own failures in real time"
+      ],
+      "suggested_angle": "Restructure around the observability spectrum. Make the post-hoc vs real-time tension the central organizing principle. Show what architectural constraints prevent real-time self-monitoring and what would be needed to move along the spectrum."
+    },
+    {
+      "chapter_id": 36,
+      "severity": "soft",
+      "reasons": [
+        "Previous passes flagged as soft. Round 3 confirms the missing divergences section has still not been addressed",
+        "The five hook types are enumerated but the chapter does not explain why cc chose these five specifically or what each type's security implications are",
+        "Connection between hooks and the permission pipeline is still missing -- the reader cannot understand how hook decisions interact with deny rules"
+      ],
+      "suggested_angle": "Add a divergences section. Explain the security model of each hook type, especially agent and function types that execute arbitrary code. Connect hooks to the permission pipeline explicitly."
+    }
+  ]
+}

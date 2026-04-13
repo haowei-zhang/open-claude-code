@@ -1,0 +1,10 @@
+{
+  "verdict": "revise",
+  "uncited_brief_files": ["src/QueryEngine.ts"],
+  "missing_diagrams": [{"required": "flowchart of stop-hook evaluation and token budget checks", "found": false}],
+  "uncovered_topics": ["QueryEngine.ts integration layer that invokes query() from the REPL"],
+  "citation_count": 16,
+  "diagram_count": 2,
+  "snippet_count": 4,
+  "top_files_without_snippets": ["src/query/stopHooks.ts"]
+}
