@@ -1,0 +1,8 @@
+{"ts":"2026-04-10T00:00:00Z","event":"bootstrap_done","missing_files":["package.json","tsconfig.json","bunfig.toml","src/types/message.ts","src/services/compact/reactiveCompact.ts","src/services/compact/cachedMicrocompact.ts","src/services/contextCollapse/","src/assistant/index.ts","src/assistant/gate.ts"],"relocated_files":{"src/services/analytics/growthbook.js":"src/services/analytics/growthbook.ts","src/utils/cost-tracker.ts":"src/cost-tracker.ts"},"total_chapters":57}{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 1, "pass": 1, "words": 3095, "citations": 22, "diagrams": 3}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 2, "pass": 1, "words": 2814, "citations": 2, "diagrams": 2}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 3, "pass": 1, "words": 4783, "citations": 7, "diagrams": 3}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 4, "pass": 1, "words": 3245, "citations": 24, "diagrams": 2}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 5, "pass": 1, "words": 4257, "citations": 67, "diagrams": 2}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 6, "pass": 1, "words": 3882, "citations": 20, "diagrams": 2}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 7, "pass": 1, "words": 5164, "citations": 30, "diagrams": 3}
+{"ts": "2026-04-11T15:27:54Z", "event": "writer_success", "chapter": 8, "pass": 1, "words": 4519, "citations": 25, "diagrams": 3}

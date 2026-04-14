@@ -1,0 +1,12 @@
+{"ts": "2026-04-12T06:53:13.155616+00:00", "event": "bootstrap_done", "chapter_count": 57, "missing_files": ["package.json", "tsconfig.json", "bunfig.toml", "src/types/message.ts", "src/services/compact/reactiveCompact.ts", "src/services/compact/cachedMicrocompact.ts", "src/services/contextCollapse/", "src/assistant/index.ts", "src/assistant/gate.ts"], "renamed_files": ["src/services/analytics/growthbook.js", "src/utils/cost-tracker.ts"]}
+{"ts": "2026-04-12T06:53:13.155616+00:00", "event": "canonical_corrections_applied", "removed": ["package.json", "tsconfig.json", "bunfig.toml", "src/types/message.ts", "src/services/compact/reactiveCompact.ts", "src/services/compact/cachedMicrocompact.ts", "src/services/contextCollapse/", "src/assistant/index.ts", "src/assistant/gate.ts"], "renamed": [{"from": "src/services/analytics/growthbook.js", "to": "src/services/analytics/growthbook.ts"}, {"from": "src/utils/cost-tracker.ts", "to": "src/cost-tracker.ts"}], "added": [{"chapter": 28, "files": ["src/services/compact/apiMicrocompact.ts", "src/services/compact/sessionMemoryCompact.ts", "src/services/compact/compactWarningHook.ts"]}, {"chapter": 49, "files": ["src/assistant/sessionHistory.ts"]}]}
+{"ts":"2026-04-12T07:06:38Z","event":"templates_extracted","worker_count":16,"step_runner_count":11}
+{"ts":"2026-04-12T07:06:38Z","event":"her_excerpts_written","count":57}
+{"ts":"2026-04-12T07:06:38Z","event":"parent_state_written","bytes":3418}
+{"ts":"2026-04-12T07:14:25.707954+00:00","event":"verification_0.9_fixes_applied","c2_exempt_chapters":[2,53,54,55,56,57],"c4_parent_state_word_count":1132}
+2026-04-11T00:30:00Z step_1_batch_1_start batch=1 chapters=[1,2,3,4]
+2026-04-11T00:30:01Z writer_success chapter=1 words=2575 citations=22 diagrams=2 snippets=4
+2026-04-11T00:30:02Z writer_success chapter=2 words=2995 citations=17 diagrams=2 snippets=4
+2026-04-11T00:30:03Z writer_success chapter=3 words=4585 citations=40 diagrams=2 snippets=5
+2026-04-11T00:30:04Z writer_success chapter=4 words=3083 citations=13 diagrams=2 snippets=7
+2026-04-11T00:30:05Z step_1_batch_1_complete batch=1 chapters_drafted=4 chapters_failed=[]
