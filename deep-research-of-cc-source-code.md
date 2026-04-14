@@ -12,7 +12,7 @@ The audience for this book is engineers building long-running agent harnesses. W
 
 The book offers three reading paths. The linear path starts at Chapter 1 and proceeds through all fifty-seven chapters in order, building from foundations through subsystems to synthesis. The subsystem-focused path jumps to the Part that covers a specific subsystem -- Part III for the tool system, Part IV for multi-agent dispatch, Part VI for safety and permissions -- and reads outward from there. The pattern-focused path starts with Part X, which maps all twelve HER patterns and seventeen failure modes to concrete cc implementations, then follows cross-references backward into the chapters that provide the detailed evidence.
 
-Each chapter follows a consistent structure: an Overview that states the chapter's thesis, a Source Map that lists the relevant source files, a Detailed Walkthrough that traces the code path with inline source citations, a Patterns and Failure Modes section that connects the implementation to HER's framework, a Diagrams section with Mermaid diagrams of the allowed types, and a Key Takeaways section. Source citations use the format `src/path/file.ts:Lnnn`. Diagrams use five allowed Mermaid types: flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, and erDiagram.
+Each chapter follows a consistent structure: an Overview that states the chapter's thesis, a Data structures and contracts section that covers the types and interfaces, a Control flow section that traces the code path with inline source citations, an Edge cases and failure modes section that connects the implementation to HER's framework, a Where cc diverges from the published pattern section, and a Developer takeaways for building a long-running agent section. Mermaid diagrams are embedded inline throughout these sections. Source citations use the format `src/path/file.ts:Lnnn`. Diagrams use five allowed Mermaid types: flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, and erDiagram.
 
 The existence of this book is itself evidence of a shift. Five years ago, the idea of reading a production agent's source code to learn how to build better agents would have seemed academic. Today, with METR benchmarks showing that well-engineered harnesses can double task completion rates, and with the harness engineering discipline coalescing around shared patterns and failure taxonomies, it is essential. The code is the curriculum. This book is the guided tour.
 
@@ -37,11 +37,13 @@ This book uses five Mermaid diagram types, each serving a distinct purpose:
 Every chapter contains six mandatory sections:
 
 1. **Overview** -- The chapter's thesis and scope.
-2. **Source Map** -- The source files covered, with line ranges.
-3. **Detailed Walkthrough** -- The main body, tracing code paths with inline citations.
-4. **Patterns and Failure Modes** -- Cross-references to HER patterns and failure modes.
-5. **Diagrams** -- At least two Mermaid diagrams of the allowed types.
-6. **Key Takeaways** -- Distilled findings and implications.
+2. **Data structures and contracts** -- The types, interfaces, and schemas that define the subsystem's contract surface.
+3. **Control flow** -- The main body, tracing code paths with inline citations.
+4. **Edge cases and failure modes** -- Corner cases, race conditions, and references to HER failure modes.
+5. **Where cc diverges from the published pattern** -- How cc's implementation differs from HER's prescribed patterns.
+6. **Developer takeaways for building a long-running agent** -- Distilled findings and implications for harness builders.
+
+Mermaid diagrams (flowchart, sequenceDiagram, stateDiagram-v2, classDiagram, erDiagram) are embedded inline throughout these sections rather than isolated in a separate section.
 
 ### Cross-Reference Notation
 
@@ -129,6 +131,12 @@ References to other chapters use the format "Chapter N" or "Part X". References 
 - **Appendix A. Glossary of Terms**
 - **Appendix B. Bibliography and Further Reading**
 - **Appendix C. Cross-Reference Concordance**
+- **Appendix D. Tool Reference Table**
+- **Appendix E. System Prompt Section Catalog**
+- **Appendix F. Feature Flag Reference**
+- **Appendix G. Hook Event Reference**
+- **Appendix H. Environment Variables**
+- **Appendix I. Minimal Harness Starter Skeleton**
 # Part I. Foundations and Framing
 
 This opening part establishes the intellectual framework for everything that follows. Before diving into source code, we need to answer three questions: why does this book exist, how should you read it, and what are you looking at?
@@ -339,7 +347,7 @@ Only when no fast-path matches does the harness load `src/main.js` via dynamic i
 
 ## Developer takeaways for building a long-running agent
 
-The single most important architectural decision in the cc codebase is that the harness owns the control flow: the model is a guest, not the host. cc's `cli.tsx` decides whether the model is even needed before loading it, and this inversion of control sets the tone for everything that follows. The TerminalBench 2.0 data confirms why this matters -- a 24.9 percentage point spread across harnesses running the same model proves that harness design is the dominant variable for production reliability, not model selection.
+The single most important architectural decision in the cc codebase is that the harness owns the control flow: the model is a guest, not the host. cc's `cli.tsx` decides whether the model is even needed before loading it, and this inversion of control sets the tone for everything that follows. The TerminalBench 2.0 data (presented in the Control flow section above) confirms why this matters: harness design is the dominant variable for production reliability, not model selection.
 
 Harness engineering is a nested discipline, not a sequential one: it encompasses context engineering, which in turn encompasses prompt engineering, and building a production harness requires mastery of all three layers. Within those layers, structural controls consistently outperform advisory ones. cc's permission system, tool dispatch pipeline, and compaction hierarchy make failure modes structurally impossible rather than merely discouraged, and this is a more reliable defense than any amount of prompt engineering can provide. The compound failure math makes this point quantitatively: 95% per-step reliability yields only 36% over 20 steps, so the harness must turn per-call reliability into end-to-end reliability through structural guarantees that compound positively.
 
@@ -1133,6 +1141,360 @@ The HER section 12 (supply chain) raises another concern. cc's dependency on Bun
 The HER section 4 taxonomy of guides and sensors provides a useful lens for evaluating the stack choice. TypeScript's type system is a computational guide (Fowler's term for deterministic, fast controls that prevent unwanted behavior before it occurs). The type checker catches incorrect tool input shapes, invalid state transitions, and mismatched API calls at compile time, before the harness ever runs. This is a structural advantage that dynamically typed languages cannot provide. The React component model is a scaffold for both guides (prop types, context contracts) and sensors (render effects, state subscriptions). The Ink renderer extends this scaffold to the terminal, providing the same component model but with terminal-specific rendering constraints.
 
 Fowler's concept of "harnessability" (HER section 4.5) is directly relevant to the stack choice. He identifies factors that improve harnessability: strongly typed languages, clear module boundaries, and conventional frameworks. cc's stack scores well on all three: TypeScript provides strong typing, the tool subdirectory contract provides clear module boundaries, and React/Ink provides a conventional component model. But Fowler's caveat is important: "Legacy systems with technical debt face particular challenges: harnesses are most necessary where hardest to build." As cc accumulates technical debt (the 4,683-line `main.tsx`, the 5,512-line `src/utils/messages.ts`), its harnessability may degrade, making the harness harder to maintain even as it becomes more necessary.
+
+## The `feature()` Gate and Compile-Time Dead Code Elimination
+
+Claude Code ships in two build variants: **ant** (internal, Anthropic-employee-facing) and **external** (public, user-facing). The distinction is not a runtime toggle. It is a compile-time split that eliminates entire code paths, entire modules, and every string literal reachable only through those paths from the external binary. The mechanism is Bun's `feature()` function from the `bun:bundle` module.
+
+The `feature()` function is a compile-time predicate. When Bun's bundler evaluates the source, each `feature('FLAG_NAME')` call is resolved to a boolean constant: `true` in the ant build, `false` in the external build. The bundler then performs standard dead-code elimination (DCE): any branch guarded by a false `feature()` check is removed entirely. This removal is transitive -- if the eliminated branch contained the only `require()` call for a module, that module and everything it imports are also eliminated. The result is that internal-only code is *physically absent* from the external binary, not hidden behind a runtime check that an attacker could bypass.
+
+The pattern is visible from the first line of the codebase. `src/entrypoints/cli.tsx:L1` opens with `import { feature } from 'bun:bundle'`, establishing the DCE dependency before any application module is loaded. The ablation baseline block at `src/entrypoints/cli.tsx:L21-L26` is a concrete example:
+
+```typescript
+// src/entrypoints/cli.tsx:L21-L26 — Ablation baseline, DCE'd from external builds
+if (feature('ABLATION_BASELINE') && process.env.CLAUDE_CODE_ABLATION_BASELINE) {
+  for (const k of ['CLAUDE_CODE_SIMPLE', 'CLAUDE_CODE_DISABLE_THINKING',
+    'DISABLE_INTERLEAVED_THINKING', 'DISABLE_COMPACT', 'DISABLE_AUTO_COMPACT',
+    'CLAUDE_CODE_DISABLE_AUTO_MEMORY', 'CLAUDE_CODE_DISABLE_BACKGROUND_TASKS']) {
+    process.env[k] ??= '1';
+  }
+}
+```
+
+In the external build, `feature('ABLATION_BASELINE')` evaluates to `false`, so the bundler replaces the entire `if` block with nothing. The string `'CLAUDE_CODE_ABLATION_BASELINE'`, the loop body, and every environment variable name listed inside are absent from the output. This is structural security: an external user cannot discover that ablation baselines exist by inspecting the binary.
+
+The `feature()` gate must appear in a position where the bundler can perform branch analysis. It works in `if` statements and ternary expressions. It does not work in indirect positions -- assigning the result to a variable and testing the variable later prevents the bundler from tracing the constant through the data flow. The comment in `src/query.ts:L796-L798` documents this constraint explicitly: "feature() only works in if/ternary conditions (bun:bundle static analysis boundary)."
+
+A subtle correctness requirement governs how `feature()` interacts with inline string literals. The pattern must use a *positive ternary* -- `feature('X') ? <true-branch> : <false-branch>` -- rather than a negative guard like `if (!feature('X')) return`. The comment in `src/voice/voiceModeEnabled.ts:L17-L18` explains: "Positive ternary pattern -- see docs/feature-gating.md. Negative pattern (if (!feature(...)) return) does not eliminate inline string literals from external builds." The negative pattern leaves the remainder of the function body reachable in the bundler's analysis, even though the early return would prevent execution at runtime. The positive ternary makes the false branch a syntactically distinct code path that the bundler can prove unreachable and remove entirely.
+
+### `require()` vs `import()` for Dead Code Elimination
+
+The codebase uses synchronous `require()` calls inside ternary expressions for feature-gated modules, not dynamic `import()`. This is a deliberate choice rooted in how Bun's bundler performs static analysis.
+
+`require()` is synchronous. It executes immediately at module-load time and returns the module's exports object. The bundler can statically determine whether a `require()` call is reachable: if it appears in the false branch of a `feature()` ternary, the call is provably unreachable and the module is eliminated. `import()`, by contrast, returns a Promise. It creates an asynchronous boundary that the bundler cannot statically reason about in the same way, because the Promise resolution is deferred to runtime. The bundler must conservatively assume the module might be needed.
+
+The canonical pattern appears throughout the codebase. Here is the coordinator module import from `src/main.tsx:L74-L76`:
+
+```typescript
+// src/main.tsx:L74-L76 — DCE-safe require with type assertion
+const coordinatorModeModule = feature('COORDINATOR_MODE')
+  ? require('./coordinator/coordinatorMode.js') as typeof import('./coordinator/coordinatorMode.js')
+  : null;
+```
+
+The `as typeof import(...)` type assertion preserves TypeScript type safety even though the module is loaded via `require()`. When `COORDINATOR_MODE` is `false`, the bundler eliminates the `require()` call and the entire `./coordinator/coordinatorMode.js` module tree. The variable `coordinatorModeModule` is assigned `null`, and every downstream usage is guarded by a null check that the bundler can also eliminate.
+
+The `require()` calls are wrapped in `/* eslint-disable @typescript-eslint/no-require-imports */` blocks because the TypeScript ESLint rules prefer ESM `import` statements. The linter exception documents the deliberate architectural choice -- this is not a legacy pattern but a DCE requirement.
+
+A related pattern uses lazy `require()` inside a thunk to break circular dependencies without compromising DCE. In `src/tools.ts:L63-L72`, team-related tools use this pattern:
+
+```typescript
+// src/tools.ts:L63-L68 — Lazy require to break circular dependency
+const getTeamCreateTool = () =>
+  require('./tools/TeamCreateTool/TeamCreateTool.js')
+    .TeamCreateTool as typeof import('./tools/TeamCreateTool/TeamCreateTool.js').TeamCreateTool
+const getTeamDeleteTool = () =>
+  require('./tools/TeamDeleteTool/TeamDeleteTool.js')
+    .TeamDeleteTool as typeof import('./tools/TeamDeleteTool/TeamDeleteTool.js').TeamDeleteTool
+```
+
+These are not feature-gated (both tools ship in both builds), but the lazy thunk defers evaluation past the circular import cycle. The DCE-gated `require()` pattern and the circular-dependency-breaking `require()` pattern coexist in the same file, each solving a different problem with the same mechanism.
+
+### Feature Flag Catalog
+
+The codebase uses 88 distinct `feature()` flags as of the current source. The following table catalogs the flags by subsystem, indicating which are ant-only (eliminated from external builds) and which are available in both variants.
+
+**Infrastructure and Entry Points**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `DAEMON` | Long-running supervisor process for background workers (`cli.tsx:L100`) | Yes |
+| `BRIDGE_MODE` | Remote control -- serve local machine as a bridge environment (`cli.tsx:L112`) | Yes |
+| `BG_SESSIONS` | Background session management: `ps`, `logs`, `attach`, `kill` (`cli.tsx:L185`) | Yes |
+| `BYOC_ENVIRONMENT_RUNNER` | Headless Bring-Your-Own-Cloud runner (`cli.tsx:L226`) | Yes |
+| `SELF_HOSTED_RUNNER` | Self-hosted runner targeting internal API (`cli.tsx:L238`) | Yes |
+| `TEMPLATES` | Template job commands: `new`, `list`, `reply` (`cli.tsx:L212`) | Yes |
+| `DIRECT_CONNECT` | Direct-connect session creation without a relay (`main.tsx:L548`) | Yes |
+| `SSH_REMOTE` | SSH-based remote session launch (`main.tsx:L577`) | Yes |
+| `CCR_AUTO_CONNECT` | Automatic reconnect for Claude Code Remote sessions | Yes |
+| `CCR_MIRROR` | Mirror mode for CCR screen sharing | Yes |
+| `CCR_REMOTE_SETUP` | Remote setup flow for CCR environments | Yes |
+| `LODESTONE` | Lodestone integration for session routing (`main.tsx:L647`) | Yes |
+
+**AI Orchestration and Context Management**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `COORDINATOR_MODE` | Multi-agent coordinator with scratchpad protocol (`tools.ts:L120`) | Yes |
+| `REACTIVE_COMPACT` | Reactive compaction on prompt-too-long errors (`query.ts:L15`) | Yes |
+| `CONTEXT_COLLAPSE` | Granular context archiving that preserves recent turns (`query.ts:L18`) | Yes |
+| `HISTORY_SNIP` | Aggressive history truncation for long SDK sessions (`query.ts:L115`) | Yes |
+| `CACHED_MICROCOMPACT` | Cache-editing-based microcompact using API-reported token deletion counts (`query.ts:L423`) | Yes |
+| `TOKEN_BUDGET` | Token budget tracking with auto-continuation (`query.ts:L280`) | Yes |
+| `ABLATION_BASELINE` | L0 ablation baseline for harness-science experiments (`cli.tsx:L21`) | Yes |
+| `COMPACTION_REMINDERS` | Inject reminders about prior context after compaction | Yes |
+| `ULTRATHINK` | Extended thinking mode with larger budgets | Yes |
+| `ULTRAPLAN` | Extended planning mode | Yes |
+| `FORK_SUBAGENT` | Fork-based subagent spawning via `Bun.fork()` | Yes |
+| `VERIFICATION_AGENT` | Post-execution verification subagent | Yes |
+
+**Assistant and Proactive Features (KAIROS family)**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `KAIROS` | Assistant mode: proactive behavior, push notifications, file sending (`main.tsx:L80`) | Yes |
+| `KAIROS_PUSH_NOTIFICATION` | Push notifications for idle task completion (`tools.ts:L46`) | Yes |
+| `KAIROS_GITHUB_WEBHOOKS` | GitHub webhook integration for PR subscription (`tools.ts:L50`) | Yes |
+| `KAIROS_BRIEF` | Brief/summary mode for KAIROS assistant | Yes |
+| `KAIROS_CHANNELS` | Channel-based communication for KAIROS | Yes |
+| `KAIROS_DREAM` | Idle-state dream/reflection mode for KAIROS | Yes |
+| `PROACTIVE` | Proactive agent features including the Sleep tool (`tools.ts:L26`) | Yes |
+| `AWAY_SUMMARY` | Generate summaries while user is away | Yes |
+
+**Tools and Capabilities**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `AGENT_TRIGGERS` | Cron-based trigger scheduling: create, delete, list (`tools.ts:L29`) | Yes |
+| `AGENT_TRIGGERS_REMOTE` | HTTP-triggered agent activation (`tools.ts:L36`) | Yes |
+| `MONITOR_TOOL` | File and process monitoring tool (`tools.ts:L39`) | Yes |
+| `CHICAGO_MCP` | Computer-use MCP server: screen capture, input control (`cli.tsx:L86`) | Yes |
+| `WEB_BROWSER_TOOL` | Web browser tool for URL navigation (`tools.ts:L117`) | Yes |
+| `OVERFLOW_TEST_TOOL` | Test tool for context overflow scenarios (`tools.ts:L107`) | Yes |
+| `TERMINAL_PANEL` | Terminal capture and panel display tool (`tools.ts:L113`) | Yes |
+| `WORKFLOW_SCRIPTS` | Workflow script definitions and execution (`tools.ts:L129`) | Yes |
+| `EXPERIMENTAL_SKILL_SEARCH` | Skill discovery via search and prefetch (`query.ts:L66`) | Yes |
+| `VOICE_MODE` | Voice input/output mode (`voiceModeEnabled.ts:L20`) | Yes |
+| `BUDDY` | Companion sprite/mascot feature (`CompanionSprite.tsx:L168`) | Yes |
+| `MCP_SKILLS` | MCP-based skill discovery and registration (`mcp/client.ts:L117`) | Yes |
+| `MCP_RICH_OUTPUT` | Rich output rendering from MCP tools | Yes |
+
+**Communication and Collaboration**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `UDS_INBOX` | Unix domain socket messaging for inter-process communication (`setup.ts:L95`) | Yes |
+| `TEAMMEM` | Team memory paths for shared agent context (`setup.ts:L365`) | Yes |
+| `COMMIT_ATTRIBUTION` | Commit attribution tracking (`setup.ts:L350`) | Yes |
+
+**Build, Debug, and Telemetry**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `DUMP_SYSTEM_PROMPT` | Extract rendered system prompt for prompt sensitivity evals (`cli.tsx:L53`) | Yes |
+| `ENHANCED_TELEMETRY_BETA` | Enhanced telemetry collection for internal builds | Yes |
+| `COWORKER_TYPE_TELEMETRY` | Telemetry for coworker type classification | Yes |
+| `MEMORY_SHAPE_TELEMETRY` | Telemetry for memory shape analysis | Yes |
+| `SHOT_STATS` | Per-shot statistics collection | Yes |
+| `PERFETTO_TRACING` | Perfetto trace export for performance analysis | Yes |
+| `SLOW_OPERATION_LOGGING` | Log operations that exceed latency thresholds | Yes |
+| `BREAK_CACHE_COMMAND` | Force cache break for debugging prompt caching | Yes |
+| `PROMPT_CACHE_BREAK_DETECTION` | Detect and report prompt cache breaks | Yes |
+
+**UI and Experience**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `HISTORY_PICKER` | Session history picker UI | Yes |
+| `MESSAGE_ACTIONS` | Message action buttons in the UI | Yes |
+| `STREAMLINED_OUTPUT` | Streamlined output formatting | Yes |
+| `QUICK_SEARCH` | Quick-search command palette | Yes |
+| `AUTO_THEME` | Automatic theme detection | Yes |
+| `NATIVE_CLIPBOARD_IMAGE` | Native clipboard image paste support | Yes |
+| `NEW_INIT` | Redesigned `claude init` flow | Yes |
+
+**Security and Policy**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `NATIVE_CLIENT_ATTESTATION` | Hardware-backed client attestation | Yes |
+| `ANTI_DISTILLATION_CC` | Anti-distillation measures for model output | Yes |
+| `TRANSCRIPT_CLASSIFIER` | Transcript classification for auto-mode state (`main.tsx:L171`) | Yes |
+| `BASH_CLASSIFIER` | Bash command classification for permission decisions | Yes |
+| `POWERSHELL_AUTO_MODE` | Auto-mode for PowerShell commands | Yes |
+| `HARD_FAIL` | Hard failure mode for strict error handling | Yes |
+| `UNATTENDED_RETRY` | Automatic retry in unattended/headless sessions | Yes |
+
+**Miscellaneous**
+
+| Flag | Purpose | Ant-Only |
+|------|---------|----------|
+| `CONNECTOR_TEXT` | Summarize connector text beta header (`betas.ts:L23`) | Yes |
+| `TORCH` | Torch integration | Yes |
+| `IS_LIBC_GLIBC` | Build-time libc variant detection (glibc) | Build |
+| `IS_LIBC_MUSL` | Build-time libc variant detection (musl) | Build |
+| `ALLOW_TEST_VERSIONS` | Allow pre-release test versions | Yes |
+| `BUILDING_CLAUDE_APPS` | Claude API app building mode | Yes |
+| `BUILTIN_EXPLORE_PLAN_AGENTS` | Built-in explore/plan agent definitions | Yes |
+| `AGENT_MEMORY_SNAPSHOT` | Snapshot agent memory state | Yes |
+| `EXTRACT_MEMORIES` | Extract memories from conversation history | Yes |
+| `FILE_PERSISTENCE` | File persistence across sessions | Yes |
+| `HOOK_PROMPTS` | Hook-injected prompt segments | Yes |
+| `REVIEW_ARTIFACT` | Review artifact generation | Yes |
+| `RUN_SKILL_GENERATOR` | Skill generator execution | Yes |
+| `SKILL_IMPROVEMENT` | Skill improvement/optimization | Yes |
+| `TREE_SITTER_BASH` | Tree-sitter-based bash parsing for permission analysis | Yes |
+| `TREE_SITTER_BASH_SHADOW` | Shadow mode for tree-sitter bash parser (compare against existing) | Yes |
+| `UPLOAD_USER_SETTINGS` | Upload user settings to server | Yes |
+| `DOWNLOAD_USER_SETTINGS` | Download user settings from server | Yes |
+
+Two flags (`IS_LIBC_GLIBC`, `IS_LIBC_MUSL`) are not ant/external toggles but build-environment markers that the bundler uses to select the correct native binary for the target platform's C library. Every other flag is ant-only, meaning the guarded code is eliminated from the external build.
+
+A second gating mechanism coexists with `feature()`: the `process.env.USER_TYPE === 'ant'` runtime check. In `src/tools.ts:L17-L24`, `REPLTool` and `SuggestBackgroundPRTool` use this pattern instead of `feature()`. The distinction is that `USER_TYPE` is set as an environment variable at build time, and Bun's bundler evaluates it as a constant expression during bundling -- producing the same DCE effect as `feature()`, but through environment substitution rather than the `bun:bundle` feature flag API. Both mechanisms result in dead code elimination, but `feature()` is the preferred pattern for new code because it is explicit about its compile-time semantics and does not depend on environment variable naming conventions.
+
+### DCE in the Tool Registry and the Query Loop
+
+The tool registry in `src/tools.ts` is the most consequential DCE target in the codebase, because it determines which tools the model can see and invoke. The `getAllBaseTools()` function (`src/tools.ts:L193-L251`) returns the complete list of tools available in the current build, and feature-gated tools are conditionally included using the require-ternary pattern.
+
+The gating follows a consistent structure. At the top of `src/tools.ts`, each feature-gated tool is imported via a ternary:
+
+```typescript
+// src/tools.ts:L25-L52 — Feature-gated tool imports
+const SleepTool =
+  feature('PROACTIVE') || feature('KAIROS')
+    ? require('./tools/SleepTool/SleepTool.js').SleepTool
+    : null
+const cronTools = feature('AGENT_TRIGGERS')
+  ? [
+      require('./tools/ScheduleCronTool/CronCreateTool.js').CronCreateTool,
+      require('./tools/ScheduleCronTool/CronDeleteTool.js').CronDeleteTool,
+      require('./tools/ScheduleCronTool/CronListTool.js').CronListTool,
+    ]
+  : []
+const MonitorTool = feature('MONITOR_TOOL')
+  ? require('./tools/MonitorTool/MonitorTool.js').MonitorTool
+  : null
+```
+
+Inside `getAllBaseTools()`, these variables are spread into the returned array with null guards:
+
+```typescript
+// src/tools.ts:L234-L243 — Null-guarded tool inclusion in getAllBaseTools()
+...(SleepTool ? [SleepTool] : []),
+...cronTools,
+...(RemoteTriggerTool ? [RemoteTriggerTool] : []),
+...(MonitorTool ? [MonitorTool] : []),
+...(SendUserFileTool ? [SendUserFileTool] : []),
+...(PushNotificationTool ? [PushNotificationTool] : []),
+...(SubscribePRTool ? [SubscribePRTool] : []),
+```
+
+In the external build, `SleepTool` is `null`, so `...(null ? [null] : [])` produces an empty spread -- the tool is absent from the array. The bundler also eliminates the `require()` call that would have loaded the SleepTool module, and because no other code path imports SleepTool, the entire `src/tools/SleepTool/` directory is excluded from the external binary. The elimination is transitive: if SleepTool imported a utility module used nowhere else, that utility is also eliminated.
+
+The external build retains a core toolset: `AgentTool`, `BashTool`, `FileReadTool`, `FileEditTool`, `FileWriteTool`, `GlobTool`, `GrepTool`, `NotebookEditTool`, `WebFetchTool`, `WebSearchTool`, `TodoWriteTool`, `SkillTool`, `AskUserQuestionTool`, `BriefTool`, and a handful of others. Over 20 additional tools exist only in the ant build, including `REPLTool`, `SleepTool`, `MonitorTool`, `WebBrowserTool`, `TerminalCaptureTool`, `SnipTool`, `WorkflowTool`, `PushNotificationTool`, `SubscribePRTool`, all three cron tools, `CtxInspectTool`, `OverflowTestTool`, `ListPeersTool`, `SendUserFileTool`, `RemoteTriggerTool`, `SuggestBackgroundPRTool`, `ConfigTool`, and `TungstenTool`.
+
+The DCE pattern extends into the query loop at `src/query.ts`, where feature-gated compaction strategies determine how context is managed during long conversations. The top of `src/query.ts:L15-L21` imports three compaction modules conditionally:
+
+```typescript
+// src/query.ts:L15-L21 — Feature-gated compaction modules
+const reactiveCompact = feature('REACTIVE_COMPACT')
+  ? (require('./services/compact/reactiveCompact.js') as typeof import('./services/compact/reactiveCompact.js'))
+  : null
+const contextCollapse = feature('CONTEXT_COLLAPSE')
+  ? (require('./services/contextCollapse/index.js') as typeof import('./services/contextCollapse/index.js'))
+  : null
+```
+
+These modules are then used at multiple points in the query function body, each guarded by a `feature()` check. For example, `src/query.ts:L440-L447` applies context collapse before autocompact:
+
+```typescript
+// src/query.ts:L440-L447 — Context collapse, DCE'd from external builds
+if (feature('CONTEXT_COLLAPSE') && contextCollapse) {
+  const collapseResult = await contextCollapse.applyCollapsesIfNeeded(
+    messagesForQuery,
+    toolUseContext,
+    querySource,
+  )
+  messagesForQuery = collapseResult.messages
+}
+```
+
+The double guard (`feature() && contextCollapse`) is a belt-and-suspenders pattern. The `feature()` check enables DCE; the `contextCollapse` null check satisfies TypeScript's type narrowing. In the external build, both guards evaluate to false (the first at compile time, the second at runtime -- though the runtime check is also eliminated because the variable is provably `null`).
+
+The `QueryEngine.ts` file demonstrates a more sophisticated DCE pattern for the snip replay callback. The `snipModule` and `snipProjection` references are feature-gated at the top of `src/QueryEngine.ts:L122-L127`, and the callback that uses them is spread into the config object using a feature-gated object spread at `src/QueryEngine.ts:L1276-L1284`:
+
+```typescript
+// src/QueryEngine.ts:L1276-L1284 — Feature-gated callback via object spread
+...(feature('HISTORY_SNIP')
+  ? {
+      snipReplay: (yielded: Message, store: Message[]) => {
+        if (!snipProjection!.isSnipBoundaryMessage(yielded))
+          return undefined
+        return snipModule!.snipCompactIfNeeded(store, { force: true })
+      },
+    }
+  : {}),
+```
+
+The spread-into-object pattern ensures that when `HISTORY_SNIP` is false, the `snipReplay` property does not exist on the config object at all. This is more robust than setting it to `undefined`, because downstream code can use `'snipReplay' in config` to check for the feature. The non-null assertions (`snipProjection!.`) inside the callback are safe because the callback is unreachable in the external build -- the feature gate eliminates both the callback and the modules it references.
+
+### The Excluded-Strings Constraint and the DCE Pipeline
+
+The DCE system enforces a critical security invariant: string literals from internal-only code must not appear in the external binary. This is verified by a CI test that scans the external build output for forbidden strings listed in `scripts/excluded-strings.txt`. If any internal-only string -- a model codename, an internal API endpoint, a feature-specific identifier -- appears in the external binary, the CI test fails and the build is rejected.
+
+This constraint shapes how feature-gated code is structured. The `require()` call for a feature-gated module must appear inside the ternary expression, not in a separate variable:
+
+```typescript
+// Correct: the string './coordinator/coordinatorMode.js' is inside the feature() branch
+// and is eliminated from the external build
+const coordinatorModeModule = feature('COORDINATOR_MODE')
+  ? require('./coordinator/coordinatorMode.js')
+  : null
+
+// Incorrect: the module path string would remain in the binary even though
+// the require() is never called
+const modulePath = './coordinator/coordinatorMode.js'
+const coordinatorModeModule = feature('COORDINATOR_MODE')
+  ? require(modulePath)
+  : null
+```
+
+The excluded-strings constraint also explains architectural decisions that might otherwise seem puzzling. The comment at `src/QueryEngine.ts:L163` notes that the `snipReplay` callback is injected from `ask()` rather than being defined inline in `QueryEngine`, specifically because "keeps QueryEngine free of excluded strings and testable." The snip-specific strings (`snipProjection`, `snipCompactIfNeeded`) must not appear in `QueryEngine.ts` because that file ships in both builds. The callback encapsulates the feature-gated logic and its strings inside the feature gate in `ask()`.
+
+Similarly, `src/setup.ts:L351` uses a dynamic import to load the commit attribution module: "Dynamic import to enable dead code elimination (module contains excluded strings)." The attribution module contains internal-only strings that would trip the excluded-strings check if the module were statically imported. The dynamic import, gated behind `feature('COMMIT_ATTRIBUTION')`, ensures the module and its strings are eliminated from the external build.
+
+The entire DCE pipeline flows through five stages:
+
+```mermaid
+flowchart LR
+    A["Source with<br/>feature() gates<br/>(88 flags)"] --> B["Bun bundler<br/>(bun build)"]
+    B --> C["DCE pass<br/>(unreachable branches<br/>and modules removed)"]
+    C --> D["External binary<br/>(internal code<br/>physically absent)"]
+    D --> E["Excluded-strings<br/>CI test<br/>(scan for<br/>forbidden strings)"]
+    E --> F["Ship"]
+    
+    B --> G["Ant binary<br/>(all code retained)"]
+    G --> H["Internal<br/>distribution"]
+```
+
+The pipeline is unidirectional: source enters with feature gates, the bundler evaluates gates and removes unreachable code, the CI test verifies the result, and the binary ships. There is no runtime fallback -- if the excluded-strings test fails, the build is broken and must be fixed at the source level. This makes DCE a hard security boundary rather than a best-effort optimization.
+
+### Runtime vs Compile-Time Feature Checks
+
+Not all feature checks are compile-time. The codebase distinguishes three categories:
+
+1. **Compile-time via `feature()`**: Evaluated by Bun's bundler, enables transitive DCE. Used for code that must not exist in the external binary at all. The 88 flags in the catalog above are all compile-time.
+
+2. **Runtime via GrowthBook/Statsig**: Evaluated at runtime against server-side experiment configuration. Used for code that exists in both builds but is conditionally enabled for rollout, A/B testing, or kill-switch purposes. Example: `config.gates.streamingToolExecution` controls whether the `StreamingToolExecutor` is used, but the executor code ships in both builds.
+
+3. **Environment-based via `process.env`**: The build sets an environment variable to a known value, and the code checks it. Example: `process.env.USER_TYPE === 'ant'` in `src/tools.ts:L17` gates `REPLTool`. The bundler evaluates this as a constant expression during bundling (because `USER_TYPE` is known at build time), producing DCE comparable to `feature()`.
+
+The bridge path in `src/entrypoints/cli.tsx:L110-L112` demonstrates the interaction between compile-time and runtime checks. The source comment is explicit: "feature() must stay inline for build-time dead code elimination; isBridgeEnabled() checks the runtime GrowthBook gate." The `feature('BRIDGE_MODE')` check eliminates the entire bridge code path from the external build. Within the ant build, the `getBridgeDisabledReason()` call queries GrowthBook at runtime to determine whether the bridge feature is currently enabled for this user -- a server-side kill switch that operates within the ant-only code that survived DCE.
+
+The `src/voice/voiceModeEnabled.ts:L16-L23` file provides the cleanest example of the layered approach:
+
+```typescript
+// src/voice/voiceModeEnabled.ts:L16-L23 — Compile-time gate + runtime kill switch
+export function isVoiceGrowthBookEnabled(): boolean {
+  return feature('VOICE_MODE')
+    ? !getFeatureValue_CACHED_MAY_BE_STALE('tengu_amber_quartz_disabled', false)
+    : false
+}
+```
+
+The `feature('VOICE_MODE')` gate eliminates the function body from the external build, including the GrowthBook feature key string `'tengu_amber_quartz_disabled'`. In the ant build, the GrowthBook check provides a runtime kill switch: if the `tengu_amber_quartz_disabled` flag is flipped to `true` on the server, voice mode is disabled for all ant users without a new build. The default value `false` means a missing or stale GrowthBook cache reads as "not killed," so fresh installs get voice mode working immediately.
+
+This layered architecture -- compile-time elimination for build-variant security, runtime gates for operational control -- provides defense in depth. An external attacker cannot discover internal features because they are physically absent. An internal operator can disable a feature without deploying a new build because the runtime gate is independent of the compile-time gate.
 
 ## Developer takeaways for building a long-running agent
 
@@ -2573,6 +2935,154 @@ HER section 13.3 describes observation masking (52% cost reduction by hiding irr
 
 HER section 13.5 provides budget reality checks: "$297 for a $50k contract (best case)", "$200 for 6 hours of harness work", "$3,200-$13,000/month per agent (enterprise)", "40-60% TCO underestimation". cc's cost tracking provides the raw data for these calculations, but does not implement the per-outcome tracking recommended in section 13.4. The `totalCostUSD` field tracks cost per session, not cost per completed task.
 
+### OAuth 2.0 with PKCE: the eight-step flow
+
+Every API call requires authentication. For users who authenticate via claude.ai (Pro, Max, Team, Enterprise subscribers), cc implements the OAuth 2.0 Authorization Code flow with PKCE (Proof Key for Code Exchange). The `OAuthService` class in `src/services/oauth/index.ts` orchestrates this flow, coordinating between a local HTTP listener, the user's browser, and the Anthropic authorization server. The PKCE extension prevents authorization code interception attacks: even if an attacker captures the authorization code from the callback URL, they cannot exchange it for tokens without the code verifier, which never leaves the local process.
+
+The flow proceeds through eight steps:
+
+**Step 1 -- Generate code verifier.** The constructor calls `crypto.generateCodeVerifier()` (`src/services/oauth/crypto.ts:L11`), which generates 32 random bytes and base64url-encodes them. The base64url encoding replaces `+` with `-`, `/` with `_`, and strips trailing `=` padding to produce a URL-safe string.
+
+```typescript
+// src/services/oauth/crypto.ts:L11 — Code verifier generation
+export function generateCodeVerifier(): string {
+  return base64URLEncode(randomBytes(32))
+}
+```
+
+**Step 2 -- Derive code challenge.** `crypto.generateCodeChallenge()` (`src/services/oauth/crypto.ts:L15`) hashes the verifier with SHA-256 and base64url-encodes the digest. The authorization server receives only this derived challenge, not the verifier itself. This ensures that an eavesdropper who intercepts the authorization request cannot reconstruct the verifier.
+
+```typescript
+// src/services/oauth/crypto.ts:L15 — SHA-256 code challenge derivation
+export function generateCodeChallenge(verifier: string): string {
+  const hash = createHash('sha256')
+  hash.update(verifier)
+  return base64URLEncode(hash.digest())
+}
+```
+
+**Step 3 -- Generate state parameter.** `crypto.generateState()` (`src/services/oauth/crypto.ts:L21`) produces a separate 32-byte random value for CSRF protection. The state is sent in the authorization URL and must match the value returned in the callback; a mismatch indicates a forged redirect.
+
+**Step 4 -- Open browser to authorization URL.** `startOAuthFlow()` (`src/services/oauth/index.ts:L32`) starts an `AuthCodeListener` on an OS-assigned localhost port, builds two authorization URLs (automatic and manual), and opens the automatic URL in the user's default browser. The authorization URL includes `code_challenge`, `code_challenge_method=S256`, `state`, `redirect_uri` (pointing to `http://localhost:<port>/callback`), `client_id` from the OAuth config (`src/constants/oauth.ts:L99`), and the full scope set. The scope set includes `user:inference`, `user:profile`, `user:sessions:claude_code`, `user:mcp_servers`, and `user:file_upload` (`src/constants/oauth.ts:L45-L51`).
+
+**Step 5 -- Listen on localhost for redirect.** The `AuthCodeListener` (`src/services/oauth/auth-code-listener.ts`) creates a temporary `http.createServer()` bound to localhost on port 0 (OS-assigned). When the browser redirects back with `?code=X&state=Y`, the listener validates that the state matches the expected value, stores the `ServerResponse` for later redirect, and resolves the promise with the authorization code. A parallel manual flow allows users in headless environments (SSH sessions, containers) to paste the authorization code directly.
+
+**Step 6 -- Exchange authorization code for tokens.** `client.exchangeCodeForTokens()` sends a POST to the token endpoint (`src/constants/oauth.ts:L91 — TOKEN_URL`) with `grant_type=authorization_code`, the authorization code, `redirect_uri`, `client_id`, and the original `code_verifier`. The server verifies that `SHA256(code_verifier)` matches the `code_challenge` from step 4, completing the PKCE proof. The response contains `access_token`, `refresh_token`, `expires_in`, and `scope`.
+
+**Step 7 -- Store tokens in secure storage.** The `formatTokens()` method (`src/services/oauth/index.ts:L169`) converts the raw token response into an `OAuthTokens` object. The tokens are saved to secure storage (macOS Keychain or plaintext fallback) and the global config via `installOAuthTokens()` in `src/utils/auth.ts`.
+
+**Step 8 -- Return OAuthTokens.** The returned `OAuthTokens` object contains `accessToken`, `refreshToken`, `expiresAt` (computed as `Date.now() + expires_in * 1000`), `scopes`, `subscriptionType`, `rateLimitTier`, and optional `profile` and `tokenAccount` fields (`src/services/oauth/index.ts:L175-L191`).
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant CC as Claude Code (OAuthService)
+    participant ACL as AuthCodeListener (localhost)
+    participant Browser
+    participant Auth as Anthropic Auth Server
+
+    CC->>CC: generateCodeVerifier() — 32 random bytes, base64url
+    CC->>CC: generateCodeChallenge(verifier) — SHA-256, base64url
+    CC->>CC: generateState() — 32 random bytes, base64url
+    CC->>ACL: new AuthCodeListener().start()
+    ACL-->>CC: OS-assigned port number
+    CC->>CC: buildAuthUrl(challenge, state, port, scopes)
+    CC->>Browser: openBrowser(automaticFlowUrl)
+    Browser->>Auth: User authenticates and authorizes scopes
+    Auth-->>Browser: 302 Redirect to http://localhost:port/callback?code=X&state=Y
+    Browser->>ACL: GET /callback?code=X&state=Y
+    ACL->>ACL: Validate state === expectedState (CSRF check)
+    ACL-->>CC: Resolve with authorization code
+    CC->>Auth: POST /oauth/token {code, code_verifier, redirect_uri, client_id}
+    Auth->>Auth: Verify SHA256(code_verifier) === stored code_challenge
+    Auth-->>CC: {access_token, refresh_token, expires_in, scope}
+    CC->>Auth: GET /api/oauth/profile (Bearer access_token)
+    Auth-->>CC: {subscriptionType, rateLimitTier, displayName}
+    CC->>CC: Save tokens to secure storage
+    ACL->>Browser: 302 Redirect to success page
+```
+
+### Secure storage: macOS Keychain and plaintext fallback
+
+OAuth tokens and API keys need durable, protected storage between sessions. cc uses a two-tier storage system: macOS Keychain as the primary backend on Darwin, with a plaintext JSON file as the universal fallback.
+
+**macOS Keychain storage** (`src/utils/secureStorage/macOsKeychainStorage.ts`) uses the `security` command-line tool to interact with the macOS Keychain Services API. The implementation addresses three security and reliability concerns:
+
+First, process list exposure. Process monitors like CrowdStrike observe all command-line arguments, so passing credentials via `argv` would expose them in security logs. The storage uses `security -i` (interactive stdin mode), piping the `add-generic-password` command via stdin so that process monitors see only `security -i` in the process list, not the credential payload (`src/utils/secureStorage/macOsKeychainStorage.ts:L122-L125`).
+
+Second, shell metacharacter injection. Credentials can contain characters that have special meaning in shell contexts. The `-X` flag accepts hex-encoded input, which eliminates any possibility of shell injection or truncation from special characters (`src/utils/secureStorage/macOsKeychainStorage.ts:L109`).
+
+Third, the stdin buffer limit. The `security -i` command reads stdin with a 4096-byte `fgets()` buffer. A command line exceeding this limit is silently truncated, causing the first 4096 bytes to be interpreted as one command (which fails due to an unterminated quote) and the overflow to be interpreted as a second unknown command. The net effect is a non-zero exit with no data written, but the previous keychain entry remains intact, which fallback storage then reads as stale. The `SECURITY_STDIN_LINE_LIMIT` constant (`src/utils/secureStorage/macOsKeychainStorage.ts:L24`) reserves 64 bytes of headroom below the 4096-byte limit for line-terminator accounting. Payloads exceeding this limit fall back to the `argv` path, where hex encoding defeats naive plaintext grep rules even though a determined observer could decode it.
+
+```typescript
+// src/utils/secureStorage/macOsKeychainStorage.ts:L24 — Buffer limit constant
+const SECURITY_STDIN_LINE_LIMIT = 4096 - 64
+```
+
+The read path (`macOsKeychainStorage.read()`, L28) uses `security find-generic-password -a <username> -w -s <serviceName>` to retrieve the stored JSON. The result is cached with a TTL managed by `keychainCacheState`, and a stale-while-error pattern ensures that a single transient `security` spawn failure does not poison the cache and surface as "Not logged in" across all subsystems (`src/utils/secureStorage/macOsKeychainStorage.ts:L57-L63`).
+
+**Plaintext storage** (`src/utils/secureStorage/plainTextStorage.ts`) stores tokens in `~/.claude/.credentials.json` with mode `0o600` (owner read/write only). This is the only option on Linux and Windows. The `update()` method creates the `~/.claude/` directory if it does not exist, writes the JSON data, and immediately calls `chmodSync(storagePath, 0o600)` to restrict permissions (`src/utils/secureStorage/plainTextStorage.ts:L57-L61`). The `warning: 'Warning: Storing credentials in plaintext.'` return value is displayed to the user on first login when the keychain is unavailable.
+
+**Fallback composition** (`src/utils/secureStorage/fallbackStorage.ts`) wraps primary and secondary storage into a single `SecureStorage` interface. The `read()` method tries the primary storage first and falls back to the secondary if the primary returns null. The `update()` method is more subtle: on a successful primary write where the primary was previously empty (`primaryDataBefore === null`), it deletes the secondary storage to complete the migration (`src/utils/secureStorage/fallbackStorage.ts:L37-L39`). On a primary write failure, it writes to the secondary and then best-effort-deletes the primary to prevent stale primary entries from shadowing fresh secondary data --- a scenario that caused infinite `/login` loops in issue #30337 (`src/utils/secureStorage/fallbackStorage.ts:L49-L54`).
+
+### Credential priority order
+
+Authentication is not a single mechanism but an eight-source priority chain. The `getAuthTokenSource()` function (`src/utils/auth.ts:L153-L206`) checks each source in order and returns the first match. This ordering ensures that explicit configuration (environment variables, file descriptors) always takes precedence over discovered credentials (keychain, config files), and that the OAuth login flow is triggered only when no other credential source is available.
+
+The priority chain, from highest to lowest:
+
+1. **`ANTHROPIC_AUTH_TOKEN`** environment variable --- an explicit bearer token injected by proxy configurations or gateway setups. Skipped in managed OAuth contexts (CCR, Claude Desktop) to prevent environment leakage from interfering with the host application's auth (`src/utils/auth.ts:L164-L166`).
+
+2. **`CLAUDE_CODE_OAUTH_TOKEN`** environment variable --- an OAuth access token provided by the environment, used in CI/CD pipelines and automated deployments. Returns an inference-only token with no refresh capability (`src/utils/auth.ts:L168-L170`).
+
+3. **File descriptor provided token** --- `CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR` passes an OAuth token via a file descriptor, which is more secure than environment variables because the token is not visible in `/proc/<pid>/environ`. Used by the CCR infrastructure and SDK control protocol (`src/utils/auth.ts:L173-L191`).
+
+4. **CCR disk fallback** --- when subprocesses cannot inherit the pipe FD from their parent, the token is written to a temporary file and read back by the child process. Distinguished from the FD source so that org-mismatch error messages do not tell the user to unset a variable that does not exist (`src/utils/auth.ts:L187-L190`).
+
+5. **`apiKeyHelper`** --- a user-configured shell command (from `settings.json`) that outputs an API key. The command is executed once and the result cached with a configurable TTL (default 5 minutes, overridable via `CLAUDE_CODE_API_KEY_HELPER_TTL_MS`). Skipped in managed contexts to prevent the user's personal settings from interfering with organizational auth (`src/utils/auth.ts:L196-L198`).
+
+6. **Keychain/secure storage** --- OAuth tokens stored in the macOS Keychain or `~/.claude/.credentials.json` by a previous `/login` session. The `getClaudeAIOAuthTokens()` function (`src/utils/auth.ts:L1255`) checks the secure storage via the `getSecureStorage()` abstraction (`src/utils/auth.ts:L200-L203`).
+
+7. **`ANTHROPIC_API_KEY`** environment variable --- a direct API key, checked via `getAnthropicApiKeyWithSource()` (`src/utils/auth.ts:L226`). On macOS, the key may also come from the keychain via the legacy `getApiKeyFromConfigOrMacOSKeychain()` path (`src/utils/auth.ts:L1051`).
+
+8. **None** --- no credential source found. The CLI triggers the interactive OAuth login flow (`/login`).
+
+### Token refresh with five-minute buffer
+
+OAuth access tokens have a finite lifetime. The `checkAndRefreshOAuthTokenIfNeeded()` function (`src/utils/auth.ts:L1427`) is called before every API request to ensure the token is fresh. Rather than waiting for the token to expire and the API to return a 401, the function proactively refreshes the token when it is within 5 minutes of expiry.
+
+The expiry check is performed by `isOAuthTokenExpired()` (`src/services/oauth/client.ts:L344`):
+
+```typescript
+// src/services/oauth/client.ts:L344 — Five-minute expiry buffer
+export function isOAuthTokenExpired(expiresAt: number | null): boolean {
+  if (expiresAt === null) {
+    return false
+  }
+
+  const bufferTime = 5 * 60 * 1000
+  const now = Date.now()
+  const expiresWithBuffer = now + bufferTime
+  return expiresWithBuffer >= expiresAt
+}
+```
+
+The 5-minute buffer serves two purposes. First, it accounts for clock skew between the client and the authorization server, which can be up to 30 seconds in practice. Second, it provides headroom for the refresh request itself (typically 200-500ms), preventing the scenario where the token expires between the check and the API call. The null-expiresAt case returns `false` (not expired), which is the correct behavior for tokens injected via environment variables (`CLAUDE_CODE_OAUTH_TOKEN`) that have no expiration metadata --- these tokens are used until they fail with a 401.
+
+The refresh implementation (`src/utils/auth.ts:L1447-L1555`) uses a multi-layer concurrency control strategy. An in-flight promise (`pendingRefreshCheck`) deduplicates concurrent calls within the same process. A filesystem lock (`lockfile.lock(claudeDir)`) prevents concurrent refreshes across multiple cc processes sharing the same credential store. After acquiring the lock, the function re-reads tokens from storage to check whether another process has already refreshed them (the "double-check after lock" pattern). The lock acquisition uses exponential backoff with up to 5 retries and 1-2 seconds of jittered delay between attempts (`src/utils/auth.ts:L1496-L1502`).
+
+Cross-process staleness detection (`invalidateOAuthCacheIfDiskChanged()`, `src/utils/auth.ts:L1320`) compares the `mtime` of `~/.claude/.credentials.json` against a cached value and clears the memoize cache when the file has been modified by another process. Without this, a second terminal's `/login` would revoke the token server-side, but the first terminal's memoize cache would serve the stale token indefinitely.
+
+### Cloud provider credential chains
+
+When cc is configured for a cloud provider (Bedrock, Vertex, or Foundry), the first-party OAuth flow is bypassed entirely and authentication delegates to provider-specific credential chains.
+
+**AWS Bedrock** (`src/services/api/client.ts:L153-L189`). The credential chain evaluates in this order: (1) `AWS_BEARER_TOKEN_BEDROCK` environment variable, which sets a bearer token directly on the `Authorization` header with `skipAuth: true` to bypass the SDK's own credential resolution; (2) `refreshAndGetAwsCredentials()` (`src/utils/auth.ts:L787`), which runs an optional auth refresh command, exports credentials, clears the AWS INI cache, and returns `{ accessKeyId, secretAccessKey, sessionToken }` with TTL-based caching; (3) the AWS SDK's default credential chain (environment variables, shared credentials file, EC2 instance metadata, ECS container credentials). The region is determined by `getAWSRegion()` (`src/utils/envUtils.ts:L96`), which reads `AWS_REGION`, then `AWS_DEFAULT_REGION`, and falls back to `us-east-1`.
+
+**Google Vertex AI** (`src/services/api/client.ts:L221-L297`). Authentication uses `GoogleAuth` from `google-auth-library` with the `https://www.googleapis.com/auth/cloud-platform` scope. The implementation carefully avoids a 12-second GCE metadata server timeout by checking for project environment variables (`GCLOUD_PROJECT`, `GOOGLE_CLOUD_PROJECT`) and credential key files (`GOOGLE_APPLICATION_CREDENTIALS`) before deciding whether to set `projectId` from `ANTHROPIC_VERTEX_PROJECT_ID` (`src/services/api/client.ts:L253-L288`). If neither environment variables nor key files are present, the `projectId` fallback prevents `GoogleAuth` from reaching the metadata server, which would stall startup for 12 seconds outside GCP. The `refreshGcpCredentialsIfNeeded()` function (`src/utils/auth.ts`) triggers credential refresh when cached GCP credentials are expired. The region is per-model, resolved by `getVertexRegionForModel()`, with `CLOUD_ML_REGION` as the default and `us-east5` as the ultimate fallback (`src/utils/envUtils.ts:L103`).
+
+**Azure Foundry** (`src/services/api/client.ts:L191-L219`). When `ANTHROPIC_FOUNDRY_API_KEY` is set, the Foundry SDK uses it directly. Otherwise, `DefaultAzureCredential` from `@azure/identity` tries multiple auth methods in sequence: environment variables (`AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`), managed identity (for Azure-hosted workloads), and Azure CLI credentials. The `getBearerTokenProvider()` function creates a callback that returns a fresh Azure AD token for the `https://cognitiveservices.azure.com/.default` scope, which the Foundry SDK calls on each request (`src/services/api/client.ts:L206-L209`).
+
 ## Developer takeaways for building a long-running agent
 
 1. **Latch beta headers once activated.** Toggling beta features on and off invalidates the prompt cache. Latching keeps the header on for the rest of the session, preventing cache busting.
@@ -2588,6 +3098,15 @@ HER section 13.5 provides budget reality checks: "$297 for a $50k contract (best
 6. **Shallow-clone cached parse results.** LRU-cached parsers return the same object reference for the same input. Mutating it poisons the cache for subsequent callers.
 
 7. **Gate new model capabilities behind beta headers.** Do not auto-enable new capabilities. Gate them behind explicit beta headers so the harness opts in at its own pace after validation.
+
+8. **Use PKCE for OAuth in CLI applications.** Desktop and CLI applications cannot keep a client secret; PKCE replaces the secret with a per-flow cryptographic proof that prevents authorization code interception without requiring a pre-shared credential.
+
+9. **Pipe credentials via stdin, not argv.** Process monitors log command-line arguments. Using `security -i` (interactive stdin) with hex-encoded payloads keeps credentials out of the process list and avoids shell metacharacter issues.
+
+10. **Implement stale-while-error for credential reads.** A transient failure in the secure storage backend (e.g., a keychain spawn timeout) should serve the last known good value rather than treating the credential as absent, which would cascade into spurious "Not logged in" errors across the application.
+
+11. **Refresh tokens proactively with a time buffer.** Waiting for a 401 to trigger refresh adds a failed request to the critical path. A 5-minute buffer before expiry accounts for clock skew and refresh latency while avoiding unnecessary refresh cycles.
+
 # System Prompts and Prompt Assembly
 
 ## Overview
@@ -9561,6 +10080,156 @@ The `getAgentStatuses()` function at `src/utils/tasks.ts:L763-L798` determines a
 
 When a teammate is killed or shuts down, the `unassignTeammateTasks()` function at `src/utils/tasks.ts:L818-L860` unassigns all open tasks and builds a notification message listing the affected tasks. The function resets each task's status to `pending` and clears the owner field, making the tasks available for reassignment. The notification message includes the task IDs and subjects, so the coordinator can quickly identify which tasks need attention.
 
+### Structural verification gates: from prompt to code
+
+The verification nudge in `TaskUpdateTool` at `src/tools/TaskUpdateTool/TaskUpdateTool.ts:L333-L349` is a soft gate: it appends a text reminder to the tool result when the main-thread agent completes a batch of three or more tasks without any verification step. The nudge fires only when `feature('VERIFICATION_AGENT')` and the `tengu_hive_evidence` GrowthBook experiment are both active, and only for the main-thread agent (`!context.agentId`). Its check is a regex match on task subjects (`/verif/i.test(t.subject)`), meaning an agent that names its task "Verify results" satisfies the check regardless of whether actual verification occurred.
+
+This is the gap: the gate is advisory, not structural. A verification worker dispatched by the coordinator receives a system prompt instruction to "verify with fresh context," but nothing in the runtime prevents that worker from calling `TaskUpdate` with `status: "completed"` after producing a cursory "looks good" without running any tests. The coordinator's requirement is enforced by prompt, not by code. Under context pressure -- when the model is near its context limit and the remaining tasks look straightforward -- the verification step is the first thing skipped.
+
+The hook system already provides the machinery to close this gap. The `PreToolUse` hook event fires before every tool call, and a command hook can emit a JSON response with `decision: "block"` to prevent the tool from executing (`src/utils/hooks.ts:L3328-L3334`). The hook receives the full `PreToolUseHookInput`, which includes `tool_name`, `tool_input` (the proposed `TaskUpdate` arguments), and `transcript_path` (the path to the session's conversation transcript, set by `createBaseHookInput()` at `src/utils/hooks.ts:L322`). This gives an external script everything it needs to inspect the agent's recent actions before allowing a status transition.
+
+The proposed implementation uses a `PreToolUse` hook scoped to `TaskUpdate` that blocks the `pending -> completed` and `in_progress -> completed` transitions unless the transcript contains evidence of a verification step. The hook configuration in `settings.json`:
+
+```json
+// Proposed hook configuration -- not in cc source, recommended addition
+// In .claude/settings.json or .claude/settings.local.json:
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /path/to/verify-before-complete.js"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The `matcher` field ensures this hook fires only for `TaskUpdate` calls, not for every tool invocation. The hook command receives the `PreToolUseHookInput` on stdin as JSON, which includes `tool_input.status` (the proposed new status) and `transcript_path` (the filesystem path to the conversation transcript).
+
+```typescript
+// verify-before-complete.js -- Proposed implementation, not in cc source
+// Reads PreToolUseHookInput from stdin, checks whether a verification
+// step occurred before allowing a status transition to 'completed'.
+import { readFileSync } from 'fs'
+import { stdin } from 'process'
+
+async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = []
+  for await (const chunk of stdin) chunks.push(chunk)
+  return Buffer.concat(chunks).toString('utf8')
+}
+
+const VERIFICATION_PATTERNS = [
+  /\btest\b/i,    // npm test, pytest, go test, etc.
+  /\bcheck\b/i,   // type-check, lint --check, etc.
+  /\bverify\b/i,  // explicit verification commands
+  /\blint\b/i,    // eslint, biome lint, etc.
+  /\bbuild\b/i,   // tsc --noEmit, cargo build, etc.
+]
+
+async function main() {
+  const input = JSON.parse(await readStdin())
+  const { tool_input, transcript_path } = input
+
+  // Only gate transitions to 'completed'
+  if (tool_input.status !== 'completed') {
+    process.exit(0) // Allow non-completion updates
+  }
+
+  // Read the transcript and extract recent tool calls
+  let transcript: Array<{ type: string; content?: unknown }>
+  try {
+    transcript = JSON.parse(readFileSync(transcript_path, 'utf8'))
+  } catch {
+    // If the transcript is unreadable, allow the transition
+    // rather than blocking all completions on a read error
+    process.exit(0)
+  }
+
+  // Walk backward through the transcript to find tool_use blocks.
+  // Check whether any of the last 10 tool calls was a Bash command
+  // matching one of the verification patterns.
+  const recentToolCalls = transcript
+    .filter((msg) => msg.type === 'assistant' && Array.isArray(msg.content))
+    .flatMap((msg) => (msg.content as Array<{ type: string; name?: string; input?: Record<string, unknown> }>))
+    .filter((block) => block.type === 'tool_use')
+    .slice(-10)
+
+  const hasVerification = recentToolCalls.some((call) =>
+    call.name === 'Bash' &&
+    typeof call.input?.command === 'string' &&
+    VERIFICATION_PATTERNS.some((pat) => pat.test(call.input!.command as string))
+  )
+
+  if (!hasVerification) {
+    // Emit JSON to block the transition
+    const response = {
+      decision: 'block',
+      reason:
+        'Cannot mark task as completed without running verification. ' +
+        'Run tests, lint, or type-check before completing this task.',
+    }
+    console.log(JSON.stringify(response))
+    process.exit(0)
+  }
+
+  // Verification found -- allow the transition
+  process.exit(0)
+}
+
+main().catch(() => process.exit(0))
+```
+
+The hook script exits with code 0 in all paths. The blocking behavior comes from the JSON output: when `decision` is `"block"`, the hook executor at `src/utils/hooks.ts:L3328-L3334` treats the result as a blocking error, which propagates through `runPreToolUseHooks()` at `src/services/tools/toolHooks.ts:L481-L497` as a `deny` permission result. The model receives the block reason as a tool result message and can act on it -- typically by running the missing verification command and retrying the `TaskUpdate`.
+
+The following diagram shows the interception flow when a worker attempts to complete a task without verification:
+
+```mermaid
+sequenceDiagram
+    participant Worker as Worker Agent
+    participant TUT as TaskUpdateTool
+    participant Hook as PreToolUse Hook
+    participant Script as verify-before-complete.js
+    participant Transcript as Session Transcript
+
+    Worker->>TUT: TaskUpdate(taskId="3", status="completed")
+    TUT->>Hook: PreToolUse fires for "TaskUpdate"
+    Hook->>Script: Spawn with PreToolUseHookInput on stdin
+    Script->>Transcript: Read transcript_path, extract last 10 tool calls
+    alt No verification found in recent tools
+        Script-->>Hook: {"decision":"block","reason":"Run tests first"}
+        Hook-->>TUT: PermissionResult{behavior:"deny"}
+        TUT-->>Worker: "Cannot mark task as completed without verification"
+        Worker->>Worker: Runs: npm test
+        Worker->>TUT: TaskUpdate(taskId="3", status="completed")
+        TUT->>Hook: PreToolUse fires again
+        Hook->>Script: Spawn with updated transcript
+        Script->>Transcript: Finds "npm test" in recent tool calls
+        Script-->>Hook: exit(0), no JSON output
+        Hook-->>TUT: No hook decision (passthrough)
+        TUT->>TUT: Executes TaskCompleted hooks, updates status
+        TUT-->>Worker: "Updated task #3 status"
+    else Verification found
+        Script-->>Hook: exit(0), no JSON output
+        Hook-->>TUT: No hook decision (passthrough)
+        TUT-->>Worker: "Updated task #3 status"
+    end
+```
+
+This approach works because of how cc layers its hook and permission systems. The `PreToolUse` hook fires before the tool's own `call()` method executes, and a `deny` result from the hook prevents the tool from running at all (`src/services/tools/toolHooks.ts:L487-L497`). The tool's internal `executeTaskCompletedHooks()` at `src/tools/TaskUpdateTool/TaskUpdateTool.ts:L235-L264` fires only after the `PreToolUse` gate passes, so the two hook layers compose cleanly: the `PreToolUse` hook enforces "did you verify?", and the `TaskCompleted` hook can enforce additional quality gates like "did CI pass?"
+
+**What counts as verification.** The pattern list in the script above is a starting point, not a specification. Reasonable additions include: `Read` calls targeting test output files, `Grep` calls searching for error patterns in build artifacts, and tool calls to CI status APIs. The pattern list should be project-specific -- a Rust project might require `cargo test` or `cargo clippy`, while a Python project might require `pytest` or `mypy`. The hook script can read a project-level configuration file (e.g., `.claude/verification-patterns.json`) to customize the patterns.
+
+**Limitations.** This gate is a heuristic, not a proof. A confused model could run `echo test` to satisfy the check, or a malicious prompt injection could instruct the model to run a no-op command matching the pattern. The defense is probabilistic: it catches the dominant failure mode where the model skips verification due to context pressure or optimization shortcuts, not the adversarial case where the model actively tries to circumvent the gate. In practice, the context-pressure skip is responsible for the vast majority of verification failures in multi-agent swarms. The adversarial case requires a different class of defense (output validation, human review) that is outside the scope of the hook system.
+
+The key insight is that moving from a prompt-based nudge to a structural hook transforms verification from a suggestion the model can ignore into a gate the model must satisfy. The model still chooses how to satisfy the gate -- it picks which tests to run, which checks to perform -- but it cannot skip the category entirely. This matches HER's principle that harness constraints should be implemented in code rather than in prompt text (Section 12.3), because prompt-based constraints degrade under context pressure while code-based constraints remain constant.
+
 ## Where cc diverges from the published pattern
 
 ### JSON vs Markdown for task lists
@@ -12885,7 +13554,7 @@ const MAX_COMPACT_STREAMING_RETRIES = 2
 
 This is not mentioned in the HER's description of progressive compaction. The retry is controlled by the `tengu_compact_streaming_retry` GrowthBook flag and only fires when the streaming attempt produces no response. It uses exponential backoff via `getRetryDelay` and is distinct from the prompt-too-long retry loop (which handles a different failure mode).
 
-## Developer takeaways
+## Developer takeaways for building a long-running agent
 
 1. **Compaction is a hierarchy, not a single event.** Each stage has different trigger conditions, latency profiles, and information-loss characteristics. History snip is free (deterministic), microcompact is cheap (no model call for the cached path), and autocompact is expensive (requires an API call).
 
@@ -20979,6 +21648,109 @@ sequenceDiagram
 7. `REPL.onSubmit` processes the input through `handlePromptSubmit`, which handles slash commands, mode prefixes, and agent routing.
 8. The input is sent to `query()` in `src/query.ts` for model processing.
 
+### QueryGuard: preventing concurrent queries
+
+Between step 7 (the REPL processing a submission) and step 8 (the actual query call), a subtle concurrency gap exists. React batches state updates, so a synchronous check of `isLoading` via `useState` can read stale values when two submissions overlap in the same event loop tick. The `QueryGuard` class (`src/utils/QueryGuard.ts`) solves this with a synchronous three-state machine that lives outside React's batching boundary.
+
+The three states are `idle`, `dispatching`, and `running` (`src/utils/QueryGuard.ts:L30`). The `_status` field transitions through these states via five methods:
+
+- **`reserve()`** (`src/utils/QueryGuard.ts:L38`): transitions `idle` to `dispatching`. Returns `false` if the guard is not idle, blocking any concurrent dequeue. The queue processor calls this before pulling the next item.
+- **`cancelReservation()`** (`src/utils/QueryGuard.ts:L49`): transitions `dispatching` back to `idle`. Called when the queue processor discovers the queue is empty after dequeuing, cleaning up the reservation without starting a query.
+- **`tryStart()`** (`src/utils/QueryGuard.ts:L61`): transitions `idle` or `dispatching` to `running`. Returns the current `_generation` counter on success, or `null` if a query is already running. This method accepts transitions from both `idle` (direct user submission) and `dispatching` (queue processor path), making it the single entry point for all query starts.
+- **`end(generation)`** (`src/utils/QueryGuard.ts:L74`): transitions `running` back to `idle`, but only if the provided `generation` matches `_generation`. Returns `true` on success and `false` on mismatch. This is the stale-finally-block defense: when a query is cancelled and a new one starts, the old query's `finally` block still runs, calling `end()`. Because the generation has incremented, the stale `end()` returns `false` and the caller skips cleanup that would corrupt the new query's state.
+- **`forceEnd()`** (`src/utils/QueryGuard.ts:L88`): force-resets to `idle` regardless of state, and increments `_generation` to invalidate any outstanding `finally` blocks. Used by the cancel handler (`onCancel`) where the running query must be terminated immediately.
+
+```mermaid
+stateDiagram-v2
+    [*] --> idle
+    idle --> dispatching : reserve()
+    idle --> running : tryStart() [direct submit]
+    dispatching --> running : tryStart()
+    dispatching --> idle : cancelReservation()
+    running --> idle : end(gen) [gen matches]
+    running --> idle : forceEnd()
+```
+
+The `isActive` getter (`src/utils/QueryGuard.ts:L99`) returns `true` for both `dispatching` and `running`. This is the key insight: during the async gap between queue dequeue and `tryStart()`, the guard is in the `dispatching` state, preventing re-entry from the queue processor even though no query is yet executing.
+
+The class implements the `useSyncExternalStore` interface required by React 18 for external state synchronization. The `subscribe` method (`src/utils/QueryGuard.ts:L111`) delegates to a `Signal` created by `createSignal()` from `src/utils/signal.ts`, which is a lightweight listener-set primitive. The `getSnapshot` method (`src/utils/QueryGuard.ts:L114`) returns `isActive` as a boolean. Together they allow a React component to subscribe to guard state changes without polling:
+
+```typescript
+// src/utils/QueryGuard.ts:L110-L116 — useSyncExternalStore interface
+subscribe = this._changed.subscribe
+
+getSnapshot = (): boolean => {
+  return this._status !== 'idle'
+}
+```
+
+The `_generation` counter is a monotonically increasing integer (`src/utils/QueryGuard.ts:L31`) that increments on each `tryStart()` and `forceEnd()`. It never wraps in practice because a session would need to exceed `Number.MAX_SAFE_INTEGER` queries. The counter solves a race that arises from JavaScript's microtask scheduling: when a query's promise is rejected (e.g., via `AbortController.abort()`), the `finally` block runs asynchronously. If a new query has already started by the time the `finally` fires, the stale block would call `end()` and reset the guard, incorrectly marking the new query as idle. The generation check prevents this: `end(oldGeneration)` returns `false` because `_generation` has already advanced.
+
+### Speculative execution: merge and rollback mechanics
+
+cc can pre-execute tool calls speculatively while waiting for the user to accept a prompt suggestion. When the user accepts, the speculated work is merged into the real session; when the user rejects or types something different, the work is rolled back and discarded. This machinery lives in `src/services/PromptSuggestion/speculation.ts`.
+
+**Overlay filesystem.** Speculative writes never touch the real filesystem. Instead, write operations target an overlay directory at `{claudeTempDir}/speculation/{pid}/{id}`, where `pid` is the current process ID and `id` is a random 8-character UUID prefix (`src/services/PromptSuggestion/speculation.ts:L80-L82`). The overlay implements copy-on-write semantics: before a write tool modifies a file, the original is copied to the overlay (`src/services/PromptSuggestion/speculation.ts:L529-L539`), then the write proceeds against the overlay path. Read tools check whether the file has been previously written to the overlay and redirect reads accordingly (`src/services/PromptSuggestion/speculation.ts:L542-L546`), ensuring the speculative agent sees its own modifications.
+
+Three functions manage the overlay lifecycle:
+
+- **`copyOverlayToMain()`** (`src/services/PromptSuggestion/speculation.ts:L99`): on acceptance, iterates the `writtenPaths` set and copies each overlay file back to the real filesystem using `fs/promises.copyFile`. Returns `false` if any copy fails, logging each failure for debugging.
+- **`safeRemoveOverlay()`** (`src/services/PromptSuggestion/speculation.ts:L72`): on rollback or error, removes the overlay directory tree via `fs.rm` with `recursive: true`, `force: true`, `maxRetries: 3`, and `retryDelay: 100ms`. The callback-based `rm` with a no-op handler makes this fire-and-forget cleanup.
+- **`mergeFileStateCaches()`** (`src/utils/fileStateCache.ts:L129`): after merging overlay files, reconciles the REPL's file state cache. For each entry in the speculation's extracted cache, it overwrites the main cache entry only if the speculated version has a newer timestamp.
+
+**Safety bounds.** Speculation enforces strict limits to prevent runaway execution:
+
+- `MAX_SPECULATION_TURNS = 20` and `MAX_SPECULATION_MESSAGES = 100` (`src/services/PromptSuggestion/speculation.ts:L58-L59`) cap the agent loop. If either limit is reached, the abort controller fires.
+- Only tools in the `SAFE_READ_ONLY_TOOLS` set (`src/services/PromptSuggestion/speculation.ts:L62-L70`) are allowed without restriction: `Read`, `Glob`, `Grep`, `ToolSearch`, `LSP`, `TaskGet`, and `TaskList`.
+- Write tools in the `WRITE_TOOLS` set (`src/services/PromptSuggestion/speculation.ts:L61`) -- `Edit`, `Write`, and `NotebookEdit` -- operate on the overlay and are further gated by the current permission mode. If the user's permission mode does not allow auto-accepting edits (e.g., `plan` mode without bypass), speculation stops at the edit boundary rather than proceeding without authorization (`src/services/PromptSuggestion/speculation.ts:L466-L494`).
+- Bash commands are validated via `checkReadOnlyConstraints` and `commandHasAnyCd` (`src/services/PromptSuggestion/speculation.ts:L577-L598`). Any command that fails the read-only check or contains `cd` triggers a `bash` boundary and aborts speculation.
+- All other tools (WebFetch, WebSearch, mcp tools, etc.) are denied by default (`src/services/PromptSuggestion/speculation.ts:L611-L631`), stopping speculation at a `denied_tool` boundary.
+
+**CompletionBoundary.** When speculation stops, it records why via the `CompletionBoundary` type (`src/state/AppStateStore.ts:L41-L50`), a discriminated union with four variants: `complete` (agent finished naturally, includes `outputTokens`), `bash` (stopped at a non-read-only bash command, includes the `command` string), `edit` (stopped at a file edit requiring permission, includes `toolName` and `filePath`), and `denied_tool` (stopped at an unknown tool, includes `toolName` and `detail`). Each variant carries a `completedAt` timestamp used to compute `timeSavedMs`.
+
+**ActiveSpeculationState.** The `SpeculationState` type (`src/state/AppStateStore.ts:L58-L77`) is either `{ status: 'idle' }` or an `active` object that tracks: the speculation `id`, an `abort` function, the `startTime`, mutable refs for `messagesRef` and `writtenPathsRef` (avoiding per-message array spread), the current `boundary`, `suggestionLength`, `toolUseCount`, and an optional `pipelinedSuggestion` for chaining a follow-up suggestion while the user reviews the current one.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant REPL
+    participant Speculation
+    participant OverlayFS
+    participant ForkedAgent
+
+    User->>REPL: sees prompt suggestion
+    REPL->>Speculation: startSpeculation(suggestion)
+    Speculation->>OverlayFS: mkdir overlay/{pid}/{id}
+    Speculation->>ForkedAgent: runForkedAgent(suggestion)
+
+    loop tool calls
+        ForkedAgent->>Speculation: canUseTool(tool, input)
+        alt write tool
+            Speculation->>OverlayFS: copy-on-write original
+            Speculation-->>ForkedAgent: allow (rewritten path)
+        else read-only tool
+            Speculation-->>ForkedAgent: allow
+        else unsafe tool / bash
+            Speculation-->>ForkedAgent: deny (boundary set)
+        end
+    end
+
+    alt user accepts suggestion
+        User->>REPL: submit matching input
+        REPL->>Speculation: acceptSpeculation(state)
+        Speculation->>OverlayFS: copyOverlayToMain()
+        Speculation->>OverlayFS: safeRemoveOverlay()
+        Speculation->>REPL: SpeculationResult{messages, boundary, timeSavedMs}
+        REPL->>REPL: inject speculated messages
+    else user types something different
+        User->>REPL: different input
+        REPL->>Speculation: abortSpeculation()
+        Speculation->>OverlayFS: safeRemoveOverlay()
+    end
+```
+
+**Telemetry.** Every speculation outcome is logged via `logSpeculation()` (`src/services/PromptSuggestion/speculation.ts:L124`) as a `tengu_speculation` analytics event. The payload includes `speculation_id`, `outcome` (one of `accepted`, `aborted`, or `error`), `duration_ms`, `suggestion_length`, `tools_executed` (count of successful tool results), `completed` (whether a boundary was reached), `boundary_type`, `boundary_tool`, and `boundary_detail`. On acceptance, additional fields capture `message_count`, `time_saved_ms`, and `is_pipelined`. On error, the event includes `error_type`, `error_message` (truncated to 200 characters), and `error_phase` (`start` or `accept`).
+
 ### Typeahead suggestion pipeline
 
 The typeahead engine aggregates suggestions from multiple sources based on the current input context. The `useTypeahead` hook examines the input text and cursor position to determine which suggestion sources are relevant. It supports five primary trigger patterns:
@@ -21636,6 +22408,165 @@ sequenceDiagram
 ```
 
 The bridge does not make permission decisions itself; it routes the request to the connected client and delivers the response back. This design ensures that the bridge does not need to understand the permission model -- it is a pure transport layer.
+
+### The Agent SDK interface
+
+The bridge chapter so far has described how IDE clients and the claude.ai web UI communicate with cc through the REPL bridge. But there is a third class of consumer: programmatic SDK clients. The Agent SDK provides a TypeScript API that lets external programs create sessions, send queries, define custom tools, and intercept permission decisions -- all without launching a terminal or IDE. Three source files define this interface: `src/entrypoints/sdk/coreTypes.ts` declares the hook event catalog and exit reasons, `src/entrypoints/agentSdkTypes.ts` exports the public function signatures, and `src/entrypoints/sdk/controlSchemas.ts` defines the Zod-validated control protocol.
+
+### Core types: hook events and exit reasons
+
+The SDK exposes two const arrays that enumerate every lifecycle point an SDK consumer can observe. `HOOK_EVENTS` lists 27 event names that cover the full agent lifecycle from session start through tool use, compaction, subagent coordination, and file-system changes (`src/entrypoints/sdk/coreTypes.ts:L25-L53`):
+
+```typescript
+// src/entrypoints/sdk/coreTypes.ts:L25-L53 — Hook event catalog
+export const HOOK_EVENTS = [
+  'PreToolUse',        'PostToolUse',       'PostToolUseFailure',
+  'Notification',      'UserPromptSubmit',  'SessionStart',
+  'SessionEnd',        'Stop',              'StopFailure',
+  'SubagentStart',     'SubagentStop',      'PreCompact',
+  'PostCompact',       'PermissionRequest', 'PermissionDenied',
+  'Setup',             'TeammateIdle',      'TaskCreated',
+  'TaskCompleted',     'Elicitation',       'ElicitationResult',
+  'ConfigChange',      'WorktreeCreate',    'WorktreeRemove',
+  'InstructionsLoaded','CwdChanged',        'FileChanged',
+] as const
+```
+
+Each event name maps to a specialized Zod schema in `src/entrypoints/sdk/coreSchemas.ts` that adds event-specific fields. For example, `PreToolUseHookInputSchema` extends `BaseHookInputSchema` with `tool_name`, `tool_input`, and `tool_use_id` (`src/entrypoints/sdk/coreSchemas.ts:L414-L423`), while `SessionStartHookInputSchema` adds `source` (one of `startup`, `resume`, `clear`, `compact`) and `model` (`src/entrypoints/sdk/coreSchemas.ts:L493-L502`). Every hook input carries a base payload of `session_id`, `transcript_path`, `cwd`, and optional `agent_id` and `agent_type` fields, giving the consumer enough context to correlate events across subagents (`src/entrypoints/sdk/coreSchemas.ts:L387-L411`).
+
+`EXIT_REASONS` enumerates the six ways a session can end (`src/entrypoints/sdk/coreTypes.ts:L55-L62`):
+
+```typescript
+// src/entrypoints/sdk/coreTypes.ts:L55-L62 — Exit reason catalog
+export const EXIT_REASONS = [
+  'clear',                       // user cleared conversation
+  'resume',                      // session suspended for later resume
+  'logout',                      // user logged out
+  'prompt_input_exit',           // user exited at the prompt
+  'other',                       // catch-all
+  'bypass_permissions_disabled', // dangerous permission mode revoked
+] as const
+```
+
+The `SessionEnd` hook input carries the exit reason, allowing SDK consumers to distinguish between intentional exits (user-initiated `clear` or `logout`) and forced shutdowns (`bypass_permissions_disabled`).
+
+### Agent SDK function surface
+
+The public API surface is defined in `src/entrypoints/agentSdkTypes.ts`. Every exported function throws `'not implemented'` in the type-declaration module; the actual implementations are injected at runtime by the SDK loader. This is the same dependency-injection pattern used by `BridgeCoreParams` -- the type declarations define the contract, and the runtime wires in the real code. The API has three tiers.
+
+**Tier 1: One-shot query.** The `query()` function (`src/entrypoints/agentSdkTypes.ts:L112-L122`) sends a prompt and returns an async iterable of `SDKMessage` objects. It accepts either a plain string or an `AsyncIterable<SDKUserMessage>` for streaming input. This is the lowest-ceremony entry point -- no session management, no state persistence:
+
+```typescript
+// src/entrypoints/agentSdkTypes.ts:L116-L119 — One-shot query signature
+export function query(_params: {
+  prompt: string | AsyncIterable<SDKUserMessage>
+  options?: Options
+}): Query
+```
+
+**Tier 2: Persistent sessions (alpha).** For multi-turn conversations, the `unstable_v2_createSession()` function (`src/entrypoints/agentSdkTypes.ts:L129-L133`) returns an `SDKSession` handle that persists across multiple queries. The companion `unstable_v2_resumeSession()` (`src/entrypoints/agentSdkTypes.ts:L140-L145`) reconnects to a previous session by ID. Both are marked `@alpha`, indicating that the API contract is not yet stable:
+
+```typescript
+// src/entrypoints/agentSdkTypes.ts:L129-L145 — Persistent session API
+export function unstable_v2_createSession(
+  _options: SDKSessionOptions,
+): SDKSession { ... }
+
+export function unstable_v2_resumeSession(
+  _sessionId: string,
+  _options: SDKSessionOptions,
+): SDKSession { ... }
+```
+
+**Tier 3: Custom tools.** The `tool()` function (`src/entrypoints/agentSdkTypes.ts:L73-L88`) defines an MCP tool with a Zod input schema and an async handler. The `createSdkMcpServer()` function (`src/entrypoints/agentSdkTypes.ts:L103-L107`) bundles one or more tool definitions into an MCP server instance that runs in-process. This allows SDK consumers to extend the agent's tool set without deploying a separate MCP server process:
+
+```typescript
+// src/entrypoints/agentSdkTypes.ts:L73-L88 — Custom tool definition
+export function tool<Schema extends AnyZodRawShape>(
+  _name: string,
+  _description: string,
+  _inputSchema: Schema,
+  _handler: (
+    args: InferShape<Schema>,
+    extra: unknown,
+  ) => Promise<CallToolResult>,
+  _extras?: {
+    annotations?: ToolAnnotations
+    searchHint?: string
+    alwaysLoad?: boolean
+  },
+): SdkMcpToolDefinition<Schema>
+```
+
+The `annotations` field (from `@modelcontextprotocol/sdk`) marks tools as `readOnly`, `destructive`, or `openWorld`, which feeds into cc's permission classification. The `alwaysLoad` flag prevents the tool from being deferred by the tool-budget optimizer (Chapter 13), ensuring it is always present in the system prompt.
+
+### Control protocol: the permission channel
+
+The control protocol, defined in `src/entrypoints/sdk/controlSchemas.ts`, is the wire format for bidirectional communication between the SDK consumer and the cc CLI process. It is the mechanism through which SDK consumers implement their own permission UIs.
+
+An `SDKControlRequest` wraps a `request_id` and an inner request discriminated by `subtype` (`src/entrypoints/sdk/controlSchemas.ts:L578-L584`). The inner union contains 21 subtypes, from `can_use_tool` (permission request) through `initialize`, `interrupt`, `mcp_status`, `get_context_usage`, and `elicitation`. The permission subtype `SDKControlPermissionRequestSchema` carries the `tool_name`, `input` (the tool's arguments), `tool_use_id`, and optional `permission_suggestions` that hint at rules the consumer could auto-apply (`src/entrypoints/sdk/controlSchemas.ts:L106-L122`):
+
+```typescript
+// src/entrypoints/sdk/controlSchemas.ts:L106-L122 — Permission request payload
+SDKControlPermissionRequestSchema = z.object({
+  subtype: z.literal('can_use_tool'),
+  tool_name: z.string(),
+  input: z.record(z.string(), z.unknown()),
+  permission_suggestions: z.array(PermissionUpdateSchema()).optional(),
+  blocked_path: z.string().optional(),
+  decision_reason: z.string().optional(),
+  title: z.string().optional(),
+  display_name: z.string().optional(),
+  tool_use_id: z.string(),
+  agent_id: z.string().optional(),
+  description: z.string().optional(),
+})
+```
+
+An `SDKControlResponse` wraps either a success response (with an optional `response` payload) or an error response (with an `error` string and optional `pending_permission_requests` for re-queuing) (`src/entrypoints/sdk/controlSchemas.ts:L605-L610`). An `SDKControlCancelRequest` cancels an outstanding control request by `request_id` (`src/entrypoints/sdk/controlSchemas.ts:L612-L619`), which is used when the user navigates away before responding to a permission prompt.
+
+The stdin/stdout message types combine these protocols into two aggregate unions. `StdoutMessageSchema` covers everything the CLI writes: `SDKMessage`, streamlined messages, control responses, control requests (outbound permission prompts), cancel requests, and keep-alive pings (`src/entrypoints/sdk/controlSchemas.ts:L642-L653`). `StdinMessageSchema` covers everything the CLI reads: user messages, control requests (inbound commands like `initialize` and `set_model`), control responses (permission decisions), keep-alive, and environment variable updates (`src/entrypoints/sdk/controlSchemas.ts:L655-L663`).
+
+### SDK session lifecycle
+
+The following diagram shows the complete lifecycle of an SDK session, from creation through query execution and permission resolution:
+
+```mermaid
+sequenceDiagram
+    participant Consumer as SDK Consumer
+    participant SDK as agentSdkTypes
+    participant CLI as cc CLI Process
+    participant Model as Anthropic API
+
+    Consumer->>SDK: unstable_v2_createSession(options)
+    SDK->>CLI: spawn process, stdin/stdout pipes
+    CLI-->>SDK: SDKControlRequest(initialize)
+    SDK-->>Consumer: SDKSession handle
+
+    Consumer->>SDK: session.query(prompt)
+    SDK->>CLI: SDKUserMessage via stdin
+    CLI->>Model: API request with tools
+    Model-->>CLI: response with tool_use
+
+    CLI-->>SDK: SDKControlRequest(can_use_tool)
+    SDK-->>Consumer: permission callback
+    Consumer-->>SDK: allow / deny
+    SDK->>CLI: SDKControlResponse(allow)
+
+    CLI->>CLI: execute tool
+    CLI->>Model: tool result + continue
+    Model-->>CLI: final response
+    CLI-->>SDK: SDKMessage (assistant)
+    SDK-->>Consumer: async iterable yields message
+
+    Consumer->>SDK: session.close()
+    SDK->>CLI: SIGTERM
+    CLI-->>SDK: SDKMessage (result)
+```
+
+The initialization handshake is the critical bootstrapping step. When the SDK spawns the CLI process, the CLI sends an `SDKControlRequest` with subtype `initialize` back through stdout. This request carries the session's hook registrations, MCP server names, and optional agent definitions (`src/entrypoints/sdk/controlSchemas.ts:L57-L75`). The SDK consumer responds with an `SDKControlInitializeResponse` containing available commands, agent info, models, and account metadata (`src/entrypoints/sdk/controlSchemas.ts:L77-L95`). Only after this handshake completes can the consumer send queries.
+
+The permission flow is synchronous from the CLI's perspective: the CLI blocks on the tool call until the SDK consumer responds with `allow` or `deny`. If the consumer disconnects before responding, the CLI treats the pending request as denied and the tool call fails. The `SDKControlCancelRequest` provides a clean way to withdraw a permission prompt without triggering a deny -- the CLI drops the request and continues as if the tool call was never attempted.
 
 ## Edge cases and failure modes
 
@@ -25023,6 +25954,53 @@ const GROWTHBOOK_REFRESH_INTERVAL_MS =
     : 20 * 60 * 1000 // 20 min (for ants)
 ```
 
+### GrowthBook evaluation path taxonomy
+
+Every feature-flag read in cc passes through one of six exported evaluation functions. Choosing the wrong one causes either a blocking startup penalty or a stale-value bug, so the codebase encodes the trade-off directly in each function's name. The six paths divide into two groups: *non-blocking* paths that return immediately from cache, and *blocking* paths that await GrowthBook initialization (up to 5 seconds). Within each group, the paths differ in fallback behavior, deprecation status, and migration role.
+
+**1. `getFeatureValue_CACHED_MAY_BE_STALE<T>(feature, defaultValue): T`** (`src/services/analytics/growthbook.ts:L734-L775`). The recommended path for all new code. Synchronous and non-blocking. It checks four override layers in order (see below), then reads the in-memory `remoteEvalFeatureValues` Map, then falls back to the disk cache (`cachedGrowthBookFeatures` in `~/.claude.json`), and finally returns `defaultValue`. Because the function never awaits initialization, it is safe for hot paths such as render loops and permission checks where blocking would freeze the UI. Exposure logging is deferred: if `experimentDataByFeature` has data for the feature, the exposure is logged immediately via `logExposureForFeature`; otherwise the feature key is added to `pendingExposures` and logged after init completes (`src/services/analytics/growthbook.ts:L753-L757`).
+
+**2. `getFeatureValue_DEPRECATED<T>(feature, defaultValue): Promise<T>`** (`src/services/analytics/growthbook.ts:L719-L724`). The legacy blocking path. Calls `getFeatureValueInternal`, which awaits `initializeGrowthBook()` -- blocking the caller until the GrowthBook client has fetched its initial payload from the server or timed out after 5 seconds (`src/services/analytics/growthbook.ts:L554`). After init, it reads `remoteEvalFeatureValues` or falls back to `client.getFeatureValue()`. This path slows startup and should not be used in new code. It remains exported because `getDynamicConfig_BLOCKS_ON_INIT` delegates to it.
+
+**3. `getFeatureValue_CACHED_WITH_REFRESH<T>(feature, defaultValue, _refreshIntervalMs): T`** (`src/services/analytics/growthbook.ts:L783-L789`). Deprecated and redundant. The `_refreshIntervalMs` parameter is unused (prefixed with underscore). The function body is a direct delegation to `getFeatureValue_CACHED_MAY_BE_STALE`. It exists because the per-feature TTL refresh it once provided is now handled globally by `setupPeriodicGrowthBookRefresh`.
+
+**4. `checkStatsigFeatureGate_CACHED_MAY_BE_STALE(gate): boolean`** (`src/services/analytics/growthbook.ts:L804-L837`). A migration helper for the Statsig-to-GrowthBook transition. Non-blocking and synchronous. After checking env and config overrides, it reads the GrowthBook disk cache (`cachedGrowthBookFeatures`). If the feature is absent there, it falls back to `cachedStatsigGates` -- a legacy cache from the previous Statsig integration. This dual-cache fallback ensures that gates migrated from Statsig continue to work even if the GrowthBook cache has not yet been populated for them. The function returns `boolean` (not generic `T`) because Statsig gates are always boolean.
+
+**5. `getDynamicConfig_BLOCKS_ON_INIT<T>(configName, defaultValue): Promise<T>`** (`src/services/analytics/growthbook.ts:L1136-L1141`). Blocking variant for configuration objects. Delegates to `getFeatureValue_DEPRECATED`. In GrowthBook's model, dynamic configs are features with object values; the function exists for Statsig API parity so call sites that previously used `Statsig.getConfig()` can migrate without restructuring.
+
+**6. `getDynamicConfig_CACHED_MAY_BE_STALE<T>(configName, defaultValue): T`** (`src/services/analytics/growthbook.ts:L1150-L1155`). Non-blocking variant for configuration objects. Delegates to `getFeatureValue_CACHED_MAY_BE_STALE`. Preferred over the blocking variant for startup-critical paths.
+
+The following decision tree shows which evaluation path to use based on the caller's context:
+
+```mermaid
+flowchart TD
+    A[Need a feature value?] --> B{New code or legacy?}
+    B -- new code --> C{Boolean gate or typed value?}
+    B -- legacy/migration --> D{Statsig gate migration?}
+    C -- typed value --> E{Blocking acceptable?}
+    C -- boolean gate --> F{Security-critical?}
+    E -- no --> G["getFeatureValue_CACHED_MAY_BE_STALE()"]
+    E -- yes, config object --> H["getDynamicConfig_BLOCKS_ON_INIT()"]
+    F -- yes --> I["checkSecurityRestrictionGate()"]
+    F -- no, user-invoked --> J["checkGate_CACHED_OR_BLOCKING()"]
+    D -- yes --> K["checkStatsigFeatureGate_CACHED_MAY_BE_STALE()"]
+    D -- no --> L["getFeatureValue_DEPRECATED() — avoid in new code"]
+```
+
+**Four override layers.** Every evaluation path checks the same four layers in the same order before reaching the GrowthBook-provided value. The override layers form a priority chain that ensures local developer intent always wins over remote configuration:
+
+1. **`CLAUDE_INTERNAL_FC_OVERRIDES` environment variable** (ant-only, `src/services/analytics/growthbook.ts:L170-L192`). A JSON object parsed once and memoized in `envOverrides`. Intended for eval harnesses that need deterministic feature flag configurations. The env var is only read when `USER_TYPE === 'ant'`, so external users cannot use it.
+
+2. **`/config` Gates tab overrides** (ant-only, `src/services/analytics/growthbook.ts:L211-L220`). Stored in `getGlobalConfig().growthBookOverrides`. Unlike env overrides, these are not memoized: the user can change them at runtime via the `/config` UI, and `getGlobalConfig()` is already memory-cached. Config overrides lose to env overrides so that eval harnesses remain deterministic even when a developer has local config overrides set.
+
+3. **In-memory `remoteEvalFeatureValues` Map** (`src/services/analytics/growthbook.ts:L81`). Populated by `processRemoteEvalPayload` after each successful server fetch (both init and periodic refresh). This is the authoritative source once the GrowthBook client has initialized. The Map is a workaround for an SDK limitation: the SDK's `evalFeature()` re-evaluates rules locally and ignores the pre-evaluated `value` from remote eval responses, so cc caches the server-evaluated values directly (`src/services/analytics/growthbook.ts:L378-L393`).
+
+4. **Disk cache in `cachedGrowthBookFeatures`** (`src/services/analytics/growthbook.ts:L770`). Written by `syncRemoteEvalToDisk` after every successful payload processing. Survives across process restarts. The function performs a wholesale replace (not merge), so features deleted server-side are dropped from disk on the next successful sync (`src/services/analytics/growthbook.ts:L407-L417`).
+
+**Periodic refresh.** The `setupPeriodicGrowthBookRefresh` function (`src/services/analytics/growthbook.ts:L1087-L1110`) establishes a `setInterval` timer with `.unref()` so the timer does not prevent Node.js process exit. External users refresh every 6 hours; ant users refresh every 20 minutes (`src/services/analytics/growthbook.ts:L1013-L1016`). Each refresh calls `refreshGrowthBookFeatures`, which invokes `client.refreshFeatures()`, rebuilds `remoteEvalFeatureValues` via `processRemoteEvalPayload`, syncs to disk, and fires `refreshed.emit()` to notify subscribers (`src/services/analytics/growthbook.ts:L1027-L1078`). Subscribers register via `onGrowthBookRefresh` and receive a catch-up notification if init has already completed by registration time (`src/services/analytics/growthbook.ts:L139-L157`).
+
+**Remote eval caching.** The `remoteEvalFeatureValues` Map (`src/services/analytics/growthbook.ts:L81`) stores server-evaluated feature values keyed by feature name. It is cleared and rebuilt on every successful `processRemoteEvalPayload` call -- both at init and on periodic refresh (`src/services/analytics/growthbook.ts:L382-L393`). The rebuild clears the Map first to remove features that were deleted server-side between refreshes (`src/services/analytics/growthbook.ts:L344`). The `experimentDataByFeature` Map is also cleared and rebuilt in parallel, storing experiment ID and variation ID for later exposure logging (`src/services/analytics/growthbook.ts:L358-L370`). The `loggedExposures` Set (`src/services/analytics/growthbook.ts:L89`) prevents duplicate exposure events within a session: once a feature's exposure has been logged, subsequent reads of the same feature skip the logging call (`src/services/analytics/growthbook.ts:L296-L300`).
+
 The `checkGate_CACHED_OR_BLOCKING` function implements a fallback-to-blocking pattern for user-invoked features: if the disk cache says `true`, return immediately; if it says `false` or is missing, block on GrowthBook init (up to 5 seconds) to fetch the fresh server value. This prevents a stale `false` from unfairly blocking access while accepting that a stale `true` is tolerable since the server is the real gatekeeper (`src/services/analytics/growthbook.ts:L904-L935`).
 
 The `checkSecurityRestrictionGate` function provides a blocking path for security-critical gates. It checks Statsig cache first (because a cached `true` for a security gate is safer than a stale `false`), then GrowthBook cache. If GrowthBook is re-initializing (e.g., after an auth change), the function waits for the reinit to complete before returning, ensuring that fresh auth state is reflected in security gate evaluations (`src/services/analytics/growthbook.ts:L851-L889`). This function is used for gates where returning a stale `false` could create a security vulnerability (e.g., allowing access to features that should be restricted for a logged-out user).
@@ -26012,53 +26990,9 @@ export const MAX_ENTRYPOINT_BYTES = 25_000
 const AUTO_MEM_DISPLAY_NAME = 'auto memory'
 ```
 
-The `MEMORY.md` file serves as a compact index -- always loaded into the system prompt -- with a hard 200-line and 25KB cap. The `truncateEntrypointContent` function at `src/memdir/memdir.ts:L57-L100` enforces both caps simultaneously, line-truncating first (natural boundary), then byte-truncating at the last newline before the cap so it never cuts mid-line. A warning is appended naming which cap fired, so the model knows content was elided.
+The `MEMORY.md` file serves as a compact index -- always loaded into the system prompt -- with a hard 200-line and 25KB cap. The `truncateEntrypointContent` function at `src/memdir/memdir.ts:L57-L103` enforces both caps simultaneously, line-truncating first (natural boundary), then byte-truncating at the last newline before the cap so it never cuts mid-line. A warning is appended naming which cap fired, so the model knows content was elided.
 
-The hook schema contract governs Pattern 12, defining five hook types each with Zod-validated input:
-
-```typescript
-// src/schemas/hooks.ts:L31-L65 — BashCommandHookSchema (first of five hook types)
-function buildHookSchemas() {
-  const BashCommandHookSchema = z.object({
-    type: z.literal('command').describe('Shell command hook type'),
-    command: z.string().describe('Shell command to execute'),
-    if: IfConditionSchema(),
-    shell: z
-      .enum(SHELL_TYPES)
-      .optional()
-      .describe(
-        "Shell interpreter. 'bash' uses your $SHELL; 'powershell' uses pwsh.",
-      ),
-    timeout: z
-      .number()
-      .positive()
-      .optional()
-      .describe('Timeout in seconds for this specific command'),
-    statusMessage: z
-      .string()
-      .optional()
-      .describe('Custom status message to display in spinner while hook runs'),
-    once: z
-      .boolean()
-      .optional()
-      .describe('If true, hook runs once and is removed after execution'),
-    async: z
-      .boolean()
-      .optional()
-      .describe('If true, hook runs in background without blocking'),
-    asyncRewake: z
-      .boolean()
-      .optional()
-      .describe(
-        'If true, hook runs in background and wakes the model on exit code 2.',
-      ),
-  })
-  // PromptHookSchema, HttpHookSchema, AgentHookSchema, FunctionHookSchema follow
-  // with analogous fields (if, timeout, once, statusMessage) plus type-specific
-  // fields (prompt, url, etc.)
-```
-
-The `if` condition field uses permission-rule syntax (e.g., `Bash(git *)`) to filter hooks before spawning -- a key optimization that avoids spawning shell processes for non-matching tool calls. The `IfConditionSchema` factory at `src/schemas/hooks.ts:L19-L27` produces a shared optional string that all five hook types reference.
+The hook schema contract governs Pattern 12, defining five hook types each with Zod-validated input. The `BashCommandHookSchema` (defined in Chapter 36, "Data structures and contracts" at `src/schemas/hooks.ts:L32-L65`) defines the primary hook type with fields for shell selection, timeout, background execution (`async`), and the async-rewake pattern (`asyncRewake`) that wakes the model on exit code 2. The remaining four hook types -- `PromptHookSchema`, `HttpHookSchema`, `AgentHookSchema`, and `FunctionHookSchema` -- follow the same structure with type-specific fields (prompt text, URL, agent definition, function reference). All five share the `if` condition field, which uses permission-rule syntax (e.g., `Bash(git *)`) to filter hooks before spawning -- a key optimization that avoids spawning shell processes for non-matching tool calls. The `IfConditionSchema` factory at `src/schemas/hooks.ts:L19-L27` produces a shared optional string that all five hook types reference.
 
 The Tool input contract underpins Pattern 11, defining how every tool exposes itself to the model:
 
@@ -26160,23 +27094,9 @@ The lock mechanism at `src/services/autoDream/consolidationLock.ts:L29-L36` uses
 
 ### Pattern 5: Progressive Context Compaction
 
-cc implements four compaction layers of escalating severity, each triggered by different token-pressure thresholds. The compactable tool set is explicitly enumerated:
+cc implements five compaction stages of escalating severity, each triggered by different token-pressure thresholds. The compactable tool set (defined in Chapter 28's microcompact analysis at `src/services/compact/microCompact.ts:L41-L50`) enumerates the tools eligible for compaction: FileRead, all shell tools, Grep, Glob, WebSearch, WebFetch, FileEdit, and FileWrite.
 
-```typescript
-// src/services/compact/microCompact.ts:L41-L50 — Tools eligible for compaction
-const COMPACTABLE_TOOLS = new Set<string>([
-  FILE_READ_TOOL_NAME,
-  ...SHELL_TOOL_NAMES,
-  GREP_TOOL_NAME,
-  GLOB_TOOL_NAME,
-  WEB_SEARCH_TOOL_NAME,
-  WEB_FETCH_TOOL_NAME,
-  FILE_EDIT_TOOL_NAME,
-  FILE_WRITE_TOOL_NAME,
-])
-```
-
-The four layers are: (1) `history_snip` markers that delimit old tool results for pruning -- these are semantic boundaries the model respects, not actual data deletion; (2) Microcompact that trims tool results without invoking the model, replacing old tool output with `[Old tool result content cleared]` (the constant at `src/services/compact/microCompact.ts:L36`); (3) Context Collapse that aggressively summarizes the full conversation via a model call; and (4) Autocompact that fires automatically when context approaches capacity, triggered from the query loop's token budget checks.
+The five stages are: (1) `history_snip` markers that delimit old tool results for pruning -- these are semantic boundaries the model respects, not actual data deletion; (2) Microcompact that trims tool results without invoking the model, replacing old tool output with `[Old tool result content cleared]` (the constant at `src/services/compact/microCompact.ts:L36`); (3) Context Collapse that aggressively summarizes the full conversation via a model call; (4) Autocompact that fires automatically when context approaches capacity, triggered from the query loop's token budget checks; and (5) Hard reset, the fallback that force-clears the context when all other compaction strategies fail to reduce token pressure below the critical threshold (see Chapter 28 for the definitive treatment of this five-stage hierarchy).
 
 Notably, `NotebookEdit` does not appear in `COMPACTABLE_TOOLS`. Notebook cell outputs contain structured data that the model references by cell index; microcompact truncation would corrupt these references. This is a deliberate design choice: tools with high information density are excluded from the cheapest compaction layer, becoming targets only for the more expensive model-based compaction stages.
 
@@ -26240,6 +27160,9 @@ const baseInputSchema = lazySchema(() => z.object({
   subagent_type: z.string().optional().describe('The type of specialized agent to use for this task'),
   model: z.enum(['sonnet', 'opus', 'haiku']).optional().describe("Optional model override for this agent. Takes precedence over the agent definition's model frontmatter. If omitted, uses the agent definition's model, or inherits from the parent."),
   run_in_background: z.boolean().optional().describe('Set to true to run this agent in the background. You will be notified when it completes.').describe('Set to true to run this agent in the background. You will be notified when it completes.')
+  // Note: the doubled .describe() is present in the source code — the second call
+  // overrides the first with the same string, making it a no-op. This is likely a
+  // copy-paste artifact rather than intentional behavior.
 }));
 ```
 
@@ -26441,7 +27364,7 @@ erDiagram
 The central data structure governing failure-mode defenses is the `TokenBudgetDecision` — a discriminated union that decides whether the query loop continues or stops based on token consumption:
 
 ```typescript
-# src/query/tokenBudget.ts:L22-L43 — Budget decision types
+// src/query/tokenBudget.ts:L22-L43 — Budget decision types
 type ContinueDecision = {
   action: 'continue'
   nudgeMessage: string
@@ -26469,7 +27392,7 @@ export type TokenBudgetDecision = ContinueDecision | StopDecision
 The `DenialTrackingState` is another critical contract — it tracks how often permission classifiers deny operations, with circuit-breaker limits that force a fallback to interactive prompting:
 
 ```typescript
-# src/utils/permissions/denialTracking.ts:L7-L15 — Denial tracking with circuit breaker
+// src/utils/permissions/denialTracking.ts:L7-L15 — Denial tracking with circuit breaker
 export type DenialTrackingState = {
   consecutiveDenials: number
   totalDenials: number
@@ -26484,7 +27407,7 @@ export const DENIAL_LIMITS = {
 The `AutoCompactTrackingState` tracks compaction health across turns, including a consecutive-failure circuit breaker that prevents infinite compaction retry loops:
 
 ```typescript
-# src/services/compact/autoCompact.ts:L51-L60 — Autocompact tracking with failure counter
+// src/services/compact/autoCompact.ts:L51-L60 — Autocompact tracking with failure counter
 export type AutoCompactTrackingState = {
   compacted: boolean
   turnCounter: number
@@ -26493,28 +27416,12 @@ export type AutoCompactTrackingState = {
 }
 ```
 
-The `CompactionResult` contract defines what a compaction pass produces — a boundary marker, summary messages, preserved attachments, and optional preserved segments:
-
-```typescript
-# src/services/compact/compact.ts:L299-L310 — Compaction result contract
-export interface CompactionResult {
-  boundaryMarker: SystemMessage
-  summaryMessages: UserMessage[]
-  attachments: AttachmentMessage[]
-  hookResults: HookResultMessage[]
-  messagesToKeep?: Message[]
-  userDisplayMessage?: string
-  preCompactTokenCount?: number
-  postCompactTokenCount?: number
-  truePostCompactTokenCount?: number
-  compactionUsage?: ReturnType<typeof getTokenUsage>
-}
-```
+The `CompactionResult` interface (defined in Chapter 28, "Data structures and contracts" at `src/services/compact/compact.ts:L299-L310`) governs what a compaction pass produces -- a boundary marker, summary messages, preserved attachments, and optional preserved segments. It is the convergence point for all compaction stages that produce model-visible output.
 
 The `StoredCostState` in `src/cost-tracker.ts:L71-L80` captures what persists across session boundaries for cost tracking — a key defense against both cost explosion (6.11) and compounding bugs (6.9):
 
 ```typescript
-# src/cost-tracker.ts:L71-L80 — Stored cost state for session persistence
+// src/cost-tracker.ts:L71-L80 — Stored cost state for session persistence
 type StoredCostState = {
   totalCostUSD: number
   totalAPIDuration: number
@@ -26556,7 +27463,7 @@ flowchart TD
 The token budget check itself is a concise function that detects both threshold breaches and diminishing returns — the latter being cc's defense against infinite loops where the model keeps working but makes no forward progress:
 
 ```typescript
-# src/query/tokenBudget.ts:L45-L93 — Token budget check with diminishing-returns detection
+// src/query/tokenBudget.ts:L45-L93 — Token budget check with diminishing-returns detection
 export function checkTokenBudget(
   tracker: BudgetTracker,
   agentId: string | undefined,
@@ -26760,7 +27667,7 @@ The yak-shaving failure mode is amplified by the tool system's capability: when 
 **cc's defense**: The `cost-tracker.ts` module provides real-time token metering. The `addToTotalSessionCost` function in `src/cost-tracker.ts:L278-L323` accumulates cost per model, per session. It handles per-model usage tracking, advisor costs, and both fast-mode and standard-mode accounting:
 
 ```typescript
-# src/cost-tracker.ts:L278-L285 — Per-session cost accumulation
+// src/cost-tracker.ts:L278-L285 — Per-session cost accumulation
 export function addToTotalSessionCost(
   cost: number,
   usage: Usage,
@@ -27051,6 +27958,183 @@ type HandoffFile = {
 
 The `contextHints` field is the critical innovation: it provides the next session with compressed semantic context about *why* work was abandoned, not just *what* was left. Without it, the next session must re-discover the same context from scratch, wasting tokens and repeating exploration.
 
+### Session handoff: from schema to working implementation
+
+The `HandoffFile` schema above is necessary but not sufficient. A working handoff requires three concrete operations: writing the file at session exit, consuming it at session start, and resuming work from its contents. The following implementation extends the schema with the fields needed for practical session-to-session continuity, then wires the file into cc's existing session lifecycle hooks.
+
+The extended schema adds two fields the minimal version lacks: `contextHints.lastTool` and `contextHints.lastFile` (so the next session knows *where* work stopped, not just *what* was left), and a `stateSnapshot` block that records paths to the manifest and convergence log (so the next session can reload structured state without re-parsing the entire conversation history):
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+import { z } from 'zod'
+import { writeFile, readFile } from 'fs/promises'
+import { join } from 'path'
+
+const HandoffFileSchema = z.object({
+  version: z.literal(1),
+  sessionId: z.string(),
+  exitReason: z.enum([
+    'context_limit',
+    'cost_limit',
+    'time_limit',
+    'user_request',
+    'error',
+  ]),
+  timestamp: z.string().datetime(),
+  remainingTaskIds: z.array(z.string()),
+  completedTaskIds: z.array(z.string()),
+  blockers: z.array(
+    z.object({ taskId: z.string(), reason: z.string() }),
+  ),
+  contextHints: z.object({
+    lastTool: z.string(),
+    lastFile: z.string(),
+    keyDecisions: z.array(z.string()),
+    openQuestions: z.array(z.string()),
+  }),
+  stateSnapshot: z.object({
+    manifestPath: z.string(),
+    convergenceLogPath: z.string(),
+    totalTokensConsumed: z.number(),
+    totalCostUSD: z.number(),
+  }),
+})
+
+type HandoffFile = z.infer<typeof HandoffFileSchema>
+```
+
+**Writing the handoff file at session exit.** cc fires `SessionEnd` hooks via `executeSessionEndHooks` in `src/utils/hooks.ts:L4097-L4131`. The `SessionEndHookInput` type carries the `exit_reason` field, which maps directly to `HandoffFile.exitReason`. The handoff writer hooks into this lifecycle event. It reads the current task list (via the same filesystem access that `TodoReadTool` uses), partitions tasks into completed and remaining, captures the last tool name and last file path from the conversation's final `AssistantMessage`, and writes the handoff JSON to a well-known location alongside the session JSONL:
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+async function writeHandoffFile(
+  projectRoot: string,
+  sessionId: string,
+  exitReason: HandoffFile['exitReason'],
+  tasks: Array<{ id: string; status: string }>,
+  lastTool: string,
+  lastFile: string,
+  keyDecisions: string[],
+  openQuestions: string[],
+  manifestPath: string,
+  convergenceLogPath: string,
+  totalTokens: number,
+  totalCostUSD: number,
+): Promise<string> {
+  const handoff: HandoffFile = {
+    version: 1,
+    sessionId,
+    exitReason,
+    timestamp: new Date().toISOString(),
+    remainingTaskIds: tasks
+      .filter(t => t.status === 'pending' || t.status === 'in_progress')
+      .map(t => t.id),
+    completedTaskIds: tasks
+      .filter(t => t.status === 'completed')
+      .map(t => t.id),
+    blockers: tasks
+      .filter(t => t.status === 'in_progress')
+      .map(t => ({ taskId: t.id, reason: `Interrupted by ${exitReason}` })),
+    contextHints: { lastTool, lastFile, keyDecisions, openQuestions },
+    stateSnapshot: {
+      manifestPath,
+      convergenceLogPath,
+      totalTokensConsumed: totalTokens,
+      totalCostUSD,
+    },
+  }
+
+  const handoffPath = join(projectRoot, '.handoff.json')
+  await writeFile(handoffPath, JSON.stringify(handoff, null, 2), 'utf-8')
+  return handoffPath
+}
+```
+
+The `writeHandoffFile` function is called from a `SessionEnd` hook registered in the settings cascade. The hook's configuration follows the same JSON schema that cc uses for all hooks in `src/utils/hooks.ts:L76-L109`:
+
+```jsonc
+// Proposed hook configuration — settings.json
+{
+  "hooks": {
+    "SessionEnd": [{
+      "type": "command",
+      "command": "node ./harness/write-handoff.mjs"
+    }]
+  }
+}
+```
+
+**Consuming the handoff file at session start.** The next session reads the handoff file during its `SessionStart` hook phase, which fires via `processSessionStartHooks` in `src/utils/sessionStart.ts`. The consumer validates the file with Zod (catching schema drift across harness versions), extracts remaining tasks, and injects the `contextHints` into the system prompt so the model has immediate access to the previous session's final state:
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+async function readHandoffFile(
+  projectRoot: string,
+): Promise<HandoffFile | null> {
+  const handoffPath = join(projectRoot, '.handoff.json')
+  try {
+    const raw = await readFile(handoffPath, 'utf-8')
+    const parsed = JSON.parse(raw)
+    const validated = HandoffFileSchema.parse(parsed)
+    return validated
+  } catch {
+    // No handoff file or invalid schema — cold start
+    return null
+  }
+}
+
+function buildHandoffSystemPrompt(handoff: HandoffFile): string {
+  const lines: string[] = [
+    '## Session Continuity — Handoff from Previous Session',
+    '',
+    `Previous session ${handoff.sessionId} exited: ${handoff.exitReason}`,
+    `at ${handoff.timestamp}.`,
+    '',
+    `Remaining tasks: ${handoff.remainingTaskIds.join(', ') || 'none'}`,
+    `Completed tasks: ${handoff.completedTaskIds.join(', ') || 'none'}`,
+    '',
+  ]
+
+  if (handoff.blockers.length > 0) {
+    lines.push('### Blockers')
+    for (const b of handoff.blockers) {
+      lines.push(`- Task ${b.taskId}: ${b.reason}`)
+    }
+    lines.push('')
+  }
+
+  lines.push('### Context from Previous Session')
+  lines.push(`Last tool used: ${handoff.contextHints.lastTool}`)
+  lines.push(`Last file touched: ${handoff.contextHints.lastFile}`)
+  if (handoff.contextHints.keyDecisions.length > 0) {
+    lines.push('Key decisions made:')
+    for (const d of handoff.contextHints.keyDecisions) {
+      lines.push(`- ${d}`)
+    }
+  }
+  if (handoff.contextHints.openQuestions.length > 0) {
+    lines.push('Open questions:')
+    for (const q of handoff.contextHints.openQuestions) {
+      lines.push(`- ${q}`)
+    }
+  }
+
+  lines.push('')
+  lines.push(
+    `Previous session consumed ${handoff.stateSnapshot.totalTokensConsumed} tokens ` +
+    `($${handoff.stateSnapshot.totalCostUSD.toFixed(4)}).`,
+  )
+
+  return lines.join('\n')
+}
+```
+
+**Resuming work from the handoff.** The resume flow loads remaining task IDs from the handoff file, re-reads the task manifest from `stateSnapshot.manifestPath`, and selects the first unblocked pending task. If blockers exist, the resume flow logs them to the convergence log and skips blocked tasks. The `contextHints` system prompt is prepended to the model's first turn, giving it the previous session's final state without requiring it to re-read the full conversation history (which no longer exists — the previous session's context was either compacted or lost to a hard reset).
+
+The integration with cc's existing session persistence is deliberate. The JSONL session log (`src/utils/sessionStorage.ts`) records the *conversation history* — messages, tool calls, tool results. The handoff file records the *task-level state* — what was done, what remains, and why the session ended. These are complementary: the JSONL log is the audit trail; the handoff file is the resumption contract. When a session resumes via `--resume` (which calls `restoreCostStateForSession` in `src/cost-tracker.ts:L130-L137` to restore cost counters), the handoff file adds task-level context that the JSONL log cannot provide — specifically the `keyDecisions` and `openQuestions` fields that capture the model's reasoning state at the point of exit.
+
+The handoff file is deleted after successful consumption to prevent stale handoffs from confusing future sessions. If the next session fails to start (e.g., due to a baseline check failure), the handoff file remains on disk for the subsequent attempt.
+
 ### Layer 3: Context Engineering — the compaction contract
 
 The most complex layer. cc implements a five-stage compaction hierarchy (Chapter 28) with explicit thresholds:
@@ -27280,6 +28364,108 @@ export function addToTotalSessionCost(
 This is the Layer 6 metering requirement implemented correctly: per-model, per-token-type, with cache distinction. However, cc currently lacks **per-session cost caps** and **anomaly detection**. The cost counter records but does not throttle. A reference architecture must add a cost gate that aborts or degrades the session when spend exceeds a configured threshold.
 
 The reference architecture should define three cost tiers: (1) a **soft cap** that triggers a warning and model downgrade (Opus → Sonnet → Haiku), (2) a **hard cap** that stops selecting new tasks and initiates graceful shutdown, and (3) a **kill switch** that aborts the session immediately, writing whatever state exists to the handoff file. HER Principle 10 ("budget for 3-10x the happy-path cost") is the operational guideline — cost caps should be set at 3x the expected cost, not at 1x.
+
+### Distributed tracing: from flat events to causal spans
+
+cc's analytics system logs events through the `AnalyticsSink` interface in `src/services/analytics/index.ts:L72-L78`, which accepts event names and flat metadata records. The `logEvent` function at `src/services/analytics/index.ts:L133-L144` carries no trace context — no trace ID, no parent span, no causal ordering. When a multi-agent workflow fails, the operator sees a chronological list of events but cannot reconstruct which subagent's action caused the failure or how long each phase of the dispatch chain took.
+
+The following walkthrough shows how trace context would propagate through cc's multi-agent dispatch chain, from the parent session's root span down to individual tool calls in worker subagents. The design uses OpenTelemetry-compatible span IDs and follows the W3C Trace Context specification for propagation.
+
+The `TraceSpan` type captures the essential data for each unit of work:
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+interface TraceSpan {
+  traceId: string            // 32-char hex, shared across all spans in a trace
+  spanId: string             // 16-char hex, unique to this span
+  parentSpanId: string | null // null for root span
+  operation: string           // e.g., 'session.query', 'tool.BashTool', 'agent.fork'
+  startTime: number           // Date.now() at span creation
+  endTime?: number            // Date.now() at span completion
+  status: 'running' | 'completed' | 'failed'
+  attributes: Record<string, string | number | boolean>
+  children: TraceSpan[]       // in-memory tree for dashboard rendering
+}
+
+function createSpan(
+  traceId: string,
+  parentSpanId: string | null,
+  operation: string,
+  attributes: Record<string, string | number | boolean> = {},
+): TraceSpan {
+  return {
+    traceId,
+    spanId: randomBytes(8).toString('hex'),
+    parentSpanId,
+    operation,
+    startTime: Date.now(),
+    status: 'running',
+    attributes,
+    children: [],
+  }
+}
+
+function completeSpan(
+  span: TraceSpan,
+  status: 'completed' | 'failed' = 'completed',
+): void {
+  span.endTime = Date.now()
+  span.status = status
+}
+```
+
+**Trace propagation through the dispatch chain.** The trace context flows through five levels, each creating a child span that inherits the parent's `traceId` but generates a new `spanId`:
+
+1. **Parent session creates root span.** At session start (in the `processSessionStartHooks` path through `src/utils/sessionStart.ts`), a root span is created with a fresh `traceId` and `parentSpanId: null`. This root span's `traceId` becomes the correlation key for the entire session, including all subagent work.
+
+2. **`AgentTool.call()` creates child span.** When the parent session dispatches a subagent via `AgentTool` (defined in `src/tools/AgentTool/AgentTool.tsx:L51`), the tool's `call()` method creates a child span with `parentSpanId` set to the current span. The `traceId` and `parentSpanId` are passed to the subagent process via environment variables (`TRACE_ID` and `PARENT_SPAN_ID`), following the same pattern that cc already uses for `CLAUDE_CODE_COORDINATOR_MODE` propagation in `src/coordinator/coordinatorMode.ts:L36-L41`.
+
+3. **`runAgent()` reads trace context.** The `runAgent` function in `src/tools/AgentTool/runAgent.ts:L248` reads `process.env.TRACE_ID` and `process.env.PARENT_SPAN_ID`, creating its own span as a child of the parent's dispatch span. This span covers the entire subagent lifecycle — from prompt injection to final result.
+
+4. **`query()` attaches trace to each API call.** Within each `query()` iteration in `src/query.ts`, the trace context is passed to `addToTotalSessionCost` in `src/cost-tracker.ts:L278` alongside the existing `cost`, `usage`, and `model` parameters. Each API call creates a child span under the `query` span, recording input/output token counts and latency in the span's `attributes`.
+
+5. **Tool dispatch creates tool-level spans.** The tool execution pipeline in `src/services/tools/toolExecution.ts:L800` wraps each tool call in a span. The `runPreToolUseHooks` and `runPostToolUseHooks` calls become child spans of the tool span, making hook latency visible in the trace tree. The tool span's `attributes` include the tool name, a sanitized summary of the input (via `tool.getToolUseSummary`), and the result status.
+
+The following sequence diagram shows trace propagation across three levels of the dispatch hierarchy — parent session, step runner (coordinator subagent), and worker (leaf subagent):
+
+```mermaid
+sequenceDiagram
+    participant P as Parent Session
+    participant S as Step Runner (subagent)
+    participant W as Worker (subagent)
+    participant API as Anthropic API
+
+    Note over P: Root span created<br/>traceId=abc123, spanId=s1
+
+    P->>P: query() — span s2 (parent=s1)
+    P->>API: model call — span s3 (parent=s2)
+    API-->>P: response with tool_use: AgentTool
+
+    P->>S: fork subagent — span s4 (parent=s2)<br/>env: TRACE_ID=abc123, PARENT_SPAN_ID=s4
+    Note over S: runAgent() reads env<br/>creates span s5 (parent=s4)
+
+    S->>S: query() — span s6 (parent=s5)
+    S->>API: model call — span s7 (parent=s6)
+    API-->>S: response with tool_use: AgentTool
+
+    S->>W: fork worker — span s8 (parent=s6)<br/>env: TRACE_ID=abc123, PARENT_SPAN_ID=s8
+    Note over W: runAgent() reads env<br/>creates span s9 (parent=s8)
+
+    W->>W: query() — span s10 (parent=s9)
+    W->>W: PreToolUse hooks — span s11 (parent=s10)
+    W->>W: BashTool.call() — span s12 (parent=s10)
+    W->>W: PostToolUse hooks — span s13 (parent=s10)
+
+    W-->>S: result + span s9 completed
+    S-->>P: result + span s5 completed
+    Note over P: Root span s1 completed<br/>Full trace tree available
+```
+
+The trace tree produced by this propagation has a clear causal structure: the root span contains the parent session's total duration, its children are query iterations, each query iteration's children are API calls and tool dispatches, and each `AgentTool` dispatch contains the full subtree of the subagent's work. This tree can be exported in OpenTelemetry's OTLP format for ingestion by Jaeger, Datadog, or Grafana Tempo.
+
+**Integration with cc's existing OTel infrastructure.** cc already initializes an OpenTelemetry `Meter` and several `AttributedCounter` instances in `src/bootstrap/state.ts:L89-L98`. The `costCounter` and `tokenCounter` emit metrics through this pipeline. The trace spans extend this infrastructure from metrics-only to metrics-plus-traces. The `Meter` continues to handle counters; a new `TracerProvider` (from `@opentelemetry/sdk-trace-base`) handles span export. Both share the same `Resource` descriptor (service name, session ID, version), ensuring that metrics and traces correlate in the backend.
+
+The environment-variable propagation for `TRACE_ID` and `PARENT_SPAN_ID` is deliberately simple — it avoids introducing a serialization dependency between parent and child processes. An alternative design would use a shared file or IPC channel, but environment variables have the advantage of working across cc's three subagent spawn mechanisms: sync subagents (same process), forked subagents (`src/tools/AgentTool/forkSubagent.ts`), and remote CCR agents. All three mechanisms already propagate environment variables; adding two more (`TRACE_ID`, `PARENT_SPAN_ID`) requires no changes to the spawn infrastructure.
 
 ## Control flow
 
@@ -27818,6 +29004,155 @@ The rewrite extends this with a `costCaps` map keyed by task ID. The `addToTotal
 
 The rewrite also adds cost-per-outcome tracking, which HER Section 13.4 prescribes. The current cost tracker measures cost-per-token (implicitly, via the per-model usage breakdown) but not cost-per-completed-task. The extended `StoredCostState` includes a `taskOutcomes` map that records the cost of each completed task, enabling operators to compare harness configurations on a per-outcome basis.
 
+### Cost enforcement: from accumulator to gatekeeper implementation
+
+The cost cap contract described above needs a concrete enforcement function and a wiring plan that integrates with cc's existing query loop and tool dispatch pipeline. The following implementation defines the three-tier cost gate (soft, hard, kill) and shows where each tier's enforcement logic attaches to cc's existing code paths.
+
+The `CostCap` interface extends the per-task cap described earlier with session-level tiers. The three thresholds correspond to progressively stronger interventions — warning the model, blocking new tool calls while allowing cleanup, and forcing an immediate session end with handoff file emission:
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+interface CostCap {
+  softLimitUSD: number    // Warn the model, suggest cheaper approaches
+  hardLimitUSD: number    // Block new tool calls, allow cleanup
+  killLimitUSD: number    // Force session end, write handoff file
+}
+
+function enforceCostCap(
+  currentCostUSD: number,
+  cap: CostCap,
+  taskId?: string,
+): 'allow' | 'warn' | 'block' | 'kill' {
+  if (currentCostUSD >= cap.killLimitUSD) return 'kill'
+  if (currentCostUSD >= cap.hardLimitUSD) return 'block'
+  if (currentCostUSD >= cap.softLimitUSD) return 'warn'
+  return 'allow'
+}
+```
+
+The three-tier design follows the same graduated-response pattern that cc uses for compaction (microcompact -> autocompact -> hard reset) and permission denial tracking (`DENIAL_LIMITS.maxConsecutive = 3` before circuit-breaking in `src/utils/permissions/denialTracking.ts:L12`). The `killLimitUSD` is the analogue of `MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES` — a hard ceiling beyond which the system stops trying and writes state to disk.
+
+**Wiring into the query loop.** The cost enforcement function is called at two interception points: before each `query()` iteration in `src/query.ts`, and before each tool dispatch in `src/services/tools/toolExecution.ts`. The query-loop check catches cost overruns between tool calls; the tool-dispatch check catches overruns within a single turn that includes multiple tool calls.
+
+The query-loop integration reads `getTotalCostUSD()` from `src/bootstrap/state.ts:L51` (the same state field that `addToTotalSessionCost` in `src/cost-tracker.ts:L278` writes to) and calls `enforceCostCap`:
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+// Inserted at the start of each query() iteration
+import { getTotalCostUSD } from './bootstrap/state.js'
+
+function checkCostBeforeQuery(
+  cap: CostCap,
+  currentTaskId?: string,
+): void {
+  const currentCost = getTotalCostUSD()
+  const verdict = enforceCostCap(currentCost, cap, currentTaskId)
+
+  switch (verdict) {
+    case 'allow':
+      break
+
+    case 'warn': {
+      // Prepend a cost warning to the system prompt for this turn
+      const warningMsg =
+        `[Cost Warning] Session spend is $${currentCost.toFixed(4)}, ` +
+        `approaching soft limit of $${cap.softLimitUSD.toFixed(2)}. ` +
+        `Prefer cheaper operations: read over write, Haiku over Opus, ` +
+        `cached results over fresh API calls.`
+      injectSystemMessage(warningMsg)
+      break
+    }
+
+    case 'block': {
+      // Allow only read-only tools and exit-related operations
+      const blockMsg =
+        `[Cost Block] Session spend is $${currentCost.toFixed(4)}, ` +
+        `exceeding hard limit of $${cap.hardLimitUSD.toFixed(2)}. ` +
+        `Only read-only tools and session cleanup are permitted. ` +
+        `Complete the current task and exit.`
+      injectSystemMessage(blockMsg)
+      setToolFilter(tool =>
+        tool.isReadOnly?.() === true ||
+        tool.name === 'TodoWrite' ||
+        tool.name === 'AskUserQuestion',
+      )
+      break
+    }
+
+    case 'kill':
+      // Write handoff file and force session end
+      writeHandoffFile(
+        getProjectRoot(),
+        getSessionId(),
+        'cost_limit',
+        getCurrentTasks(),
+        getLastToolName(),
+        getLastFilePath(),
+        getKeyDecisions(),
+        getOpenQuestions(),
+        getManifestPath(),
+        getConvergenceLogPath(),
+        getTotalInputTokens() + getTotalOutputTokens(),
+        currentCost,
+      )
+      throw new CostKillError(
+        `Session terminated: cost $${currentCost.toFixed(4)} ` +
+        `exceeded kill limit $${cap.killLimitUSD.toFixed(2)}`,
+      )
+  }
+}
+```
+
+The `block` tier's tool filter leverages the same read-only classification that cc's `BashTool` already performs in `src/tools/BashTool/commandSemantics.ts` and `src/tools/BashTool/readOnlyValidation.ts`. By allowing `TodoWrite` (to update task status) and `AskUserQuestion` (to request budget extension from the human), the agent can gracefully conclude its current task rather than being cut off mid-operation.
+
+The `kill` tier invokes the handoff writer described in Chapter 55's session handoff section, ensuring that remaining tasks and context hints are persisted before the session terminates. The `CostKillError` propagates up to the REPL's main loop in `src/screens/REPL.tsx`, where it triggers the same graceful shutdown path used by `executeSessionEndHooks` in `src/utils/hooks.ts:L4097`.
+
+**Per-task cost attribution.** To support per-task cost caps (not just per-session), the `addToTotalSessionCost` function in `src/cost-tracker.ts:L278-L323` needs a `taskId` parameter threaded through the call chain. The existing function signature accepts `cost`, `usage`, and `model`; the extended version adds an optional `taskId` that routes cost to a per-task accumulator:
+
+```typescript
+// Proposed extension to src/cost-tracker.ts:L278 — not in cc source
+const taskCosts = new Map<string, number>()
+
+function addToTaskCost(taskId: string, cost: number): number {
+  const current = taskCosts.get(taskId) ?? 0
+  const updated = current + cost
+  taskCosts.set(taskId, updated)
+  return updated
+}
+
+function getTaskCost(taskId: string): number {
+  return taskCosts.get(taskId) ?? 0
+}
+```
+
+The `taskId` originates from the task list managed by `TodoWriteTool` and is threaded through the dispatch chain: `query()` reads the current task ID from the session state, passes it to the tool execution pipeline, and the pipeline passes it to `addToTotalSessionCost`. This threading reuses the same pattern that cc already uses for `requestId` — a correlation identifier that flows from the API response through tool dispatch and back to analytics logging.
+
+The cost enforcement flow, end to end, follows this path:
+
+```mermaid
+flowchart TD
+    A["query() iteration starts"] --> B["getTotalCostUSD()"]
+    B --> C{"enforceCostCap()"}
+    C -->|allow| D["Proceed to model call"]
+    C -->|warn| E["Inject cost warning\ninto system prompt"]
+    E --> D
+    C -->|block| F["Filter to read-only tools\n+ cleanup tools"]
+    F --> D
+    C -->|kill| G["writeHandoffFile()"]
+    G --> H["throw CostKillError"]
+    H --> I["SessionEnd hooks fire"]
+    I --> J["Session terminates"]
+    D --> K["Model responds with tool calls"]
+    K --> L["For each tool call:\ncheck per-task cost cap"]
+    L --> M{"Task cap exceeded?"}
+    M -->|No| N["Execute tool"]
+    M -->|Yes| O["Deny tool call\n+ escalate to human"]
+    N --> P["addToTotalSessionCost()\n+ addToTaskCost()"]
+    P --> A
+```
+
+The vertical integration — session-level cap checked at query-loop entry, per-task cap checked at tool-dispatch time, cost accumulated after each tool call — ensures that cost enforcement is both prompt (catching overruns within a single turn) and comprehensive (catching overruns across turns). The graduated response (warn -> block -> kill) gives the model opportunities to self-correct before the harness intervenes destructively, matching the same philosophy that cc's compaction hierarchy uses for context management.
+
 **Analytics sink: from event log to trace collector.** The current `AnalyticsSink` interface logs flat events with no causal linkage. The rewrite adds span creation and propagation. Every `logEvent` call gains an optional `parentSpanId` parameter. The sink maintains an in-memory trace tree that can be exported in OpenTelemetry format.
 
 This is not a full rewrite -- the existing `logEvent` and `logEventAsync` signatures are preserved -- but the internal representation changes from a flat event stream to a hierarchical trace. The `attachAnalyticsSink` function in `src/services/analytics/index.ts:L95-L123` already queues events before the sink is attached; the rewrite extends this queue to carry span context, so events logged during startup (before the sink is attached) are still linked to their parent spans when the sink drains the queue.
@@ -27848,6 +29183,128 @@ The rewrite also implements HER Section 11.3's async-approval pattern. When a Ti
 The implementation draws on the same sliding-window pattern used by the autocompact circuit breaker in `src/services/compact/autoCompact.ts:L70`, where `MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES` is set to 3. The loop detector uses a similar threshold: 3 identical calls within 5 minutes triggers a loop alert. The threshold is configurable via settings, and the detector can be disabled entirely for tasks that legitimately require repetitive polling.
 
 The detector's output is a `LoopDetectionRecord` that flows into the `TraceSpan` system, so loop events appear in the trace tree alongside tool calls and model invocations. This enables the agent dashboard (described below) to display loop alerts in real time.
+
+### Loop detection: from record to working implementation
+
+The `LoopDetectionRecord` above describes *what* to capture; the following implementation shows *how* to capture it and *where* to wire it into cc's tool dispatch pipeline. The core abstraction is a `LoopDetector` class that maintains a sliding window of recent tool calls, hashes each call's identity (tool name plus input), and returns a three-valued verdict: `allow`, `warn`, or `block`.
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+import { createHash } from 'crypto'
+
+class LoopDetector {
+  private window: Array<{ hash: string; timestamp: number }> = []
+  private readonly windowSize: number
+  private readonly threshold: number
+  private readonly pollableTools: Set<string>
+
+  constructor(opts: {
+    windowSize?: number
+    threshold?: number
+    pollableTools?: string[]
+  }) {
+    this.windowSize = opts.windowSize ?? 10
+    this.threshold = opts.threshold ?? 3
+    this.pollableTools = new Set(
+      opts.pollableTools ?? ['Monitor', 'TaskGet'],
+    )
+  }
+
+  check(toolName: string, input: unknown): 'allow' | 'warn' | 'block' {
+    // Pollable tools (status checks, monitoring) are exempt
+    if (this.pollableTools.has(toolName)) return 'allow'
+
+    const hash = this.computeHash(toolName, input)
+    this.window.push({ hash, timestamp: Date.now() })
+    if (this.window.length > this.windowSize) this.window.shift()
+
+    const matches = this.window.filter(e => e.hash === hash).length
+    if (matches >= this.threshold) return 'block'
+    if (matches >= this.threshold - 1) return 'warn'
+    return 'allow'
+  }
+
+  reset(): void {
+    this.window = []
+  }
+
+  private computeHash(toolName: string, input: unknown): string {
+    return createHash('sha256')
+      .update(JSON.stringify({ toolName, input }))
+      .digest('hex')
+      .slice(0, 16)
+  }
+}
+```
+
+The `computeHash` function uses SHA-256 truncated to 16 hex characters. This is deliberately collision-tolerant — a false positive (two different inputs producing the same hash) causes an earlier warning, which is the safe direction. The sliding window evicts old entries by count (`windowSize`), not by time, because the detector's purpose is to catch *consecutive* repetition within a bounded scope. A time-based window would miss loops that span long tool calls (e.g., a 5-minute build command repeated identically three times would fall outside a 5-minute window but still be a loop).
+
+The `pollableTools` exemption set is critical for avoiding false positives. Tools like `Monitor` (which polls background process output) and `TaskGet` (which reads the current task list) are *expected* to be called repeatedly with identical inputs. Without this exemption, every multi-step task that checks its own progress would trigger the loop detector. The set is configurable via the settings cascade, and new tools can be added by operators who observe false positives in their specific workflows.
+
+**Wiring into the PreToolUse hook pipeline.** The loop detector integrates with cc's hook infrastructure at the `PreToolUse` interception point. The `runPreToolUseHooks` function in `src/services/tools/toolHooks.ts:L435` iterates over registered hooks before each tool dispatch, yielding results that can modify the tool input, deny the call, or inject additional context. The loop detector registers as a `PreToolUse` hook that calls `loopDetector.check()` and maps the verdict to hook actions:
+
+```typescript
+// Proposed implementation — not in cc source, recommended addition
+function createLoopDetectorHook(
+  detector: LoopDetector,
+): (toolName: string, input: Record<string, unknown>) => {
+  blockingError?: string
+  additionalContext?: string
+} {
+  return (toolName: string, input: Record<string, unknown>) => {
+    const verdict = detector.check(toolName, input)
+
+    switch (verdict) {
+      case 'allow':
+        return {}
+
+      case 'warn':
+        // Inject a system message nudging the model to change approach
+        return {
+          additionalContext:
+            `[Loop Warning] You have called ${toolName} with similar ` +
+            `parameters multiple times. Consider a different approach: ` +
+            `change the input, try a different tool, or re-read the ` +
+            `error output more carefully before retrying.`,
+        }
+
+      case 'block':
+        // Deny the tool call with an explanation
+        return {
+          blockingError:
+            `[Loop Blocked] Tool call denied: ${toolName} has been ` +
+            `called with identical parameters ${detector['threshold']} ` +
+            `times in the last ${detector['windowSize']} tool calls. ` +
+            `This indicates the current approach is not making progress. ` +
+            `You must try a fundamentally different strategy.`,
+        }
+    }
+  }
+}
+```
+
+On `warn`, the hook returns `additionalContext` — a system message that the `runPreToolUseHooks` generator yields as a `{ type: 'additionalContext' }` event, which the tool execution pipeline in `src/services/tools/toolExecution.ts:L800` prepends to the model's next turn. This is a soft intervention: the model sees the warning but can still proceed with a different input. On `block`, the hook returns `blockingError`, which `runPreToolUseHooks` maps to a `{ type: 'hookPermissionResult', hookPermissionResult: { behavior: 'deny' } }` event at `src/services/tools/toolHooks.ts:L481-L494`. The tool call is denied, and the model receives the error message as tool output, forcing it to change approach.
+
+The hook registration follows the same pattern as cc's existing configurable hooks. In `settings.json`, the loop detector appears as a `PreToolUse` hook with configurable thresholds:
+
+```jsonc
+// Proposed hook configuration — settings.json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "type": "builtin",
+      "builtin": "loop-detector",
+      "config": {
+        "windowSize": 10,
+        "threshold": 3,
+        "pollableTools": ["Monitor", "TaskGet", "TodoRead"]
+      }
+    }]
+  }
+}
+```
+
+The interaction between the loop detector and cc's existing circuit breakers is worth noting. The autocompact circuit breaker (`MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3` in `src/services/compact/autoCompact.ts:L70`) catches compaction-specific loops. The permission denial tracker (`DENIAL_LIMITS.maxConsecutive = 3` in `src/utils/permissions/denialTracking.ts:L12`) catches permission-specific loops. The loop detector catches *all other* tool-level loops that these specialized detectors miss — the common case of an agent editing a file, running a test, getting the same error, and editing the file the same way again. Together, these three mechanisms form a defense-in-depth against repetitive behavior at different layers of the stack.
 
 **Spend-rate monitor.** HER Section 13.2 prescribes "per-hour spend rate alert -- anomaly detection on spend velocity." cc tracks cumulative cost but not spend velocity. The proposed `SpendRateMonitor` computes a rolling average of cost-per-minute and fires an alert when the current rate exceeds 2x the rolling average. The monitor is wired into the query loop's post-iteration hook: when the rate is anomalous, the harness pauses the session and prompts the user to confirm continuation.
 
@@ -27936,6 +29393,31 @@ For the loop detector, the migration is also additive. The sliding window starts
 ## Developer takeaways for building a long-running agent
 
 The roadmap yields five principles that should govern any team building on the cc codebase. First, gate cost rather than merely tracking it: a production harness must refuse tool dispatch when a `CostCap` is exceeded, placing the guard in the query loop rather than a post-hoc dashboard. Second, wire deterministic quality gates (lint, type-check, test) into the query loop as `PostToolUse` hooks that return pass/fail/escalate verdicts, using the compaction hierarchy's graduated-response pattern as the model for all new resource-management subsystems. Third, make every human-in-the-loop prompt context-rich by default via `EscalationRecord` payloads, add loop detection as a `PreToolUse` hook before you need it, and track spend rate as a leading indicator rather than relying solely on cumulative cost. Fourth, add OpenTelemetry-compatible trace spans to every tool dispatch so that causal chains can be reconstructed across subagent boundaries, and separate generation from evaluation using deterministic checks to avoid the Ouroboros problem. Fifth, enforce one task per session, treat every external input as untrusted, budget for 3-10x the happy-path cost, and simplify relentlessly as models improve -- every harness component encodes assumptions about model limitations that go stale fast.
+
+### Greenfield implementation ordering guide
+
+The roadmap above assumes you are extending the existing cc codebase. But what if you are building a harness from scratch? The eight layers of the reference architecture (Chapter 55) have a natural implementation order that differs from the numbering order. The correct build sequence is driven by a single heuristic: **implement the layer whose absence causes the most catastrophic failure first**. Here is the ordering, with rationale for each step.
+
+**Layer 1: Query loop and tool dispatch.** Build this first. Without a query loop, nothing runs. The query loop is the irreducible core of any agent harness: it sends a message array to the model, receives a response, checks for tool-use blocks, dispatches each tool call to a handler function, appends the tool results to the message array, and loops until the model emits a stop signal or a turn limit is reached. Implement these pieces: a `messages: Message[]` array that accumulates the conversation, a `callModel(messages)` function that invokes the Anthropic API, a `toolRegistry: Record<string, ToolHandler>` that maps tool names to functions, a response accumulator that appends assistant and tool-result messages, and stop conditions (model says `end_turn`, max turns reached, or a cost limit trips). cc's implementation lives in `src/query/query.ts` -- the `processQueryStream` function at L149-L372 is the canonical reference. A greenfield implementation needs approximately 80 lines to replicate this core loop.
+
+**Layer 2: Session persistence.** Build second. Without persistence, every crash loses all state. An agent that runs for 30 minutes and crashes at minute 29 must restart from zero if the conversation is not persisted. Implement a JSONL conversation log that appends each message as a single JSON line to a file keyed by session ID. On startup, check for an existing log file, replay it into the message array, and resume. cc's implementation lives in `src/persistence/` -- the `saveConversation` and `loadConversation` functions in `src/persistence/conversationPersistence.ts` are the reference. A minimal implementation needs a `sessionId`, a `logPath` derived from it, an `appendMessage(msg)` function that appends to the log, and a `replayLog(logPath)` function that reads the log on startup.
+
+**Layer 4: Back-pressure and cost control.** Build BEFORE Layer 3. This is the deliberate reordering that distinguishes a practical build plan from a theoretical one. At low agent scale (single agent, short sessions), you will hit cost limits before you hit context limits. A 200k-token context window lasts for hours of typical tool use, but an uncapped cost accumulator can burn $50 in 20 minutes of aggressive multi-tool loops. Back-pressure is the first defense that matters in practice. Implement these pieces: a token counter that reads `usage.input_tokens` and `usage.output_tokens` from every API response, a cost accumulator that multiplies token counts by per-model prices, a soft limit that logs a warning (e.g., at 80% of budget), a hard limit that stops dispatching new tool calls, and a kill limit that terminates the session. Optionally, implement a diminishing-returns detector that tracks the ratio of tool calls to meaningful output and flags sessions where the agent is spinning. cc's cost tracking lives in `src/cost-tracker.ts` -- the `addToTotalSessionCost` function at L278 is the accumulator, and `CostState` at L22 is the state shape. A greenfield implementation needs approximately 40 lines for the counter and 10 lines for the gate check in the query loop.
+
+**Layer 3: Context management.** Build fourth. Now that you have persistence and cost control, context overflow is the next bottleneck. When the message array exceeds the model's context window, the API call fails. Implement two mechanisms. First, microcompact: walk the message array and replace old tool-result blocks with a short summary string (e.g., "[tool result truncated]"), preserving the most recent N tool results. This is cheap and deterministic. Second, autocompact: when the token count exceeds a threshold (e.g., 80% of context window), invoke the model with a summarization prompt that compresses the conversation history into a compact summary, then replace the message array with `[system, summary, recent_messages]`. cc's implementation lives in `src/services/compact/` -- the `autoCompact` function in `autoCompact.ts` and the `compactConversation` function in `compact.ts` are the references. Also implement `history_snip` markers: sentinel messages that mark the boundary between compacted history and live conversation, so the model knows which messages are summaries and which are verbatim.
+
+**Layer 5: Tool permission system.** Build fifth. The tool dispatch system exists from Layer 1, but permission checking is a separate concern that should be layered on top. Implement allow/deny rules that specify which tools can run without confirmation, which require user approval, and which are blocked entirely. Implement permission modes: `plan` mode (all tools require approval), `auto` mode (approved tools run freely, others prompt), and `bypass` mode (everything runs, for trusted environments). Wire the permission check as a `PreToolUse` hook that runs before every tool dispatch and returns `allow`, `deny`, or `ask`. cc's implementation lives in `src/permissions/` -- the `checkPermission` function and the `PermissionMode` type are the references. The key insight from cc's design: permission checking is a pipeline of rules evaluated in order, and the first matching rule wins.
+
+**Layer 6: Multi-agent dispatch.** Build sixth. Only after single-agent stability is established. A multi-agent system multiplies every failure mode: cost overruns multiply by agent count, context overflows happen independently in each agent, and permission violations can cascade. Implement an `AgentTool` that the primary agent can invoke to spawn a subagent with its own message array, its own cost cap (derived from the parent's remaining budget), and its own session log. Implement a task list that tracks what each agent is working on. Implement a coordinator pattern where the primary agent dispatches tasks and collects results. Implement fork isolation: each subagent operates on its own copy of state and cannot directly modify the parent's conversation. cc's implementation lives in `src/tools/AgentTool/` and `src/agents/`.
+
+**Layer 7: Observability.** Build seventh. The system is now complex enough that printf debugging is insufficient. Implement structured event logging: every tool dispatch, every model call, every cost checkpoint emits a structured event with a timestamp, a session ID, and a span ID. For multi-agent systems, implement distributed tracing: each subagent carries a trace ID inherited from the parent, so the full causal chain can be reconstructed. Implement a cost display that shows cumulative spend, spend rate, and per-task cost at the end of each session. cc's analytics layer lives in `src/services/analytics/` -- the `AnalyticsSink` type at `src/services/analytics/index.ts:L72` is the reference interface.
+
+**Layer 8: Memory and learning.** Build last. This is the highest-risk, lowest-urgency layer. Memory extraction is inherently lossy (the model decides what to remember), memory injection is inherently risky (stale or wrong memories pollute future sessions), and the ROI is low for short-lived agents. Only invest in memory after the agent runs reliably for hours. Implement session memory extraction: at session end, invoke the model with a summarization prompt that extracts key learnings, file paths, architectural decisions, and error patterns. Write the result to a memory directory as a Markdown file. On the next session start, inject relevant memories into the system prompt. cc's implementation lives in `src/memory/` -- the `extractSessionMemory` function and the `memdir` loader are the references. The key risk: memory injection increases the system prompt size, which reduces the effective context window for the actual task. Budget for this tradeoff.
+
+**Why this order works.** The ordering is driven by blast radius. A missing query loop means nothing runs (total failure). Missing persistence means crashes are catastrophic (data loss). Missing cost control means runaway spend (financial damage). Missing context management means long sessions fail (degraded reliability). Missing permissions means unsafe operations (security risk, but only for tool-using agents). Missing multi-agent means no parallelism (reduced throughput, not failure). Missing observability means blind debugging (developer pain, not user-facing). Missing memory means no cross-session learning (reduced effectiveness, not failure). Each layer addresses a progressively less severe failure mode, which means each layer is safe to defer until the previous layers are stable.
+
+A working TypeScript skeleton implementing Layers 1 and 2 is provided in Appendix I.
+
 # Closing: Lessons for the Harness Engineering Discipline
 
 ## Overview
@@ -29386,3 +30868,1297 @@ cc is the most mature public long-running agent harness -- and a work in progres
 | 8 | src/hooks/useCanUseTool.tsx | 12, 35 |
 | 9 | src/state/AppStateStore.ts | 10, 30 |
 | 10 | src/main.tsx | 1, 3, 6 |
+
+
+# Appendix D. Tool Reference Table
+
+This appendix catalogs every tool registered in the Claude Code harness. The table covers both the core tools that ship in the external build and the ant-only tools gated behind compile-time feature flags. Tools are grouped by functional category. The columns are:
+
+- **Tool Name**: the string returned by the tool's `name` property and seen by the model in the tool-use API.
+- **Directory / Source**: the directory under `src/tools/` or, for MCP-derived tools, the service path.
+- **Permission Required**: the permission class the harness checks before execution (Read, Write, Execute, Network, or None).
+- **Feature Flag Gate**: the `feature('...')` compile-time constant (if any) that must be true for the tool to exist in the build.
+- **Read-Only**: whether the tool is guaranteed to leave the filesystem and system state unchanged.
+- **Concurrency-Safe**: whether the tool can safely run in parallel with other instances of itself.
+- **Destructive**: whether the tool can irreversibly modify or delete data.
+
+## Core File System Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| Read | FileReadTool/ | Read | None | Yes | Yes | No |
+| Edit | FileEditTool/ | Write | None | No | No | No |
+| MultiEdit | FileEditTool/ | Write | None | No | No | No |
+| Write | FileWriteTool/ | Write | None | No | No | Yes |
+| NotebookEdit | NotebookEditTool/ | Write | None | No | No | No |
+| Glob | GlobTool/ | Read | None | Yes | Yes | No |
+| Grep | GrepTool/ | Read | None | Yes | Yes | No |
+
+## Shell Execution Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| Bash | BashTool/ | Execute | None | No | No | Varies |
+| PowerShell | BashTool/ (shared infra) | Execute | None (Windows only) | No | No | Varies |
+| REPL | REPLTool/ | Execute | None (ant-only runtime gate) | No | No | Varies |
+
+## Agent and Task Management Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| Agent | AgentTool/ | Execute | None | No | Yes | No |
+| TaskCreate | TaskCreateTool/ | Execute | None | No | No | No |
+| TaskGet | TaskGetTool/ | Read | None | Yes | Yes | No |
+| TaskUpdate | TaskUpdateTool/ | Execute | None | No | No | No |
+| TaskList | TaskListTool/ | Read | None | Yes | Yes | No |
+| TaskOutput | TaskOutputTool/ | Read | None | Yes | Yes | No |
+| TaskStop | TaskStopTool/ | Execute | None | No | No | No |
+| SendMessage | SendMessageTool/ | Execute | COORDINATOR_MODE | No | Yes | No |
+| TeamCreate | TeamCreateTool/ | Execute | KAIROS | No | No | No |
+| TeamDelete | TeamDeleteTool/ | Execute | KAIROS | No | No | Yes |
+
+## User Interaction and Plan Mode Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| AskUserQuestion | AskUserQuestionTool/ | None | None | Yes | Yes | No |
+| EnterPlanMode | EnterPlanModeTool/ | None | None | Yes | Yes | No |
+| ExitPlanMode | ExitPlanModeTool/ | None | None | Yes | Yes | No |
+| TodoWrite | TodoWriteTool/ | Write | None | No | No | No |
+| Config | ConfigTool/ | Execute | None (ant-only runtime gate) | No | No | Yes |
+
+## Web and Network Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| WebFetch | WebFetchTool/ | Network | None | Yes | No | No |
+| WebSearch | WebSearchTool/ | Network | None | Yes | No | No |
+
+## MCP Integration Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| (dynamic MCP tools) | MCPTool/ | Execute | None | Varies | Varies | Varies |
+| McpAuth | McpAuthTool/ (implicit) | Network | None | Yes | Yes | No |
+| ListMcpResourcesTool | ListMcpResourcesTool/ | Read | None | Yes | Yes | No |
+| ReadMcpResourceTool | ReadMcpResourceTool/ | Read | None | Yes | Yes | No |
+
+## Skill and Search Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| Skill | SkillTool/ | Execute | None | No | Yes | No |
+| ToolSearch | ToolSearchTool/ | Read | None | Yes | Yes | No |
+| LSP | LSPTool/ | Read | None (env gate: ENABLE_LSP_TOOL) | Yes | Yes | No |
+
+## Git Worktree Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| EnterWorktree | EnterWorktreeTool/ | Execute | WORKTREE_MODE | No | No | No |
+| ExitWorktree | ExitWorktreeTool/ | Execute | WORKTREE_MODE | No | No | Varies |
+
+## Scheduling and Trigger Tools
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| CronCreate | ScheduleCronTool/ | Execute | AGENT_TRIGGERS | No | No | No |
+| CronDelete | ScheduleCronTool/ | Execute | AGENT_TRIGGERS | No | No | Yes |
+| CronList | ScheduleCronTool/ | Read | AGENT_TRIGGERS | Yes | Yes | No |
+| RemoteTrigger | RemoteTriggerTool/ | Execute | AGENT_TRIGGERS_REMOTE | No | No | No |
+
+## Internal and Ant-Only Tools
+
+These tools are stripped from external builds via compile-time feature flags.
+
+| Tool Name | Directory | Permission | Feature Flag | Read-Only | Conc-Safe | Destructive |
+|---|---|---|---|---|---|---|
+| SendUserMessage | BriefTool/ | None | KAIROS or KAIROS_BRIEF | Yes | Yes | No |
+| StructuredOutput | SyntheticOutputTool/ | None | None (non-interactive only) | Yes | Yes | No |
+| Sleep | SleepTool/ | None | None | Yes | Yes | No |
+| Workflow | WorkflowTool/ | Execute | WORKFLOW_SCRIPTS | No | No | No |
+| Tungsten | (ant-only) | Read | None (ant-only runtime gate) | Yes | Yes | No |
+| Monitor | (ant-only) | Read | MONITOR_TOOL | Yes | Yes | No |
+| WebBrowser | (ant-only) | Execute | WEB_BROWSER_TOOL | No | No | No |
+| OverflowTest | (ant-only) | None | OVERFLOW_TEST_TOOL | Yes | Yes | No |
+| Snip | (ant-only) | None | HISTORY_SNIP | Yes | Yes | No |
+| TerminalCapture | (ant-only) | Read | TERMINAL_PANEL | Yes | Yes | No |
+| CtxInspect | (ant-only) | Read | CONTEXT_COLLAPSE | Yes | Yes | No |
+| SubscribePR | (ant-only) | Network | KAIROS_GITHUB_WEBHOOKS | Yes | No | No |
+| PushNotification | (ant-only) | Network | KAIROS_PUSH_NOTIFICATION | Yes | No | No |
+| SendUserFile | (ant-only) | Network | KAIROS | No | No | No |
+| SuggestBackgroundPR | (ant-only) | Execute | PROACTIVE | No | No | No |
+| ListPeers | (ant-only) | Read | UDS_INBOX | Yes | Yes | No |
+
+**Source files**: `src/Tool.ts` (base type definition), `src/tools.ts` (tool registration), `src/constants/tools.ts` (tool set constants), and individual tool directories under `src/tools/`.
+
+# Appendix E. System Prompt Section Catalog
+
+Claude Code assembles its system prompt from a set of named sections. Each section is either **cached** (computed once per session, recomputed on `/clear` or `/compact`) or **uncached** (recomputed every turn, which breaks the prompt cache when the value changes). The infrastructure is defined in `src/constants/systemPromptSections.ts`, and the sections themselves are registered in `src/constants/prompts.ts` via the `getSystemPrompt()` function.
+
+## Static Sections (Always Included, Cacheable)
+
+These sections are placed before the `SYSTEM_PROMPT_DYNAMIC_BOUNDARY` marker and are cacheable across the entire conversation when `shouldUseGlobalCacheScope()` returns true.
+
+| Section | Function | Content |
+|---|---|---|
+| Identity and Purpose | `getSimpleIntroSection()` | Establishes Claude Code identity, Anthropic attribution, and output style configuration |
+| Core Behavioral Rules | `getSimpleSystemSection()` | Cyber-risk instruction, proactive-information rules, tool-use discipline |
+| Task Execution | `getSimpleDoingTasksSection()` | Guidelines for git, code modifications, testing, debugging, writing code |
+| Actions | `getActionsSection()` | Available slash commands and their descriptions |
+| Tool Usage | `getUsingYourToolsSection()` | Rules for preferring dedicated tools over Bash, parallel call guidance |
+| Tone and Style | `getSimpleToneAndStyleSection()` | Emoji policy, conciseness, file path references, GitHub link format |
+| Output Efficiency | `getOutputEfficiencySection()` | Ant-only: prose communication rules; External: conciseness instructions |
+
+## Dynamic Sections (Registry-Managed)
+
+These sections are registered via `systemPromptSection()` or `DANGEROUS_uncachedSystemPromptSection()` and placed after the `SYSTEM_PROMPT_DYNAMIC_BOUNDARY` marker.
+
+| Section Name | Cached/Uncached | Recomputation Trigger | Content |
+|---|---|---|---|
+| `session_guidance` | Cached | /clear, /compact | Enabled tools list, skill tool commands, plan mode instructions, agent tool guidance, verification agent instructions |
+| `memory` | Cached | /clear, /compact | Contents of all CLAUDE.md files (user, project, local, managed) |
+| `ant_model_override` | Cached | /clear, /compact | Model override instructions for internal Anthropic users |
+| `env_info_simple` | Cached | /clear, /compact | OS, shell, working directory, git branch, date, model name |
+| `language` | Cached | /clear, /compact | Output language preference from settings |
+| `output_style` | Cached | /clear, /compact | Custom output style rules from user configuration |
+| `mcp_instructions` | **Uncached** | Every turn | Instructions from connected MCP servers; recomputed because servers connect and disconnect between turns. Skipped when MCP instructions delta is enabled (uses attachments instead) |
+| `scratchpad` | Cached | /clear, /compact | Scratchpad directory path and usage instructions |
+| `frc` | Cached | /clear, /compact | Function result clearing instructions and micro-compact configuration |
+| `summarize_tool_results` | Cached | /clear, /compact | Instructions for summarizing verbose tool outputs |
+| `numeric_length_anchors` | Cached | /clear, /compact | Numeric word limits for responses (ant-only: 25 words between tool calls, 100 words for final responses) |
+| `token_budget` | Cached | /clear, /compact | Instructions for working until token target is reached (TOKEN_BUDGET feature) |
+| `brief` | Cached | /clear, /compact | Brief response mode instructions (KAIROS/KAIROS_BRIEF) |
+
+## Section Resolution Mechanism
+
+The `resolveSystemPromptSections()` function in `systemPromptSections.ts` manages caching:
+
+1. For each section, it checks whether the section is cached (`cacheBreak: false`) and whether a cached value exists.
+2. If cached and available, it returns the cached value without recomputation.
+3. If uncached (`cacheBreak: true`) or no cached value exists, it calls the section's `compute()` function.
+4. Results are stored in the section cache via `setSystemPromptSectionCacheEntry()`.
+5. The entire cache is cleared by `clearSystemPromptSections()`, which is called on `/clear` and `/compact`. This function also resets beta header latches so fresh conversations get fresh evaluation of AFK/fast-mode/cache-editing headers.
+
+The `SYSTEM_PROMPT_DYNAMIC_BOUNDARY` marker separates the static prefix (identical across sessions using the same tool set) from the dynamic suffix. When `shouldUseGlobalCacheScope()` is true, the static prefix produces the same Blake2b hash across sessions, enabling prompt caching optimization at the provider level.
+
+**Source files**: `src/constants/systemPromptSections.ts`, `src/constants/prompts.ts`, `src/utils/systemPrompt.ts`.
+
+# Appendix F. Feature Flag Reference
+
+Claude Code uses Bun's `feature()` compile-time constant mechanism for dead-code elimination. When a flag is false in the build configuration, the bundler removes all gated code paths entirely, keeping the external binary small and preventing access to ant-only features. The table below lists all 97 feature flags found in the source, organized by functional domain.
+
+## Agent and Coordination Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| COORDINATOR_MODE | Multi-agent coordinator mode | Ant | coordinatorMode.ts, tool registration (AgentTool + TaskStop in SIMPLE mode), session resume mode selection |
+| AGENT_TRIGGERS | Scheduled task triggers (cron) | Ant | CronCreate/CronDelete/CronList tools, useScheduledTasks hook |
+| AGENT_TRIGGERS_REMOTE | Remote-triggered agents | Ant | RemoteTriggerTool |
+| AGENT_MEMORY_SNAPSHOT | Agent memory snapshots | Ant | Memory snapshot persistence for custom agents |
+| BUILTIN_EXPLORE_PLAN_AGENTS | Built-in explore/plan agent types | Ant | Explore and Plan agent definitions in agent tool |
+| FORK_SUBAGENT | Fork-style subagent spawning | Ant | Fork subagent path in AgentTool, prompt guidance |
+| VERIFICATION_AGENT | Adversarial verification agent | Ant | Verification agent prompt section, subagent_type verification |
+| BG_SESSIONS | Background session management | Ant | Background session startup, task summary module |
+| TEAMMEM | Team memory synchronization | Ant | Team memory paths, watcher, prompts, file detection |
+| UDS_INBOX | Unix domain socket inbox | Ant | ListPeersTool, messaging socket setup |
+
+## Kairos and Assistant Mode Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| KAIROS | Full Kairos/assistant feature set | Ant | BriefTool, SendUserFileTool, proactive sections, brief section, numeric length anchors, keybindings, assistant activation, channel notifications |
+| KAIROS_BRIEF | Brief response mode subset | Ant | BriefTool, brief section, getUserMsgOptIn |
+| KAIROS_CHANNELS | Channel notification support | Ant | Channel notification system, MCP connection channel handling |
+| KAIROS_DREAM | Dream/consolidation feature | Ant | Dream skill in bundled skills |
+| KAIROS_GITHUB_WEBHOOKS | GitHub PR webhook subscriptions | Ant | SubscribePRTool |
+| KAIROS_PUSH_NOTIFICATION | Push notification support | Ant | PushNotificationTool |
+| BUDDY | Companion sprite UI | Ant | CompanionSprite component, companion prompts, floating bubble |
+
+## Bridge and Remote Connectivity Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| BRIDGE_MODE | Remote Control bridge | Ant | bridgeEnabled.ts, entire bridge subsystem, replBridge.ts |
+| CCR_AUTO_CONNECT | Auto-connect to CCR | Ant | getCcrAutoConnectDefault() |
+| CCR_MIRROR | CCR mirror mode | Ant | isCcrMirrorEnabled(), mirror telemetry |
+| CCR_REMOTE_SETUP | Remote setup via CCR | Ant | Remote setup flow in bridge |
+| DIRECT_CONNECT | Direct connection mode | Ant | Direct connect startup path in main.tsx |
+| SSH_REMOTE | SSH remote session support | Ant | SSH remote pending state in main.tsx |
+| LODESTONE | Lodestone integration | Ant | Lodestone startup check, settings types |
+
+## Tool-Specific Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| WORKTREE_MODE | Git worktree support | External | EnterWorktreeTool, ExitWorktreeTool |
+| WORKFLOW_SCRIPTS | Workflow script execution | Ant | WorkflowTool, agent disallowed tools |
+| MONITOR_TOOL | File/system monitoring | Ant | MonitorTool, Bash/PowerShell background task hints |
+| WEB_BROWSER_TOOL | Web browser tool | Ant | WebBrowserTool, WebBrowserPanel component |
+| OVERFLOW_TEST_TOOL | Context overflow testing | Ant | OverflowTestTool |
+| HISTORY_SNIP | Conversation snipping | Ant | SnipTool, message history snip handling |
+| TERMINAL_PANEL | Terminal panel UI | Ant | TerminalCaptureTool, keybindings |
+
+## Context and Compaction Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| REACTIVE_COMPACT | Reactive context compaction | Ant | Reactive compaction triggers in analyzeContext.ts, autoCompact.ts |
+| CONTEXT_COLLAPSE | Context collapse/overflow handling | Ant | CtxInspectTool, ResumeConversation context selection, session restore |
+| CACHED_MICROCOMPACT | Cached micro-compact section | Ant | getCachedMCConfigForFRC, micro-compact cache editing |
+| COMPACTION_REMINDERS | Compaction reminder attachments | Ant | Compaction reminder attachment generation |
+| PROMPT_CACHE_BREAK_DETECTION | Detect prompt cache breaks | Ant | Micro-compact cache-break detection, compact flow |
+
+## Permissions and Security Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| TRANSCRIPT_CLASSIFIER | Transcript classification | Ant | AFK mode beta header, BASH_CLASSIFIER integration, auto-mode state, tool execution classification |
+| BASH_CLASSIFIER | Bash command classification | Ant | StructuredIO classification, permission handlers, classifier decision |
+| TREE_SITTER_BASH | Tree-sitter Bash parsing | Ant | Bash parser tree-sitter path |
+| TREE_SITTER_BASH_SHADOW | Tree-sitter Bash shadow mode | Ant | Shadow-mode comparison in bashPermissions |
+| POWERSHELL_AUTO_MODE | PowerShell auto-mode support | Ant | PowerShell classifier integration |
+| NATIVE_CLIENT_ATTESTATION | Client attestation header | Ant | CCH header in HTTP requests |
+| ANTI_DISTILLATION_CC | Anti-distillation protections | Ant | Anti-distillation markers in system prompt |
+
+## UI and Experience Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| VOICE_MODE | Voice input mode | Ant | Voice integration hooks, keybindings, voice provider |
+| MESSAGE_ACTIONS | Message action buttons | Ant | Keybinding registration, message action handlers |
+| QUICK_SEARCH | Quick search keybinding | Ant | Keybinding registration |
+| AUTO_THEME | Auto theme detection | Ant | Theme settings options |
+| NATIVE_CLIPBOARD_IMAGE | Native clipboard image paste | Ant | Image paste handling |
+| HISTORY_PICKER | History picker UI | Ant | History navigation UI |
+| ULTRAPLAN | Ultraplan planning mode | Ant | Ultraplan choice/launch dialogs in REPL |
+| ULTRATHINK | Ultra-thinking mode | Ant | Thinking configuration |
+| STREAMLINED_OUTPUT | Streamlined output format | Ant | Output rendering in print.ts |
+
+## Skill and Plugin Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| EXPERIMENTAL_SKILL_SEARCH | Skill search functionality | Ant | Skill search section, DiscoverSkills tool, skill index cache |
+| SKILL_IMPROVEMENT | Skill improvement suggestions | Ant | Skill improvement flow |
+| RUN_SKILL_GENERATOR | Skill generator execution | Ant | Skill generator in bundled skills |
+| MCP_SKILLS | MCP skills integration | Ant | MCP skill fetching, resource-based skills |
+| MCP_RICH_OUTPUT | Rich MCP output rendering | Ant | MCPTextOutput component in MCPTool UI |
+| TEMPLATES | Template job classification | Ant | Job classifier in query, markdown config |
+| BUILDING_CLAUDE_APPS | Claude apps building skill | Ant | Building-claude-apps bundled skill |
+| REVIEW_ARTIFACT | Review artifact skill | Ant | Review artifact bundled skill |
+
+## Telemetry and Diagnostics Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| ENHANCED_TELEMETRY_BETA | Enhanced telemetry | Ant | Session tracing configuration |
+| PERFETTO_TRACING | Perfetto trace export | Ant | Perfetto tracing initialization |
+| MEMORY_SHAPE_TELEMETRY | Memory shape telemetry | Ant | Memory file access hooks |
+| COWORKER_TYPE_TELEMETRY | Coworker type telemetry | Ant | Coworker type metadata |
+| SHOT_STATS | Shot-level statistics | Ant | Shot distribution tracking in stats |
+| SLOW_OPERATION_LOGGING | Slow operation logging | Ant | Slow operation threshold configuration |
+| DUMP_SYSTEM_PROMPT | System prompt dump | Ant | System prompt dump to file |
+
+## Settings, Configuration, and Miscellaneous Flags
+
+| Flag Name | Purpose | Ant/External | Gated Code Paths |
+|---|---|---|---|
+| UPLOAD_USER_SETTINGS | Upload user settings sync | Ant | Settings upload in main.tsx |
+| DOWNLOAD_USER_SETTINGS | Download user settings sync | Ant | Settings download in print.ts, reload-plugins |
+| TOKEN_BUDGET | Token budget tracking | Ant | Token budget section, budget tracker in query |
+| PROACTIVE | Proactive agent behavior | Ant | Proactive section, SuggestBackgroundPRTool, proactive module |
+| CONNECTOR_TEXT | Connector text summarization | Ant | Summarize connector text beta header |
+| COMMIT_ATTRIBUTION | Commit attribution tracking | Ant | Commit attribution setup, session restore |
+| HOOK_PROMPTS | Hook prompt request support | Ant | Prompt request passing in REPL query |
+| HARD_FAIL | Hard failure mode | Ant | Hard-fail error handling in log.ts |
+| BREAK_CACHE_COMMAND | Cache-break command injection | Ant | Context injection in context.ts |
+| EXTRACT_MEMORIES | Memory extraction mode | Ant | Extract memories module in print.ts |
+| FILE_PERSISTENCE | File persistence tracking | Ant | File persistence in filePersistence.ts |
+| ABLATION_BASELINE | Ablation baseline mode | Ant | Ablation baseline env var check |
+| AWAY_SUMMARY | Away summary feature | Ant | Away summary rendering in REPL |
+| DAEMON | Background daemon mode | Ant | Daemon startup, persistent sessions |
+| CHICAGO_MCP | MCP tool proxy mode | Ant | MCP tool proxy configuration, computer use wrapper |
+| NEW_INIT | New initialization flow | Ant | Init command flow |
+| SELF_HOSTED_RUNNER | Self-hosted runner mode | Ant | Runner configuration |
+| BYOC_ENVIRONMENT_RUNNER | BYOC environment runner | Ant | BYOC runner setup |
+| ALLOW_TEST_VERSIONS | Allow test version numbers | Ant | Version validation bypass for 99.99.x |
+| IS_LIBC_GLIBC | glibc detection | Build | Libc detection for native module loading |
+| IS_LIBC_MUSL | musl detection | Build | Libc detection for native module loading |
+| TORCH | Torch integration | Ant | Torch-related features |
+| UNATTENDED_RETRY | Unattended retry mode | Ant | Retry logic in withRetry.ts |
+
+**Source**: All flags extracted via `grep -r "feature('" src/ | grep -oP "feature\('([^']+)'\)" | sort -u`. Total: 97 unique flags.
+
+# Appendix G. Hook Event Reference
+
+The Claude Code hook system fires events at well-defined points in the session lifecycle. Hooks can be configured in `settings.json` as command hooks (shell scripts), prompt hooks (natural-language instructions the model receives), agent hooks (subagent invocations), or HTTP hooks (webhook POST requests). All hook events share a set of base fields defined in `BaseHookInputSchema`:
+
+- `session_id` (string): Current session identifier
+- `transcript_path` (string): Path to the session transcript file
+- `cwd` (string): Current working directory
+- `permission_mode` (string, optional): Active permission mode
+- `agent_id` (string, optional): Subagent identifier, present only when the hook fires from within a subagent
+- `agent_type` (string, optional): Agent type name (e.g., "general-purpose"), present for subagents or main-thread --agent sessions
+
+The table below lists all 28 hook events, their event-specific fields, and what they can modify through hook output.
+
+## Tool Lifecycle Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| PreToolUse | Before a tool is executed | `tool_name`, `tool_input`, `tool_use_id` | Permission decision (approve/block), modified input (`updatedInput`), updated permissions (`updatedPermissions`), additional context (`additionalContext`) |
+| PostToolUse | After a tool completes successfully | `tool_name`, `tool_input`, `tool_response`, `tool_use_id` | Additional context (`additionalContext`), modified MCP tool output (`updatedMCPToolOutput`) |
+| PostToolUseFailure | After a tool fails | `tool_name`, `tool_input`, `tool_use_id`, `error`, `is_interrupt?` | Additional context (`additionalContext`) |
+| PermissionRequest | When a permission is requested | `tool_name`, `tool_input`, `permission_suggestions?` | Decision (allow with `updatedInput`/`updatedPermissions`, or deny with `message`/`interrupt`) |
+| PermissionDenied | When a permission is denied | `tool_name`, `tool_input`, `tool_use_id`, `reason` | Retry flag (`retry`) |
+
+## Session Lifecycle Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| SessionStart | When a new session begins | `source` (startup / resume / clear / compact), `agent_type?`, `model?` | Additional context (`additionalContext`), initial user message (`initialUserMessage`), watch paths (`watchPaths`) |
+| SessionEnd | When a session ends | `reason` (clear / resume / logout / prompt_input_exit / other / bypass_permissions_disabled) | Clean up resources, save state (no specific output fields) |
+| Setup | During initial setup | `trigger` (init / maintenance) | Additional context (`additionalContext`) |
+| Stop | When the agent stops normally | `stop_hook_active`, `last_assistant_message?` | Continue flag, stop reason, system message |
+| StopFailure | When the agent stops due to failure | `error` (authentication_failed / billing_error / rate_limit / invalid_request / server_error / unknown / max_output_tokens), `error_details?`, `last_assistant_message?` | Continue flag, stop reason, system message |
+
+## User Input Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| UserPromptSubmit | When user submits a prompt | `prompt` | Additional context (`additionalContext`) |
+| Notification | Asynchronous notification | `message`, `title?`, `notification_type` | Additional context (`additionalContext`) |
+
+## Agent Lifecycle Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| SubagentStart | When a sub-agent is spawned | `agent_id`, `agent_type` | Additional context (`additionalContext`) |
+| SubagentStop | When a sub-agent completes | `stop_hook_active`, `agent_id`, `agent_transcript_path`, `agent_type`, `last_assistant_message?` | Continue flag, stop reason, system message |
+| TeammateIdle | When a teammate agent becomes idle | `teammate_name`, `team_name` | Continue flag, stop reason, system message |
+
+## Task Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| TaskCreated | When a task is created | `task_id`, `task_subject`, `task_description?`, `teammate_name?`, `team_name?` | Continue flag, stop reason, system message |
+| TaskCompleted | When a task is completed | `task_id`, `task_subject`, `task_description?`, `teammate_name?`, `team_name?` | Continue flag, stop reason, system message |
+
+## Context Management Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| PreCompact | Before context compaction | `trigger` (manual / auto), `custom_instructions` (nullable) | Continue flag, stop reason, system message |
+| PostCompact | After context compaction | `trigger` (manual / auto), `compact_summary` | Continue flag, stop reason, system message |
+
+## Configuration and File System Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| ConfigChange | When configuration changes | `source` (user_settings / project_settings / local_settings / policy_settings / skills), `file_path?` | Continue flag, stop reason, system message |
+| CwdChanged | When working directory changes | `old_cwd`, `new_cwd` | Watch paths (`watchPaths`) |
+| FileChanged | When a watched file is modified | `file_path`, `event` (change / add / unlink) | Watch paths (`watchPaths`) |
+| InstructionsLoaded | When CLAUDE.md is loaded | `file_path`, `memory_type` (User / Project / Local / Managed), `load_reason` (session_start / nested_traversal / path_glob_match / include / compact), `globs?`, `trigger_file_path?`, `parent_file_path?` | Continue flag, stop reason, system message |
+
+## Worktree Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| WorktreeCreate | When a git worktree is created | `name` | Worktree path (`worktreePath`) |
+| WorktreeRemove | When a git worktree is removed | `worktree_path` | Continue flag, stop reason, system message |
+
+## MCP Elicitation Events
+
+| Event Name | When It Fires | Event-Specific Fields | What It Can Modify |
+|---|---|---|---|
+| Elicitation | When an MCP server requests user input | `mcp_server_name`, `message`, `mode?` (form / url), `url?`, `elicitation_id?`, `requested_schema?` | Action (accept / decline / cancel), content |
+| ElicitationResult | After user responds to an MCP elicitation | `mcp_server_name`, `elicitation_id?`, `mode?` (form / url), `action` (accept / decline / cancel), `content?` | Override action and content before response is sent to MCP server |
+
+## Common Hook Output Fields
+
+All synchronous hook outputs can include these general-purpose fields (defined in `SyncHookJSONOutputSchema`):
+
+| Field | Type | Purpose |
+|---|---|---|
+| `continue` | boolean | Whether to continue processing |
+| `suppressOutput` | boolean | Whether to suppress hook output display |
+| `stopReason` | string | Reason for stopping (if applicable) |
+| `decision` | "approve" or "block" | Permission decision (PreToolUse context) |
+| `systemMessage` | string | System message to inject |
+| `reason` | string | Reason for the decision |
+| `hookSpecificOutput` | object | Event-specific output (keyed by `hookEventName`) |
+
+Hooks can also return an async output (`{ async: true, asyncTimeout?: number }`) to indicate that the hook will complete asynchronously.
+
+**Source files**: `src/entrypoints/sdk/coreTypes.ts` (HOOK_EVENTS array, lines 24-52), `src/entrypoints/sdk/coreSchemas.ts` (all hook input and output schemas), `src/utils/hooks.ts` (hook execution infrastructure).
+
+# Appendix H. Environment Variables
+
+Claude Code reads a large number of environment variables to configure its behavior at runtime. Unlike feature flags (which are compile-time constants), environment variables can be set by users, CI systems, SDK hosts, and the bridge subsystem. This appendix catalogs the most significant variables, grouped by subsystem.
+
+## Authentication and API Provider Selection
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| ANTHROPIC_API_KEY | Auth | API key for direct Anthropic API access | None |
+| ANTHROPIC_AUTH_TOKEN | Auth | Alternative auth token (OAuth or API key) | None |
+| CLAUDE_CODE_OAUTH_TOKEN | Auth | OAuth token for claude.ai authentication | None |
+| CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR | Auth | File descriptor containing OAuth token | None |
+| CLAUDE_CODE_OAUTH_REFRESH_TOKEN | Auth | OAuth refresh token for token renewal | None |
+| CLAUDE_CODE_OAUTH_SCOPES | Auth | OAuth scopes for refresh token | None |
+| CLAUDE_CODE_API_KEY_FILE_DESCRIPTOR | Auth | File descriptor containing API key | None |
+| CLAUDE_CODE_API_KEY_HELPER_TTL_MS | Auth | TTL for API key helper cache | None |
+| CLAUDE_CODE_USE_BEDROCK | Auth | Use AWS Bedrock for inference | false |
+| CLAUDE_CODE_USE_VERTEX | Auth | Use Google Vertex AI for inference | false |
+| CLAUDE_CODE_USE_FOUNDRY | Auth | Use Anthropic Foundry for inference | false |
+| CLAUDE_CODE_SKIP_BEDROCK_AUTH | Auth | Skip Bedrock credential validation | false |
+| CLAUDE_CODE_SKIP_VERTEX_AUTH | Auth | Skip Vertex credential validation | false |
+| CLAUDE_CODE_SKIP_FOUNDRY_AUTH | Auth | Skip Foundry credential validation | false |
+| CLAUDE_TRUSTED_DEVICE_TOKEN | Auth | Override trusted device token | None |
+| CLAUDE_CODE_ACCOUNT_UUID | Auth | Account UUID for OAuth context | None |
+| CLAUDE_CODE_USER_EMAIL | Auth | User email for OAuth context | None |
+| CLAUDE_CODE_ORGANIZATION_UUID | Auth | Organization UUID for OAuth context | None |
+| CLAUDE_CODE_ENABLE_XAA | Auth | Enable XAA IDP login flow | false |
+
+## API and Network Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| ANTHROPIC_BASE_URL | API | Base URL for Anthropic API | None (uses OAuth config default) |
+| ANTHROPIC_CUSTOM_HEADERS | API | Custom headers for API requests (JSON or key:value format) | None |
+| ANTHROPIC_BETAS | API | Comma-separated list of beta features to enable | None |
+| ANTHROPIC_UNIX_SOCKET | API | Unix socket path for API connection | None |
+| ANTHROPIC_BEDROCK_BASE_URL | API | Override Bedrock endpoint URL | None |
+| ANTHROPIC_FOUNDRY_BASE_URL | API | Override Foundry endpoint URL | None |
+| ANTHROPIC_FOUNDRY_RESOURCE | API | Foundry resource identifier | None |
+| ANTHROPIC_FOUNDRY_API_KEY | API | API key for Foundry access | None |
+| ANTHROPIC_VERTEX_PROJECT_ID | API | Google Cloud project ID for Vertex | None |
+| CLAUDE_CODE_API_BASE_URL | API | Alternative base URL for API | None |
+| CLAUDE_CODE_EXTRA_BODY | API | Extra JSON body fields for API requests | None |
+| CLAUDE_CODE_EXTRA_METADATA | API | Extra metadata for API requests | None |
+| CLAUDE_CODE_ADDITIONAL_PROTECTION | API | Additional protection header value | None |
+| CLAUDE_CODE_MAX_RETRIES | API | Maximum number of API retries | Provider-dependent |
+| CLAUDE_CODE_UNATTENDED_RETRY | API | Enable unattended retry mode | false |
+| CLAUDE_CODE_PROXY_RESOLVES_HOSTS | Network | Proxy resolves hostnames (skip DNS) | false |
+
+## Model Selection and Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| ANTHROPIC_MODEL | Model | Override the default model | None |
+| ANTHROPIC_SMALL_FAST_MODEL | Model | Override the small/fast model (Haiku) | None |
+| ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION | Model | AWS region for small/fast model on Bedrock | None |
+| ANTHROPIC_DEFAULT_OPUS_MODEL | Model | Custom Opus model identifier | None |
+| ANTHROPIC_DEFAULT_OPUS_MODEL_NAME | Model | Display name for custom Opus model | None |
+| ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION | Model | Description for custom Opus model | None |
+| ANTHROPIC_DEFAULT_SONNET_MODEL | Model | Custom Sonnet model identifier | None |
+| ANTHROPIC_DEFAULT_SONNET_MODEL_NAME | Model | Display name for custom Sonnet model | None |
+| ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION | Model | Description for custom Sonnet model | None |
+| ANTHROPIC_DEFAULT_HAIKU_MODEL | Model | Custom Haiku model identifier | None |
+| ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME | Model | Display name for custom Haiku model | None |
+| ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION | Model | Description for custom Haiku model | None |
+| ANTHROPIC_CUSTOM_MODEL_OPTION | Model | Entirely custom model identifier | None |
+| ANTHROPIC_CUSTOM_MODEL_OPTION_NAME | Model | Display name for custom model | None |
+| ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION | Model | Description for custom model | None |
+| CLAUDE_CODE_MAX_OUTPUT_TOKENS | Model | Maximum output tokens per turn | Model default |
+| CLAUDE_CODE_MAX_CONTEXT_TOKENS | Model | Override maximum context window size | Model default |
+| CLAUDE_CODE_SUBAGENT_MODEL | Model | Override model for subagent sessions | Parent model |
+| CLAUDE_CODE_DISABLE_THINKING | Model | Disable extended thinking entirely | false |
+| CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING | Model | Disable adaptive thinking (Opus 4.6+) | false |
+| CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP | Model | Disable legacy model name remapping | false |
+| CLAUDE_CODE_DISABLE_1M_CONTEXT | Model | Disable 1M context window | false |
+| CLAUDE_CODE_EFFORT_LEVEL | Model | Override effort level (low/medium/high/max) | None |
+| CLAUDE_CODE_ALWAYS_ENABLE_EFFORT | Model | Always show effort level controls | false |
+
+## Mode and Entrypoint Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_SIMPLE | Mode | Simple mode (Bash, Read, Edit only) | false |
+| CLAUDE_CODE_BARE | Mode | Bare mode (no TUI, minimal features) | false |
+| CLAUDE_CODE_ENTRYPOINT | Mode | Entrypoint identifier (cli / sdk-ts / sdk-py / sdk-cli / mcp / remote / local-agent / claude-desktop / claude-vscode / claude-code-github-action) | cli |
+| CLAUDE_CODE_COORDINATOR_MODE | Mode | Enable coordinator mode | false |
+| CLAUDE_CODE_ACTION | Mode | GitHub Action mode | false |
+| CLAUDE_CODE_PROACTIVE | Mode | Enable proactive agent behavior | false |
+| CLAUDE_CODE_BRIEF | Mode | Enable brief response mode | false |
+| CLAUDE_CODE_VERIFY_PLAN | Mode | Enable plan verification mode | false |
+| CLAUDE_CODE_PLAN_MODE_REQUIRED | Mode | Require plan mode for teammates | false |
+| CLAUDE_CODE_UNDERCOVER | Mode | Undercover mode (ant-internal) | false |
+
+## Bridge and Remote Mode
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_REMOTE | Bridge | Running in remote/bridge mode | false |
+| CLAUDE_CODE_REMOTE_SESSION_ID | Bridge | Remote session identifier | None |
+| CLAUDE_CODE_REMOTE_MEMORY_DIR | Bridge | Override memory directory for remote mode | None |
+| CLAUDE_CODE_REMOTE_ENVIRONMENT_TYPE | Bridge | Remote environment type metadata | None |
+| CLAUDE_CODE_ENVIRONMENT_KIND | Bridge | Environment type indicator (e.g., "bridge") | None |
+| CLAUDE_CODE_SESSION_ACCESS_TOKEN | Bridge | Session access token for ingress auth | None |
+| CLAUDE_CODE_WEBSOCKET_AUTH_FILE_DESCRIPTOR | Bridge | File descriptor for WebSocket auth | None |
+| CLAUDE_CODE_USE_CCR_V2 | Bridge | Use CCR v2 transport protocol | false |
+| CLAUDE_CODE_POST_FOR_SESSION_INGRESS_V2 | Bridge | Use POST for session ingress v2 | false |
+| CLAUDE_CODE_WORKER_EPOCH | Bridge | Worker epoch for CCR v2 | None |
+| CLAUDE_BRIDGE_BASE_URL | Bridge | Override bridge base URL (dev) | None |
+| CLAUDE_BRIDGE_USE_CCR_V2 | Bridge | Override CCR v2 usage (dev) | false |
+| CLAUDE_BRIDGE_SESSION_INGRESS_URL | Bridge | Override session ingress URL (dev) | None |
+| CLAUDE_BRIDGE_OAUTH_TOKEN | Bridge | Override bridge OAuth token | None |
+| CLAUDE_CODE_CCR_MIRROR | Bridge | Enable CCR mirror mode | false |
+| CLAUDE_CODE_CONTAINER_ID | Bridge | Container identifier for remote sessions | None |
+| CLAUDE_CODE_REMOTE_SEND_KEEPALIVES | Bridge | Send keepalive messages in remote mode | false |
+
+## SDK and Agent Integration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_AGENT_SDK_VERSION | SDK | Agent SDK version identifier | None |
+| CLAUDE_AGENT_SDK_CLIENT_APP | SDK | Client application identifier | None |
+| CLAUDE_AGENT_SDK_MCP_NO_PREFIX | SDK | Skip shell prefix for MCP server commands | false |
+| CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS | SDK | Disable built-in agent types | false |
+| CLAUDE_CODE_STREAM_CLOSE_TIMEOUT | SDK | Timeout for MCP stream close (ms) | 60000 |
+| CLAUDE_CODE_AGENT | Agent | Agent CLI definition path | None |
+| CLAUDE_CODE_TASK_LIST_ID | Agent | Task list identifier for agent | None |
+| CLAUDE_CODE_SESSION_KIND | Agent | Session kind (main / bg) | None |
+| CLAUDE_CODE_SESSION_NAME | Agent | Named session identifier | None |
+| CLAUDE_CODE_SESSION_LOG | Agent | Session log path | None |
+| CLAUDE_CODE_MESSAGING_SOCKET | Agent | Unix socket path for messaging | None |
+| CLAUDE_CODE_SESSION_ID | Agent | Session identifier (ant-internal) | None |
+| CLAUDE_CODE_IS_COWORK | Agent | Running in cowork mode | false |
+
+## Privacy, Telemetry, and Diagnostics
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC | Privacy | Disable non-essential network requests (telemetry, GrowthBook, official registry) | false |
+| CLAUDE_CODE_ENABLE_TELEMETRY | Telemetry | Enable OpenTelemetry instrumentation | false |
+| CLAUDE_CODE_OTEL_SHUTDOWN_TIMEOUT_MS | Telemetry | OTEL shutdown timeout (ms) | 2000 |
+| CLAUDE_CODE_OTEL_FLUSH_TIMEOUT_MS | Telemetry | OTEL flush timeout (ms) | 5000 |
+| CLAUDE_CODE_OTEL_HEADERS_HELPER_DEBOUNCE_MS | Telemetry | OTEL headers helper debounce (ms) | None |
+| CLAUDE_CODE_ENHANCED_TELEMETRY_BETA | Telemetry | Enhanced telemetry beta setting | None |
+| CLAUDE_CODE_PERFETTO_TRACE | Telemetry | Perfetto trace output file path | None |
+| CLAUDE_CODE_PERFETTO_WRITE_INTERVAL_S | Telemetry | Perfetto write interval (seconds) | None |
+| CLAUDE_CODE_DATADOG_FLUSH_INTERVAL_MS | Telemetry | Datadog flush interval (ms) | None |
+| CLAUDE_CODE_DIAGNOSTICS_FILE | Diagnostics | Diagnostics output file path | None |
+| CLAUDE_CODE_DEBUG_LOG_LEVEL | Diagnostics | Debug log level (error/warn/info/debug/trace) | None |
+| CLAUDE_CODE_DEBUG_LOGS_DIR | Diagnostics | Debug logs directory | None |
+| CLAUDE_DEBUG | Diagnostics | Enable verbose debug output | false |
+| CLAUDE_CODE_PROFILE_STARTUP | Diagnostics | Enable startup profiling | false |
+| CLAUDE_CODE_PROFILE_QUERY | Diagnostics | Enable query profiling | false |
+| CLAUDE_CODE_DUMP_AUTO_MODE | Diagnostics | Dump auto-mode classifier decisions | false |
+
+## Tool and Feature Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| ENABLE_LSP_TOOL | Tools | Enable the LSP tool | false |
+| DISABLE_PROMPT_CACHING | Performance | Disable prompt caching | false |
+| CLAUDE_CODE_DISABLE_FAST_MODE | Performance | Disable fast mode (Haiku routing) | false |
+| CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS | Performance | Skip fast mode on network errors | false |
+| CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY | Tools | Maximum parallel tool executions | 10 |
+| CLAUDE_CODE_DISABLE_BACKGROUND_TASKS | Tools | Disable background task support | false |
+| CLAUDE_CODE_DISABLE_CRON | Tools | Disable cron scheduling | false |
+| CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS | Tools | Override file read max output tokens | None |
+| CLAUDE_CODE_DISABLE_COMMAND_INJECTION_CHECK | Security | Disable command injection detection | false |
+| CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING | Tools | Disable file checkpointing/undo | false |
+| CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING | Tools | Enable file checkpointing in SDK mode | false |
+| CLAUDE_CODE_DISABLE_ADVISOR_TOOL | Tools | Disable advisor tool | false |
+| CLAUDE_CODE_DISABLE_ATTACHMENTS | Tools | Disable message attachments | false |
+| CLAUDE_CODE_ENABLE_TOKEN_USAGE_ATTACHMENT | Tools | Enable token usage attachment | false |
+| CLAUDE_CODE_GLOB_TIMEOUT_SECONDS | Tools | Timeout for glob operations (seconds) | 0 (no timeout) |
+| CLAUDE_CODE_GLOB_NO_IGNORE | Tools | Disable .gitignore in glob | true |
+| CLAUDE_CODE_GLOB_HIDDEN | Tools | Include hidden files in glob | true |
+| CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING | Tools | Enable fine-grained tool streaming | false |
+| CLAUDE_CODE_TWO_STAGE_CLASSIFIER | Security | Enable two-stage bash classifier | None |
+| CLAUDE_CODE_AUTO_MODE_MODEL | Security | Model for auto-mode classifier | None |
+| CLAUDE_CODE_JSONL_TRANSCRIPT | Diagnostics | Enable JSONL transcript output | None |
+| ENABLE_TOOL_SEARCH | Tools | Override tool search enablement | None |
+
+## UI and Display Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_DISABLE_TERMINAL_TITLE | UI | Disable terminal title updates | false |
+| CLAUDE_CODE_DISABLE_VIRTUAL_SCROLL | UI | Disable virtual scroll rendering | false |
+| CLAUDE_CODE_DISABLE_MOUSE | UI | Disable mouse support | false |
+| CLAUDE_CODE_DISABLE_MOUSE_CLICKS | UI | Disable mouse click handling | false |
+| CLAUDE_CODE_NO_FLICKER | UI | Enable flicker-free rendering | Platform-dependent |
+| CLAUDE_CODE_ACCESSIBILITY | UI | Enable accessibility mode | false |
+| CLAUDE_CODE_SCROLL_SPEED | UI | Scroll speed multiplier | None |
+| CLAUDE_CODE_FORCE_FULL_LOGO | UI | Force full logo display | false |
+| CLAUDE_CODE_SYNTAX_HIGHLIGHT | UI | Syntax highlighting theme (or "false" to disable) | BAT_THEME or auto |
+| CLAUDE_CODE_DISABLE_MESSAGE_ACTIONS | UI | Disable message action buttons | false |
+| CLAUDE_CODE_EXIT_AFTER_FIRST_RENDER | UI | Exit after first render (testing) | false |
+| CLAUDE_CODE_FRAME_TIMING_LOG | UI | Frame timing log file path | None |
+| CLAUDE_CODE_COMMIT_LOG | UI | Commit log file for reconciler | None |
+| CLAUDE_CODE_DEBUG_REPAINTS | UI | Debug repaint cycle logging | false |
+| CLAUDE_CODE_TERMINAL_RECORDING | UI | Enable terminal recording (asciicast) | false |
+| CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION | UI | Enable prompt suggestions | None |
+| CLAUDE_CODE_QUESTION_PREVIEW_FORMAT | UI | Question preview format | None |
+
+## Session, Memory, and Configuration Paths
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CONFIG_DIR | Config | Override ~/.claude config directory | ~/.claude |
+| CLAUDE_ENV_FILE | Config | Path to environment file | None |
+| CLAUDE_CODE_OVERRIDE_DATE | Config | Override current date string | None |
+| CLAUDE_CODE_MANAGED_SETTINGS_PATH | Config | Override managed settings file path | None |
+| CLAUDE_CODE_DISABLE_AUTO_MEMORY | Memory | Disable automatic memory creation | false |
+| CLAUDE_CODE_DISABLE_CLAUDE_MDS | Memory | Disable CLAUDE.md loading | false |
+| CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD | Memory | Additional directories for CLAUDE.md search | None |
+| CLAUDE_COWORK_MEMORY_PATH_OVERRIDE | Memory | Override cowork memory path | None |
+| CLAUDE_COWORK_MEMORY_EXTRA_GUIDELINES | Memory | Extra guidelines for cowork memory | None |
+| CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS | Memory | Disable git-related instructions | false |
+| CLAUDE_CODE_USE_NATIVE_FILE_SEARCH | Config | Use native file search for markdown config | false |
+| CLAUDE_CODE_ATTRIBUTION_HEADER | Config | Override attribution header | None |
+| CLAUDE_CODE_BASE_REF | Git | Override git base ref for diffs | default branch |
+| CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR | Shell | Maintain project working directory in bash | false |
+| CLAUDE_CODE_SHELL | Shell | Override shell binary path | None |
+| CLAUDE_CODE_SHELL_PREFIX | Shell | Shell prefix command for MCP/hook processes | None |
+| CLAUDE_CODE_TMPDIR | Shell | Override temporary directory path | /tmp |
+| CLAUDE_CODE_GIT_BASH_PATH | Shell | Override Git Bash path (Windows) | None |
+| CLAUDE_CODE_PWSH_PARSE_TIMEOUT_MS | Shell | PowerShell parse timeout (ms) | None |
+| CLAUDE_CODE_USE_POWERSHELL_TOOL | Shell | Enable/disable PowerShell tool | Platform-dependent |
+
+## AWS-Specific Variables
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| AWS_REGION | AWS | AWS region for Bedrock | us-east-1 |
+| AWS_DEFAULT_REGION | AWS | Fallback AWS region | us-east-1 |
+| AWS_BEARER_TOKEN_BEDROCK | AWS | Bearer token for Bedrock authentication | None |
+| AWS_LAMBDA_FUNCTION_NAME | AWS | Lambda function name (platform detection) | None |
+| AWS_EXECUTION_ENV | AWS | AWS execution environment (platform detection) | None |
+
+## mTLS and Certificate Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_CLIENT_CERT | mTLS | Client certificate file path | None |
+| CLAUDE_CODE_CLIENT_KEY | mTLS | Client private key file path | None |
+| CLAUDE_CODE_CLIENT_KEY_PASSPHRASE | mTLS | Client key passphrase | None |
+
+## Plugin and Extension Configuration
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_PLUGIN_CACHE_DIR | Plugins | Override plugin cache directory | None |
+| CLAUDE_CODE_PLUGIN_SEED_DIR | Plugins | Plugin seed directory | None |
+| CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS | Plugins | Git timeout for plugin operations (ms) | None |
+| CLAUDE_CODE_PLUGIN_USE_ZIP_CACHE | Plugins | Use zip cache for plugins | false |
+| CLAUDE_CODE_USE_COWORK_PLUGINS | Plugins | Enable cowork plugins | false |
+| CLAUDE_CODE_SYNC_PLUGIN_INSTALL | Plugins | Synchronous plugin installation | false |
+| CLAUDE_CODE_SYNC_PLUGIN_INSTALL_TIMEOUT_MS | Plugins | Plugin install timeout (ms) | None |
+| CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL | Plugins | Disable marketplace auto-install | false |
+| CLAUDE_CODE_DISABLE_POLICY_SKILLS | Plugins | Disable policy-managed skills | false |
+| CLAUDE_CODE_SSE_PORT | IDE | SSE port for IDE integration | None |
+| CLAUDE_CODE_IDE_SKIP_VALID_CHECK | IDE | Skip IDE validation check | false |
+| CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL | IDE | Skip IDE extension auto-install | false |
+| CLAUDE_CODE_IDE_HOST_OVERRIDE | IDE | Override IDE host | None |
+| CLAUDE_CODE_AUTO_CONNECT_IDE | IDE | Auto-connect to IDE | false |
+
+## Compaction and Context Management
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| CLAUDE_CODE_AUTO_COMPACT_WINDOW | Compact | Auto-compact trigger window (token count) | None |
+| CLAUDE_AUTOCOMPACT_PCT_OVERRIDE | Compact | Auto-compact percentage override | None |
+| CLAUDE_CODE_BLOCKING_LIMIT_OVERRIDE | Compact | Blocking limit override for auto-compact | None |
+| CLAUDE_CODE_DISABLE_PRECOMPACT_SKIP | Compact | Disable pre-compact skip optimization | false |
+| CLAUDE_CODE_MCP_INSTR_DELTA | Compact | Enable MCP instructions delta mode | None |
+| CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES | Compact | Emit tool use summaries | None |
+
+## Miscellaneous Runtime Variables
+
+| Variable | Subsystem | Description | Default |
+|---|---|---|---|
+| USER_TYPE | Build | User type ("ant" for internal, "external" for public) | "external" |
+| NODE_ENV | Runtime | Node environment (test / development / production) | "production" |
+| CLAUDE_CODE_FORCE_SANDBOX | Sandbox | Force sandbox mode for child processes | false |
+| CLAUDE_CODE_BUBBLEWRAP | Sandbox | Enable bubblewrap sandbox | false |
+| CLAUDE_CODE_HOST_PLATFORM | Platform | Override host platform detection | process.platform |
+| CLAUDE_CODE_WORKSPACE_HOST_PATHS | Platform | Workspace host paths for telemetry | None |
+| CLAUDE_CODE_TAGS | Metadata | Session tags for telemetry | None |
+| CLAUDE_CODE_COWORKER_TYPE | Metadata | Coworker type for telemetry | None |
+| CLAUDE_INTERNAL_FC_OVERRIDES | Debug | Feature flag overrides (JSON) | None |
+| CLAUDE_CODE_GB_BASE_URL | Debug | Override GrowthBook base URL | None |
+| CLAUDE_CODE_CUSTOM_OAUTH_URL | OAuth | Custom OAuth base URL | None |
+| CLAUDE_CODE_OAUTH_CLIENT_ID | OAuth | Custom OAuth client ID | None |
+| CLAUDE_LOCAL_OAUTH_API_BASE | OAuth | Local OAuth API base URL | None |
+| CLAUDE_LOCAL_OAUTH_APPS_BASE | OAuth | Local OAuth apps base URL | None |
+| CLAUDE_LOCAL_OAUTH_CONSOLE_BASE | OAuth | Local OAuth console base URL | None |
+| CLAUDE_CODE_IDLE_THRESHOLD_MINUTES | Session | Idle threshold before auto-actions (minutes) | 75 |
+| CLAUDE_CODE_IDLE_TOKEN_THRESHOLD | Session | Token threshold for idle detection | 100000 |
+| CLAUDE_CODE_EXIT_AFTER_STOP_DELAY | Session | Delay before exit after stop (ms) | None |
+| CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS | Hooks | SessionEnd hook timeout (ms) | None |
+| CLAUDE_CODE_SAVE_HOOK_ADDITIONAL_CONTEXT | Hooks | Save hook additional context to session storage | false |
+| CLAUDE_ENABLE_STREAM_WATCHDOG | API | Enable stream idle watchdog | None |
+| CLAUDE_STREAM_IDLE_TIMEOUT_MS | API | Stream idle timeout (ms) | 90000 |
+| CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK | API | Disable non-streaming fallback | false |
+| CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS | API | Disable experimental beta features | false |
+| CLAUDE_CODE_INCLUDE_PARTIAL_MESSAGES | SDK | Include partial messages in output | false |
+| CLAUDE_CODE_RESUME_INTERRUPTED_TURN | Session | Resume an interrupted turn | None |
+| CLAUDE_CODE_SKIP_PROMPT_HISTORY | Session | Skip prompt history storage | false |
+| CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY | UI | Disable feedback surveys | false |
+| CLAUDE_FORCE_DISPLAY_SURVEY | UI | Force display of feedback survey | None |
+| CLAUDE_CODE_STALL_TIMEOUT_MS_FOR_TESTING | Testing | Stall timeout for download testing | None |
+| CLAUDE_CODE_TEST_FIXTURES_ROOT | Testing | Test fixtures root directory | cwd |
+| CLAUDE_CODE_SLOW_OPERATION_THRESHOLD_MS | Diagnostics | Threshold for slow operation logging (ms) | None |
+| CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST | Auth | Provider managed by host process | false |
+| CLAUDE_CODE_ENABLE_CFC | Chrome | Enable Claude-in-Chrome feature | None |
+| CLAUDE_CHROME_PERMISSION_MODE | Chrome | Permission mode for Chrome extension | None |
+| CLAUDE_CODE_TMUX_SESSION | UI | Tmux session name | None |
+| CLAUDE_CODE_TMUX_PREFIX | UI | Tmux prefix key | None |
+| CLAUDE_CODE_TMUX_PREFIX_CONFLICTS | UI | Whether tmux prefix conflicts with Claude | None |
+| CLAUDE_CODE_TMUX_TRUECOLOR | UI | Tmux truecolor support flag | None |
+| CLAUDE_JOB_DIR | Agent | Job directory for classifier state | None |
+| CLAUDE_REPL_MODE | Tools | REPL tool mode | None |
+| CLAUDE_MORERIGHT | UI | Enable moreright mode (ant-only) | false |
+| CLAUDE_CODE_PLAN_V2_AGENT_COUNT | Plan | Plan v2 agent count | None |
+| CLAUDE_CODE_PLAN_V2_EXPLORE_AGENT_COUNT | Plan | Plan v2 explore agent count | None |
+| CLAUDE_CODE_PLAN_MODE_INTERVIEW_PHASE | Plan | Plan mode interview phase | None |
+| CLAUDE_MOCK_HEADERLESS_429 | Testing | Mock headerless 429 responses | None |
+| CLAUDE_AFTER_LAST_COMPACT | Debug | After-last-compact flag | None |
+| CLAUDE_CODE_ENVIRONMENT_RUNNER_VERSION | Remote | Environment runner version | None |
+| CLAUDE_CODE_EAGER_FLUSH | SDK | Enable eager message flushing | false |
+
+**Source**: All variables extracted by grepping for `process.env.CLAUDE_`, `process.env.ANTHROPIC_`, and `process.env.AWS_` across the `src/` directory. Variables prefixed with `CLAUDE_CODE_` are Claude Code specific. Variables prefixed with `ANTHROPIC_` are shared with the Anthropic SDK ecosystem. Variables prefixed with `AWS_` are standard AWS SDK variables read for Bedrock integration.
+
+# Appendix I. Minimal Harness Starter Skeleton
+
+This appendix provides a self-contained TypeScript file that implements Layers 1 and 2 from the greenfield implementation ordering guide in Chapter 56. The code is a **starter skeleton -- not production code**. It is designed to be copied into a new project, run immediately, and extended incrementally by adding Layers 3-8 as described in the ordering guide.
+
+The skeleton uses the official `@anthropic-ai/sdk` package and runs under Bun, Node, or any TypeScript runtime that supports the Anthropic SDK. It demonstrates: the query loop (send messages, receive responses, dispatch tool calls, loop until done), a tool registry with three example tools (`read_file`, `write_file`, `bash`), session persistence via JSONL, stop conditions (max turns, model stop, cost limit), and basic cost tracking.
+
+To run the skeleton:
+
+```bash
+# Install the dependency
+npm install @anthropic-ai/sdk
+# or: bun add @anthropic-ai/sdk
+
+# Set your API key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Run the skeleton
+bun run minimal-harness.ts
+# or: npx tsx minimal-harness.ts
+```
+
+## The skeleton
+
+```typescript
+// minimal-harness.ts — Starter skeleton for a long-running agent harness
+// Implements Layers 1 (query loop + tool dispatch) and 2 (session persistence)
+// from the implementation ordering guide in Chapter 56.
+//
+// Starter skeleton — not production code.
+// To run: bun run minimal-harness.ts
+// Requires: @anthropic-ai/sdk package
+
+import Anthropic from "@anthropic-ai/sdk";
+import * as fs from "fs";
+import * as path from "path";
+import * as readline from "readline";
+
+// ---------------------------------------------------------------------------
+// Configuration
+// ---------------------------------------------------------------------------
+
+const MODEL = "claude-sonnet-4-20250514";
+const MAX_TOKENS_PER_TURN = 8192;
+const MAX_TURNS = 200;
+const COST_LIMIT_USD = 5.0;
+const COST_WARNING_USD = COST_LIMIT_USD * 0.8;
+const SESSION_DIR = ".sessions";
+
+// Per-model pricing (USD per million tokens). Update these as pricing changes.
+const PRICING: Record<string, { input: number; output: number }> = {
+  "claude-sonnet-4-20250514": { input: 3.0, output: 15.0 },
+  "claude-opus-4-20250514": { input: 15.0, output: 75.0 },
+  "claude-haiku-3-20250307": { input: 0.25, output: 1.25 },
+};
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+// A tool handler receives the tool input (parsed from the model's JSON) and
+// returns a string result. In a production harness, handlers would return
+// structured results with success/failure status and optional metadata.
+type ToolHandler = (input: Record<string, unknown>) => Promise<string>;
+
+// Cost tracking state. Accumulates token counts and dollar estimates
+// across all model calls in the session.
+interface CostState {
+  inputTokens: number;
+  outputTokens: number;
+  estimatedUSD: number;
+  turnCount: number;
+}
+
+// A single entry in the JSONL session log. Each line in the log file
+// is one of these records, JSON-serialized.
+interface LogEntry {
+  timestamp: string;
+  role: "user" | "assistant" | "tool_result";
+  content: unknown;
+  costSnapshot?: CostState;
+}
+
+// ---------------------------------------------------------------------------
+// Layer 2: Session persistence
+// ---------------------------------------------------------------------------
+// The session log is a JSONL file (one JSON object per line) stored in
+// the SESSION_DIR directory. Each message sent to or received from the
+// model is appended as a LogEntry. On startup, if a session ID matches
+// an existing log file, the conversation is replayed from the log.
+
+function ensureSessionDir(): void {
+  if (!fs.existsSync(SESSION_DIR)) {
+    fs.mkdirSync(SESSION_DIR, { recursive: true });
+  }
+}
+
+function sessionLogPath(sessionId: string): string {
+  return path.join(SESSION_DIR, `${sessionId}.jsonl`);
+}
+
+function appendToLog(sessionId: string, entry: LogEntry): void {
+  const logPath = sessionLogPath(sessionId);
+  fs.appendFileSync(logPath, JSON.stringify(entry) + "\n");
+}
+
+// Replay a JSONL log file into an Anthropic-compatible message array.
+// Returns the messages and the last cost snapshot (so cost tracking
+// resumes from where it left off).
+function replayLog(sessionId: string): {
+  messages: Anthropic.MessageParam[];
+  cost: CostState;
+} {
+  const logPath = sessionLogPath(sessionId);
+  const messages: Anthropic.MessageParam[] = [];
+  let cost: CostState = {
+    inputTokens: 0,
+    outputTokens: 0,
+    estimatedUSD: 0,
+    turnCount: 0,
+  };
+
+  if (!fs.existsSync(logPath)) {
+    return { messages, cost };
+  }
+
+  const lines = fs.readFileSync(logPath, "utf-8").split("\n").filter(Boolean);
+  for (const line of lines) {
+    const entry: LogEntry = JSON.parse(line);
+    if (entry.costSnapshot) {
+      cost = entry.costSnapshot;
+    }
+    if (entry.role === "user") {
+      messages.push({
+        role: "user",
+        content: entry.content as string,
+      });
+    } else if (entry.role === "assistant") {
+      messages.push({
+        role: "assistant",
+        content: entry.content as Anthropic.ContentBlock[],
+      });
+    } else if (entry.role === "tool_result") {
+      messages.push({
+        role: "user",
+        content: entry.content as Anthropic.ToolResultBlockParam[],
+      });
+    }
+  }
+
+  return { messages, cost };
+}
+
+// ---------------------------------------------------------------------------
+// Layer 1: Tool registry
+// ---------------------------------------------------------------------------
+// Each tool has a name, a JSON Schema for its input, and a handler function.
+// The registry is a plain object mapping tool names to their definitions.
+// To add a new tool, add an entry to TOOL_DEFINITIONS and TOOL_HANDLERS.
+
+// Tool definitions sent to the model. These follow the Anthropic tool schema.
+const TOOL_DEFINITIONS: Anthropic.Tool[] = [
+  {
+    name: "read_file",
+    description:
+      "Read the contents of a file at the given path. Returns the file " +
+      "content as a string, or an error message if the file does not exist.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        path: {
+          type: "string",
+          description: "Absolute or relative path to the file to read.",
+        },
+      },
+      required: ["path"],
+    },
+  },
+  {
+    name: "write_file",
+    description:
+      "Write content to a file at the given path. Creates the file if it " +
+      "does not exist. Overwrites the file if it does exist. Creates " +
+      "parent directories as needed.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        path: {
+          type: "string",
+          description: "Absolute or relative path to the file to write.",
+        },
+        content: {
+          type: "string",
+          description: "The content to write to the file.",
+        },
+      },
+      required: ["path", "content"],
+    },
+  },
+  {
+    name: "bash",
+    description:
+      "Execute a bash command and return its stdout and stderr. " +
+      "The command runs in a child process with a 30-second timeout.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        command: {
+          type: "string",
+          description: "The bash command to execute.",
+        },
+      },
+      required: ["command"],
+    },
+  },
+];
+
+// Tool handler implementations. Each handler receives the parsed input
+// object and returns a string result.
+const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  async read_file(input) {
+    const filePath = input.path as string;
+    try {
+      return fs.readFileSync(filePath, "utf-8");
+    } catch (err) {
+      return `Error reading file: ${(err as Error).message}`;
+    }
+  },
+
+  async write_file(input) {
+    const filePath = input.path as string;
+    const content = input.content as string;
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(filePath, content);
+      return `Wrote ${content.length} bytes to ${filePath}`;
+    } catch (err) {
+      return `Error writing file: ${(err as Error).message}`;
+    }
+  },
+
+  async bash(input) {
+    const command = input.command as string;
+    const { execSync } = await import("child_process");
+    try {
+      const output = execSync(command, {
+        encoding: "utf-8",
+        timeout: 30_000,
+        maxBuffer: 1024 * 1024, // 1 MB output cap
+      });
+      return output || "(no output)";
+    } catch (err) {
+      const execErr = err as { stdout?: string; stderr?: string; message: string };
+      return [
+        execErr.stdout || "",
+        execErr.stderr || "",
+        `Exit error: ${execErr.message}`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Cost tracking
+// ---------------------------------------------------------------------------
+// Reads input_tokens and output_tokens from the API response usage field,
+// multiplies by the per-model price, and accumulates into the CostState.
+// Returns the updated state and a boolean indicating whether the cost
+// limit has been exceeded.
+
+function updateCost(
+  cost: CostState,
+  usage: Anthropic.Usage,
+  model: string,
+): { cost: CostState; exceeded: boolean; warning: boolean } {
+  const pricing = PRICING[model] || { input: 3.0, output: 15.0 };
+  const inputCost = (usage.input_tokens / 1_000_000) * pricing.input;
+  const outputCost = (usage.output_tokens / 1_000_000) * pricing.output;
+
+  const updated: CostState = {
+    inputTokens: cost.inputTokens + usage.input_tokens,
+    outputTokens: cost.outputTokens + usage.output_tokens,
+    estimatedUSD: cost.estimatedUSD + inputCost + outputCost,
+    turnCount: cost.turnCount + 1,
+  };
+
+  return {
+    cost: updated,
+    exceeded: updated.estimatedUSD >= COST_LIMIT_USD,
+    warning:
+      updated.estimatedUSD >= COST_WARNING_USD &&
+      cost.estimatedUSD < COST_WARNING_USD,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Layer 1: Query loop
+// ---------------------------------------------------------------------------
+// The query loop is the core of the harness. It sends the message array
+// to the model, receives a response, checks for tool-use blocks, dispatches
+// each tool call to its handler, appends the results, and loops.
+//
+// Stop conditions:
+//   1. The model returns stop_reason "end_turn" (model is done).
+//   2. The turn count exceeds MAX_TURNS (runaway protection).
+//   3. The accumulated cost exceeds COST_LIMIT_USD (budget gate).
+
+async function queryLoop(
+  client: Anthropic,
+  sessionId: string,
+  messages: Anthropic.MessageParam[],
+  cost: CostState,
+): Promise<void> {
+  const systemPrompt =
+    "You are a helpful coding assistant. You have access to tools for " +
+    "reading files, writing files, and running bash commands. Use these " +
+    "tools to help the user with their task. When you are done, say so " +
+    "clearly and stop calling tools.";
+
+  let currentCost = cost;
+
+  while (currentCost.turnCount < MAX_TURNS) {
+    // ---- Call the model ----
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: MAX_TOKENS_PER_TURN,
+      system: systemPrompt,
+      tools: TOOL_DEFINITIONS,
+      messages,
+    });
+
+    // ---- Update cost ----
+    const costResult = updateCost(currentCost, response.usage, MODEL);
+    currentCost = costResult.cost;
+
+    if (costResult.warning) {
+      console.log(
+        `[COST WARNING] Estimated spend: $${currentCost.estimatedUSD.toFixed(4)} ` +
+          `(${((currentCost.estimatedUSD / COST_LIMIT_USD) * 100).toFixed(1)}% of limit)`,
+      );
+    }
+
+    // ---- Log the assistant message ----
+    appendToLog(sessionId, {
+      timestamp: new Date().toISOString(),
+      role: "assistant",
+      content: response.content,
+      costSnapshot: currentCost,
+    });
+
+    // ---- Append assistant message to conversation ----
+    messages.push({
+      role: "assistant",
+      content: response.content,
+    });
+
+    // ---- Print text blocks to the console ----
+    for (const block of response.content) {
+      if (block.type === "text") {
+        console.log(`\nAssistant: ${block.text}`);
+      }
+    }
+
+    // ---- Check stop conditions ----
+    if (response.stop_reason === "end_turn") {
+      console.log("\n[Session ended: model stop]");
+      break;
+    }
+
+    if (costResult.exceeded) {
+      console.log(
+        `\n[Session ended: cost limit exceeded at $${currentCost.estimatedUSD.toFixed(4)}]`,
+      );
+      break;
+    }
+
+    // ---- Dispatch tool calls ----
+    // Collect all tool_use blocks from the response and dispatch them.
+    // Results are gathered into a single tool_result message.
+    const toolUseBlocks = response.content.filter(
+      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use",
+    );
+
+    if (toolUseBlocks.length === 0) {
+      // No tool calls and no end_turn -- the model may be waiting for
+      // user input or is confused. Break to avoid an infinite loop.
+      console.log("\n[Session ended: no tool calls and no stop signal]");
+      break;
+    }
+
+    const toolResults: Anthropic.ToolResultBlockParam[] = [];
+
+    for (const toolUse of toolUseBlocks) {
+      const handler = TOOL_HANDLERS[toolUse.name];
+      let result: string;
+
+      if (!handler) {
+        result = `Error: unknown tool "${toolUse.name}"`;
+        console.log(`\n[Tool ${toolUse.name}] unknown tool`);
+      } else {
+        console.log(`\n[Tool ${toolUse.name}] dispatching...`);
+        try {
+          result = await handler(toolUse.input as Record<string, unknown>);
+        } catch (err) {
+          result = `Error executing tool: ${(err as Error).message}`;
+        }
+        // Truncate very large tool results to avoid context blowup.
+        // In production, this is where microcompact (Layer 3) would go.
+        const MAX_RESULT_LENGTH = 50_000;
+        if (result.length > MAX_RESULT_LENGTH) {
+          result =
+            result.slice(0, MAX_RESULT_LENGTH) +
+            `\n...[truncated, ${result.length - MAX_RESULT_LENGTH} bytes omitted]`;
+        }
+        console.log(
+          `[Tool ${toolUse.name}] done (${result.length} chars)`,
+        );
+      }
+
+      toolResults.push({
+        type: "tool_result",
+        tool_use_id: toolUse.id,
+        content: result,
+      });
+    }
+
+    // ---- Append tool results to conversation ----
+    const toolResultMessage: Anthropic.MessageParam = {
+      role: "user",
+      content: toolResults,
+    };
+    messages.push(toolResultMessage);
+
+    // ---- Log tool results ----
+    appendToLog(sessionId, {
+      timestamp: new Date().toISOString(),
+      role: "tool_result",
+      content: toolResults,
+      costSnapshot: currentCost,
+    });
+  }
+
+  if (currentCost.turnCount >= MAX_TURNS) {
+    console.log(`\n[Session ended: max turns (${MAX_TURNS}) reached]`);
+  }
+
+  // ---- Print session summary ----
+  console.log("\n--- Session Summary ---");
+  console.log(`  Turns: ${currentCost.turnCount}`);
+  console.log(`  Input tokens: ${currentCost.inputTokens.toLocaleString()}`);
+  console.log(`  Output tokens: ${currentCost.outputTokens.toLocaleString()}`);
+  console.log(`  Estimated cost: $${currentCost.estimatedUSD.toFixed(4)}`);
+  console.log(`  Session log: ${sessionLogPath(sessionId)}`);
+}
+
+// ---------------------------------------------------------------------------
+// Main: read user input, start or resume a session, run the loop
+// ---------------------------------------------------------------------------
+
+async function main(): Promise<void> {
+  const client = new Anthropic();
+
+  // Session ID: use HARNESS_SESSION_ID env var to resume, or generate a new one.
+  const sessionId =
+    process.env.HARNESS_SESSION_ID ||
+    `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  ensureSessionDir();
+
+  // Replay existing session if resuming.
+  const { messages, cost } = replayLog(sessionId);
+  if (messages.length > 0) {
+    console.log(
+      `Resumed session ${sessionId} (${messages.length} messages, ` +
+        `$${cost.estimatedUSD.toFixed(4)} spent so far)`,
+    );
+  } else {
+    console.log(`New session: ${sessionId}`);
+  }
+
+  // Read user prompt from stdin (single prompt, then run to completion).
+  // In a production harness, this would be a REPL loop or an API endpoint.
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const userPrompt = await new Promise<string>((resolve) => {
+    rl.question("Prompt: ", (answer) => {
+      rl.close();
+      resolve(answer);
+    });
+  });
+
+  if (!userPrompt.trim()) {
+    console.log("Empty prompt. Exiting.");
+    return;
+  }
+
+  // Append the user message to the conversation and log.
+  messages.push({ role: "user", content: userPrompt });
+  appendToLog(sessionId, {
+    timestamp: new Date().toISOString(),
+    role: "user",
+    content: userPrompt,
+  });
+
+  console.log(`\nRunning (max ${MAX_TURNS} turns, $${COST_LIMIT_USD} limit)...\n`);
+
+  await queryLoop(client, sessionId, messages, cost);
+}
+
+main().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
+});
+```
+
+## How to extend this skeleton
+
+The skeleton above is deliberately minimal. Here is how to add each subsequent layer from the ordering guide:
+
+**Adding Layer 4 (back-pressure and cost control).** The skeleton already includes basic cost tracking and a hard limit. To make it production-grade: add per-model pricing lookup from a configuration file, add spend-rate tracking (dollars per minute over a sliding window), add a diminishing-returns detector that counts consecutive tool calls that produce no new output, and wire the cost gate into a `PreToolUse` hook rather than checking it inline in the loop.
+
+**Adding Layer 3 (context management).** When the total token count approaches the model's context window, the skeleton will fail with an API error. To prevent this: add a `tokenCount` function that estimates the token count of the message array (the Anthropic SDK returns `usage.input_tokens` which can be used as a running estimate), add a microcompact pass that replaces old tool-result content with `"[result truncated]"` when the count exceeds 60% of context window, and add an autocompact pass that invokes the model with a summarization prompt when the count exceeds 80%.
+
+**Adding Layer 5 (tool permissions).** Wrap the tool dispatch in a permission check: before calling `handler(toolUse.input)`, look up the tool name in a permission table. If the permission is `deny`, return an error to the model without executing. If the permission is `ask`, prompt the user for confirmation. If the permission is `allow`, proceed. Store the permission table in a JSON configuration file that can be edited without changing code.
+
+**Adding Layer 6 (multi-agent dispatch).** Add a new tool called `dispatch_agent` that spawns a subagent: create a new `queryLoop` invocation with its own message array, its own session log (using a child session ID derived from the parent), and a cost cap that is a fraction of the parent's remaining budget. The subagent's result is returned as a tool result to the parent agent.
+
+**Adding Layer 7 (observability).** Replace the `console.log` calls with a structured event emitter. Each event should carry a timestamp, a session ID, a span ID, and a parent span ID (for multi-agent tracing). Write events to a JSONL log separate from the conversation log. At session end, compute and display: total cost, cost per tool, average tokens per turn, and wall-clock duration.
+
+**Adding Layer 8 (memory).** At session end, invoke the model with a summarization prompt: "Given this conversation, extract key facts, decisions, file paths, and lessons learned. Format as a bulleted list." Write the result to a memory file at `.sessions/{sessionId}.memory.md`. On session start, read all memory files and inject them into the system prompt as a "Previous session context" section. Cap the total memory injection at 2000 tokens to avoid crowding out the actual task.
